@@ -1,0 +1,49 @@
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.input {
+  border: 1px solid #dfdfdf;
+  border-radius: 5px;
+  padding: 8px;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.input:disabled {
+  color: #858585;
+  background-color: #d9d9d9;
+  cursor: not-allowed;
+}
+
+.input::-webkit-outer-spin-button,
+.input::-webkit-inner-spin-button {
+  -webkit-appearance: none !important;
+  margin: 0 !important;
+}
+
+.input:checked {
+  @apply bg-main-jungleGreen accent-main-jungleGreen;
+}
+
+/* Firefox */
+.input[type="number"] {
+  -moz-appearance: textfield !important;
+}
+
+.input[type="date"]::-webkit-calendar-picker-indicator {
+  position: absolute;
+  right: 10px; /* Adjust this value as needed */
+  cursor: pointer;
+}
+
+.input[type="date"] {
+  direction: rtl;
+  text-align: left !important; /* Keeps text aligned properly */
+}
+
+.input[type="date"]::-webkit-calendar-picker-indicator {
+  direction: ltr; /* Resets the icon direction */
+}
