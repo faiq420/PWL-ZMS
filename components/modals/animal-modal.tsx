@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -11,61 +11,79 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface Animal {
-  name: string
-  count: number
-  category: string
+  name: string;
+  count: number;
+  category: string;
 }
 
 interface AnimalModalProps {
-  isOpen: boolean
-  onClose: () => void
-  onSave: (animal: Animal) => void
-  animal?: Animal
-  mode: "create" | "edit" | "view"
+  isOpen: boolean;
+  onClose: () => void;
+  onSave: (animal: Animal) => void;
+  animal?: Animal;
+  mode: "create" | "edit" | "view";
+  onAdd: (animal: Animal) => void;
 }
 
-export function AnimalModal({ isOpen, onClose, onSave, animal, mode }: AnimalModalProps) {
+export function AnimalModal({
+  isOpen,
+  onClose,
+  onSave,
+  animal,
+  mode,
+  onAdd,
+}: AnimalModalProps) {
   const [formData, setFormData] = useState<Animal>(
     animal || {
       name: "",
       count: 1,
       category: "Mammals",
-    },
-  )
+    }
+  );
 
   const handleChange = (field: keyof Animal, value: string | number) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
-    }))
-  }
+    }));
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    onSave(formData)
-  }
+    e.preventDefault();
+    onSave(formData);
+  };
 
-  const isViewOnly = mode === "view"
+  const isViewOnly = mode === "view";
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>
-            {mode === "create" ? "Add New Animal" : mode === "edit" ? "Edit Animal" : "Animal Details"}
+            {mode === "create"
+              ? "Add New Animal"
+              : mode === "edit"
+              ? "Edit Animal"
+              : "Animal Details"}
           </DialogTitle>
           <DialogDescription>
             {mode === "create"
               ? "Add a new animal to the zoo collection."
               : mode === "edit"
-                ? "Edit the details of this animal."
-                : "View animal details."}
+              ? "Edit the details of this animal."
+              : "View animal details."}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
@@ -114,7 +132,9 @@ export function AnimalModal({ isOpen, onClose, onSave, animal, mode }: AnimalMod
                 type="number"
                 min="1"
                 value={formData.count}
-                onChange={(e) => handleChange("count", Number.parseInt(e.target.value))}
+                onChange={(e) =>
+                  handleChange("count", Number.parseInt(e.target.value))
+                }
                 className="col-span-3"
                 disabled={isViewOnly}
                 required
@@ -136,5 +156,5 @@ export function AnimalModal({ isOpen, onClose, onSave, animal, mode }: AnimalMod
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
