@@ -10,6 +10,7 @@
   padding: 8px;
   font-size: 12px;
   font-weight: 400;
+  @apply font-tajawal
 }
 
 .input:disabled {

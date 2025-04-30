@@ -21,6 +21,8 @@ import { InfoIcon } from "lucide-react";
 import Image from "next/image";
 import { Separator } from "@radix-ui/react-separator";
 import InputTag from "@/components/utils/FormElements/InputTag";
+import PasswordInputTag from "@/components/utils/FormElements/PasswordInputTag";
+import ButtonComp from "@/components/utils/Button";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -42,7 +44,7 @@ export default function LoginPage() {
     setTimeout(() => {
       // Simple validation
       if (email === "admin@zoosystem.com" && password === "password") {
-        router.push("/dashboard");
+        router.push("/home");
       } else {
         setError("Invalid email or password.");
       }
@@ -51,22 +53,22 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex h-full flex-col loginBg font-barlow">
+    <div className="flex h-full flex-col loginBg">
       <div className="absolute inset-0 bg-black opacity-50 z-0"></div>
       <div className="relative flex-1 h-full grid grid-cols-1 md:grid-cols-[65%_35%]">
         <div className="flex flex-col justify-center text-white p-5 space-y-4">
-          <h1 className="font-semibold tracking-tighter text-7xl leading-[80px]">
+          <h1 className="font-semibold tracking-tighter text-7xl leading-[80px] font-faustina">
             Punjab Wildlife & <br /> Parks
           </h1>
           <div className="border-b border-double border-b-white w-[30%]"></div>
-          <p className="w-full md:w-3/4 text-sm ">
+          <p className="w-full md:w-3/4 text-sm font-syne">
             The Parks and Wildlife Department of Punjab oversees three premier
             zoological facilities in the province: Lahore Zoo, Lahore Safari
             Park, and Bahawalpur Zoo. Each offers unique wildlife experiences
             that attract both domestic and international visitors.
           </p>
         </div>
-        <div className="flex-1 flex flex-col items-center justify-center bg-gradient-to-b from-white/90 via-white to-white/10 backdrop-blur-md shadow-[inset_1px_1px_4px_rgba(255,255,255,0.1),_4px_4px_12px_rgba(0,0,0,0.2)] rounded-lg m-3 space-y-9">
+        <div className="font-tajawal flex-1 flex flex-col items-center justify-center bg-gradient-to-b from-white/90 via-white to-white/10 backdrop-blur-md shadow-[inset_1px_1px_4px_rgba(255,255,255,0.1),_4px_4px_12px_rgba(0,0,0,0.2)] rounded-lg m-3 space-y-9">
           <div className="flex gap-2">
             <Image src={"/PWL_logo.png"} height={100} width={100} alt="logo" />
           </div>
@@ -87,7 +89,7 @@ export default function LoginPage() {
                 label="Email Address"
                 placeHolder="youremail@domain.com"
               />
-              <InputTag
+              <PasswordInputTag
                 name=""
                 value={password}
                 type="password"
@@ -116,7 +118,7 @@ export default function LoginPage() {
               <Button
                 onClick={handleSubmit}
                 type="submit"
-                className="w-full bg-[#422402] hover:bg-[#422402]/80 disabled:bg-[#422402]/60"
+                className="w-full text-xs font-faustina bg-[#422402] hover:bg-[#422402]/80 disabled:bg-[#422402]/60"
                 disabled={isLoading}
               >
                 {isLoading ? "Signing in..." : "Sign In"}

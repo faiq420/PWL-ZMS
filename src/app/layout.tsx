@@ -1,6 +1,14 @@
 import type React from "react";
 import type { Metadata } from "next";
-import { Barlow, DM_Sans, Inter, Poppins } from "next/font/google";
+import {
+  Barlow,
+  DM_Sans,
+  Inter,
+  Poppins,
+  Syne,
+  Faustina,
+  Tajawal,
+} from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "../../components/theme-provider";
 import { Toaster } from "../../components/toaster";
@@ -29,6 +37,27 @@ const DMSans = DM_Sans({
   display: "swap",
   variable: "--font-DMSans",
 });
+const syne = Syne({
+  weight: ["400", "500", "600", "700"],
+  style: ["normal"],
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-syne",
+});
+const faustina = Faustina({
+  weight: ["400", "500", "600", "700"],
+  style: ["normal"],
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-syne",
+});
+const tajawal = Tajawal({
+  weight: ["200", "300", "400", "500", "700"],
+  style: ["normal"],
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-tajawal",
+});
 
 export const metadata: Metadata = {
   title: "Zoo Management System",
@@ -43,13 +72,13 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${poppins.variable} ${barlow.variable} ${DMSans.variable} min-h-screen`}
+      className={`${poppins.variable} ${barlow.variable} ${DMSans.variable} ${syne.variable} ${faustina.variable} ${tajawal.variable} min-h-screen`}
     >
       <body className="flex-1 flex flex-col min-h-screen">
-        {/* <ThemeProvider attribute="class" defaultTheme="light" enableSystem> */}
-        {children}
-        <Toaster />
-        {/* </ThemeProvider> */}
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+          {children}
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );
