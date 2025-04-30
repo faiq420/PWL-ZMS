@@ -10,8 +10,11 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { changeDateFormat } from "@/Helper/DateFormats";
 import { Calendar, PawPrintIcon as Paw, Ticket, Users } from "lucide-react";
+import dynamic from "next/dynamic";
 import { use, useEffect, useState } from "react";
-import Chart from "react-apexcharts";
+// import Chart from "react-apexcharts";
+
+const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
 export default function DashboardPage() {
   const [chartParams, setChartParams] = useState<{
@@ -124,9 +127,7 @@ export default function DashboardPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">1,248</div>
-                <p className="text-xs text-muted-foreground">
-                  +12.5% from yesterday
-                </p>
+                <p className="text-xs text-muted-foreground"></p>
               </CardContent>
             </Card>
 
@@ -138,10 +139,8 @@ export default function DashboardPage() {
                 <Ticket className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">$12,234</div>
-                <p className="text-xs text-muted-foreground">
-                  +8.2% from last week
-                </p>
+                <div className="text-2xl font-bold">522,234</div>
+                <p className="text-xs text-muted-foreground"></p>
               </CardContent>
             </Card>
 
@@ -154,9 +153,7 @@ export default function DashboardPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">573</div>
-                <p className="text-xs text-muted-foreground">
-                  +2 new arrivals this month
-                </p>
+                <p className="text-xs text-muted-foreground"></p>
               </CardContent>
             </Card>
 

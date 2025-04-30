@@ -66,7 +66,7 @@ export function SideMenu() {
 
   return (
     <>
-      <div className="md:hidden flex items-center h-16 px-4 border-b z-50 bg-white">
+      <div className="md:hidden flex items-center h-16 px-4 border-b z-50 bg-white font-faustina">
         <Button
           variant="ghost"
           size="icon"
@@ -81,7 +81,7 @@ export function SideMenu() {
 
       {/* Mobile Sidebar */}
       {sidebarOpen && (
-        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm md:hidden">
+        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm md:hidden font-syne">
           <div className="fixed inset-y-0 left-0 z-50 w-3/4 max-w-xs bg-background shadow-lg">
             <div className="flex items-center justify-between h-16 px-6 border-b">
               <h2 className="font-semibold">Navigation</h2>
@@ -119,7 +119,7 @@ export function SideMenu() {
       )}
 
       {/* Desktop Sidebar */}
-      <div className="h-screen hidden border-r bg-gray-50 md:block md:w-[20vw] xl:w-[15vw]">
+      <div className="h-screen hidden border-r bg-gray-50 md:block md:w-[20vw] xl:w-[15vw] font-syne">
         <div className="flex h-full max-h-screen flex-col gap-2">
           <div className="flex h-14 items-center border-b px-4">
             <Link
