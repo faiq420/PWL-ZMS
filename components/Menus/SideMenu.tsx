@@ -58,16 +58,6 @@ const sidebarItems = [
     href: "/home/veterinary-inspection",
     icon: <Stethoscope className="h-3 w-3" />,
   },
-  {
-    title: "Reports",
-    href: "/home/reports",
-    icon: <FileText className="h-3 w-3" />,
-  },
-  {
-    title: "Settings",
-    href: "/home/settings",
-    icon: <Settings className="h-3 w-3" />,
-  },
 ];
 
 export function SideMenu() {
