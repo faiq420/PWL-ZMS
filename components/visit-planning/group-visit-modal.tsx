@@ -1,253 +1,231 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { CalendarIcon } from "lucide-react"
-import { Calendar } from "@/components/ui/calendar"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { format } from "date-fns"
-import { cn } from "../../lib/utils"
 
-export function GroupVisitModal({ isOpen, onClose, groupVisit, onSave, viewMode }) {
+export function GroupVisitModal({ isOpen, onClose, onSave, groupVisit, availableZoos }) {
   const [formData, setFormData] = useState({
-    organization: "",
-    contactPerson: "",
-    email: "",
-    phone: "",
-    groupType: "",
-    groupSize: "",
+    name: "",
     date: "",
     time: "",
-    programs: []
-  });
-
-  const [date, setDate] = useState(null);
-
-  const availablePrograms = [
-    { id: "wildlife", name: "Wildlife Conservation Workshop" },
-    { id: "adaptations", name: "Animal Adaptations Tour" },
-    { id: "ecosystem", name: "Ecosystem Exploration" },
-    { id: "behindScenes", name: "Behind-the-Scenes Experience" }
-  ];
+    groupSize: "",
+    contactPerson: "",
+    contactEmail: "",
+    contactPhone: "",
+    specialRequirements: "",
+    status: "pending",
+    zoo: "",
+  })
 
   useEffect(() => {
     if (groupVisit) {
-      setFormData(groupVisit);
-      if (groupVisit.date) {
-        setDate(new Date(groupVisit.date));
-      }
+      setFormData({
+        ...groupVisit,
+        groupSize: groupVisit.groupSize.toString(),
+      })
     } else {
       setFormData({
-        organization: "",
-        contactPerson: "",
-        email: "",
-        phone: "",
-        groupType: "",
-        groupSize: "",
+        name: "",
         date: "",
         time: "",
-        programs: []
-      });
-      setDate(null);
+        groupSize: "",
+        contactPerson: "",
+        contactEmail: "",
+        contactPhone: "",
+        specialRequirements: "",
+        status: "pending",
+        zoo: availableZoos.length > 0 ? availableZoos[0].name : "",
+      })
     }
-  }, [groupVisit, isOpen]);
+  }, [groupVisit, availableZoos])
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
+  const handleChange = (e) => {
+    const { name, value } = e.target
+    setFormData((prev) => ({ ...prev, [name]: value }))
+  }
 
   const handleSelectChange = (name, value) => {
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const handleDateChange = (newDate) => {
-    setDate(newDate);
-    setFormData(prev => ({
-      ...prev,
-      date: format(newDate, "yyyy-MM-dd")
-    }));
-  };
-
-  const handleProgramToggle = (programName) => {
-    setFormData(prev => {
-      const programs = [...prev.programs];
-      if (programs.includes(programName)) {
-        return {
-          ...prev,
-          programs: programs.filter(p => p !== programName)
-        };
-      } else {
-        return {
-          ...prev,
-          programs: [...programs, programName]
-        };
-      }
-    });
-  };
+    setFormData((prev) => ({ ...prev, [name]: value }))
+  }
 
   const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!viewMode) {
-      onSave(formData);
-    }
-    onClose();
-  };
+    e.preventDefault()
+    onSave({
+      ...formData,
+      groupSize: Number.parseInt(formData.groupSize, 10),
+      id: groupVisit?.id || undefined,
+    })
+    onClose()
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>
-            {viewMode ? "Group Visit Details" : groupVisit ? "Edit Group Visit" : "Create New Group Visit"}
-          </DialogTitle>
+          <DialogTitle>{groupVisit ? "Edit Group Visit" : "Add New Group Visit"}</DialogTitle>
+          <DialogDescription>
+            {groupVisit ? "Make changes to the group visit here." : "Create a new group visit for the zoo."}
+          </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
           <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="organization">Organization Name</Label>
-                <Input
-                  id="organization"
-                  name="organization"
-                  value={formData.organization}
-                  onChange={handleInputChange}
-                  disabled={viewMode}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="contactPerson">Contact Person</Label>
-                <Input
-                  id="contactPerson"
-                  name="contactPerson"
-                  value={formData.contactPerson}
-                  onChange={handleInputChange}
-                  disabled={viewMode}
-                  required
-                />
-              </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="name" className="text-right">
+                Group Name
+              </Label>
+              <Input
+                id="name"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                className="col-span-3"
+                required
+              />
             </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email Address</Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  disabled={viewMode}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="phone">Phone Number</Label>
-                <Input
-                  id="phone"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleInputChange}
-                  disabled={viewMode}
-                  required
-                />
-              </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="date" className="text-right">
+                Date
+              </Label>
+              <Input
+                id="date"
+                name="date"
+                type="date"
+                value={formData.date}
+                onChange={handleChange}
+                className="col-span-3"
+                required
+              />
             </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Group Type</Label>
-                <Select
-                  value={formData.groupType}
-                  onValueChange={(value) => handleSelectChange("groupType", value)}
-                  disabled={viewMode}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select group type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="school">School Group</SelectItem>
-                    <SelectItem value="college">College/University</SelectItem>
-                    <SelectItem value="corporate">Corporate Group</SelectItem>
-                    <SelectItem value="community">Community Organization</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="groupSize">Group Size</Label>
-                <Input
-                  id="groupSize"
-                  name="groupSize"
-                  type="number"
-                  min="1"
-                  value={formData.groupSize}
-                  onChange={handleInputChange}
-                  disabled={viewMode}
-                  required
-                />
-              </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="time" className="text-right">
+                Time
+              </Label>
+              <Input
+                id="time"
+                name="time"
+                type="time"
+                value={formData.time}
+                onChange={handleChange}
+                className="col-span-3"
+                required
+              />
             </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Preferred Date</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !date && "text-muted-foreground"
-                      )}
-                      disabled={viewMode}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {date ? format(date, "PPP") : "Pick a date"}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0">
-                    <Calendar
-                      mode="single"
-                      selected={date}
-                      onSelect={handleDateChange}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-              <div className="space-y-2">
-                <Label>Preferred Time</Label>
-                <Select
-                  value={formData.time}
-                  onValueChange={(value) => handleSelectChange("time", value)}
-                  disabled={viewMode}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select time" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="morning">Morning (9:00 AM - 12:00 PM)</SelectItem>
-                    <SelectItem value="afternoon">Afternoon (1:00 PM - 4:00 PM)</SelectItem>
-                    <SelectItem value="full">Full Day (9:00 AM - 4:00 PM)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="groupSize" className="text-right">
+                Group Size
+              </Label>
+              <Input
+                id="groupSize"
+                name="groupSize"
+                type="number"
+                value={formData.groupSize}
+                onChange={handleChange}
+                className="col-span-3"
+                required
+              />
             </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Preferred Programs</Label>
-              </div>
-            </div>\
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="contactPerson" className="text-right">
+                Contact Person
+              </Label>
+              <Input
+                id="contactPerson"
+                name="contactPerson"
+                value={formData.contactPerson}
+                onChange={handleChange}
+                className="col-span-3"
+                required
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="contactEmail" className="text-right">
+                Email
+              </Label>
+              <Input
+                id="contactEmail"
+                name="contactEmail"
+                type="email"
+                value={formData.contactEmail}
+                onChange={handleChange}
+                className="col-span-3"
+                required
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="contactPhone" className="text-right">
+                Phone
+              </Label>
+              <Input
+                id="contactPhone"
+                name="contactPhone"
+                value={formData.contactPhone}
+                onChange={handleChange}
+                className="col-span-3"
+                required
+              />
+            </div>
+            <div className="grid grid-cols-4 items-start gap-4">
+              <Label htmlFor="specialRequirements" className="text-right pt-2">
+                Special Requirements
+              </Label>
+              <Textarea
+                id="specialRequirements"
+                name="specialRequirements"
+                value={formData.specialRequirements}
+                onChange={handleChange}
+                className="col-span-3"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="status" className="text-right">
+                Status
+              </Label>
+              <Select value={formData.status} onValueChange={(value) => handleSelectChange("status", value)}>
+                <SelectTrigger className="col-span-3">
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="confirmed">Confirmed</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="cancelled">Cancelled</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="zoo" className="text-right">
+                Zoo
+              </Label>
+              <Select value={formData.zoo} onValueChange={(value) => handleSelectChange("zoo", value)}>
+                <SelectTrigger className="col-span-3">
+                  <SelectValue placeholder="Select zoo" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableZoos.map((zoo) => (
+                    <SelectItem key={zoo.id} value={zoo.name} disabled={zoo.status === "maintenance"}>
+                      {zoo.name} {zoo.status === "maintenance" && "(Maintenance)"}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button type="submit">{groupVisit ? "Save Changes" : "Create Group Visit"}</Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  )
+}
