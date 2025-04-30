@@ -52,33 +52,21 @@ export default function VisitPlanningPage() {
   const [availableZoos, setAvailableZoos] = useState([
     {
       id: 1,
-      name: "Central City Zoo",
-      location: "Central City",
+      name: "Lahore Zoo",
+      location: "Mall Road",
       status: "active",
     },
     {
       id: 2,
-      name: "Woodland Wildlife Park",
-      location: "Woodland County",
+      name: "Lahore Safari Park",
+      location: "Wildlife Park Road",
       status: "active",
     },
     {
       id: 3,
-      name: "Oceanview Marine World",
-      location: "Coastal Bay",
-      status: "active",
-    },
-    {
-      id: 4,
-      name: "Mountain Safari Park",
-      location: "Highland Region",
-      status: "maintenance",
-    },
-    {
-      id: 5,
-      name: "Desert Oasis Zoo",
-      location: "Sunnyvale",
-      status: "active",
+      name: "Bahawalpur Zoo",
+      location: "Circular Road",
+      status: "active", //maintenance
     },
   ]);
 
@@ -92,7 +80,7 @@ export default function VisitPlanningPage() {
       attendees: 45,
       status: "confirmed",
       type: "education",
-      zoo: "Central City Zoo",
+      zoo: "Lahore Zoo",
     },
     {
       id: 2,
@@ -102,7 +90,7 @@ export default function VisitPlanningPage() {
       attendees: 20,
       status: "pending",
       type: "corporate",
-      zoo: "Woodland Wildlife Park",
+      zoo: "Lahori Safari Park",
     },
     {
       id: 3,
@@ -112,7 +100,7 @@ export default function VisitPlanningPage() {
       attendees: 15,
       status: "confirmed",
       type: "birthday",
-      zoo: "Central City Zoo",
+      zoo: "Lahore Zoo",
     },
     {
       id: 4,
@@ -122,7 +110,7 @@ export default function VisitPlanningPage() {
       attendees: 25,
       status: "confirmed",
       type: "community",
-      zoo: "Oceanview Marine World",
+      zoo: "Bahawalpur Zoo",
     },
   ]);
 
@@ -505,7 +493,7 @@ export default function VisitPlanningPage() {
                   <div className="flex justify-between">
                     <CardTitle>{event.title}</CardTitle>
                     <div
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      className={`px-2 py-1 rounded-2xl h-6 text-xs font-medium ${
                         event.status === "confirmed"
                           ? "bg-green-100 text-green-800"
                           : event.status === "pending"
@@ -594,8 +582,8 @@ export default function VisitPlanningPage() {
                 <CardHeader className="pb-2">
                   <div className="flex justify-between">
                     <CardTitle>{visit.name}</CardTitle>
-                    <div
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    <p
+                      className={`px-2 py-1 rounded-2xl !h-4 text-xs font-medium ${
                         visit.status === "confirmed"
                           ? "bg-green-100 text-green-800"
                           : visit.status === "pending"
@@ -605,7 +593,7 @@ export default function VisitPlanningPage() {
                     >
                       {visit.status.charAt(0).toUpperCase() +
                         visit.status.slice(1)}
-                    </div>
+                    </p>
                   </div>
                   <CardDescription>
                     {visit.date} at {visit.time}

@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -9,13 +9,38 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
-export function GroupVisitModal({ isOpen, onClose, onSave, groupVisit, availableZoos }) {
+interface Props {
+  isOpen: boolean;
+  onClose: () => void;
+  groupVisit: any;
+  onSave: (groupVisit: any) => void;
+  availableZoos: {
+    id: number;
+    name: string;
+    location: string;
+    status: string;
+  }[];
+}
+
+export function GroupVisitModal({
+  isOpen,
+  onClose,
+  onSave,
+  groupVisit,
+  availableZoos,
+}: Props) {
   const [formData, setFormData] = useState({
     name: "",
     date: "",
@@ -27,14 +52,14 @@ export function GroupVisitModal({ isOpen, onClose, onSave, groupVisit, available
     specialRequirements: "",
     status: "pending",
     zoo: "",
-  })
+  });
 
   useEffect(() => {
     if (groupVisit) {
       setFormData({
         ...groupVisit,
         groupSize: groupVisit.groupSize.toString(),
-      })
+      });
     } else {
       setFormData({
         name: "",
@@ -47,36 +72,42 @@ export function GroupVisitModal({ isOpen, onClose, onSave, groupVisit, available
         specialRequirements: "",
         status: "pending",
         zoo: availableZoos.length > 0 ? availableZoos[0].name : "",
-      })
+      });
     }
-  }, [groupVisit, availableZoos])
+  }, [groupVisit, availableZoos]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
-  const handleSelectChange = (name, value) => {
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
+  const handleSelectChange = (name: string, value: string | number) => {
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
+  const handleSubmit = (e: React.ChangeEvent<HTMLFormElement>) => {
+    e.preventDefault();
     onSave({
       ...formData,
       groupSize: Number.parseInt(formData.groupSize, 10),
       id: groupVisit?.id || undefined,
-    })
-    onClose()
-  }
+    });
+    onClose();
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>{groupVisit ? "Edit Group Visit" : "Add New Group Visit"}</DialogTitle>
+          <DialogTitle>
+            {groupVisit ? "Edit Group Visit" : "Add New Group Visit"}
+          </DialogTitle>
           <DialogDescription>
-            {groupVisit ? "Make changes to the group visit here." : "Create a new group visit for the zoo."}
+            {groupVisit
+              ? "Make changes to the group visit here."
+              : "Create a new group visit for the zoo."}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
@@ -192,7 +223,10 @@ export function GroupVisitModal({ isOpen, onClose, onSave, groupVisit, available
               <Label htmlFor="status" className="text-right">
                 Status
               </Label>
-              <Select value={formData.status} onValueChange={(value) => handleSelectChange("status", value)}>
+              <Select
+                value={formData.status}
+                onValueChange={(value) => handleSelectChange("status", value)}
+              >
                 <SelectTrigger className="col-span-3">
                   <SelectValue placeholder="Select status" />
                 </SelectTrigger>
@@ -207,14 +241,22 @@ export function GroupVisitModal({ isOpen, onClose, onSave, groupVisit, available
               <Label htmlFor="zoo" className="text-right">
                 Zoo
               </Label>
-              <Select value={formData.zoo} onValueChange={(value) => handleSelectChange("zoo", value)}>
+              <Select
+                value={formData.zoo}
+                onValueChange={(value) => handleSelectChange("zoo", value)}
+              >
                 <SelectTrigger className="col-span-3">
                   <SelectValue placeholder="Select zoo" />
                 </SelectTrigger>
                 <SelectContent>
                   {availableZoos.map((zoo) => (
-                    <SelectItem key={zoo.id} value={zoo.name} disabled={zoo.status === "maintenance"}>
-                      {zoo.name} {zoo.status === "maintenance" && "(Maintenance)"}
+                    <SelectItem
+                      key={zoo.id}
+                      value={zoo.name}
+                      disabled={zoo.status === "maintenance"}
+                    >
+                      {zoo.name}{" "}
+                      {zoo.status === "maintenance" && "(Maintenance)"}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -222,10 +264,12 @@ export function GroupVisitModal({ isOpen, onClose, onSave, groupVisit, available
             </div>
           </div>
           <DialogFooter>
-            <Button type="submit">{groupVisit ? "Save Changes" : "Create Group Visit"}</Button>
+            <Button type="submit">
+              {groupVisit ? "Save Changes" : "Create Group Visit"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

@@ -19,6 +19,43 @@ body {
   }
 }
 
+/* Dark mode compatible */
+:root {
+  --scrollbar-thumb: rgba(120, 120, 120, 0.5);
+  --scrollbar-thumb-hover: rgba(120, 120, 120, 0.7);
+  --scrollbar-track: transparent;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --scrollbar-thumb: rgba(200, 200, 200, 0.5);
+    --scrollbar-thumb-hover: rgba(200, 200, 200, 0.7);
+  }
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;

@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -9,12 +9,37 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
-export function EventModal({ isOpen, onClose, onSave, event, availableZoos }) {
+interface Props {
+  isOpen: boolean;
+  onClose: () => void;
+  event: any;
+  onSave: (event: any) => void;
+  availableZoos: {
+    id: number;
+    name: string;
+    location: string;
+    status: string;
+  }[];
+}
+
+export function EventModal({
+  isOpen,
+  onClose,
+  onSave,
+  event,
+  availableZoos,
+}: Props) {
   const [formData, setFormData] = useState({
     title: "",
     date: "",
@@ -23,14 +48,14 @@ export function EventModal({ isOpen, onClose, onSave, event, availableZoos }) {
     type: "education",
     status: "pending",
     zoo: "",
-  })
+  });
 
   useEffect(() => {
     if (event) {
       setFormData({
         ...event,
         attendees: event.attendees.toString(),
-      })
+      });
     } else {
       setFormData({
         title: "",
@@ -40,28 +65,28 @@ export function EventModal({ isOpen, onClose, onSave, event, availableZoos }) {
         type: "education",
         status: "pending",
         zoo: availableZoos.length > 0 ? availableZoos[0].name : "",
-      })
+      });
     }
-  }, [event, availableZoos])
+  }, [event, availableZoos]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
+  const handleChange = (e:React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
-  const handleSelectChange = (name, value) => {
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
+  const handleSelectChange = (name: string, value: string | number) => {
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     onSave({
       ...formData,
       attendees: Number.parseInt(formData.attendees, 10),
       id: event?.id || undefined,
-    })
-    onClose()
-  }
+    });
+    onClose();
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -69,7 +94,9 @@ export function EventModal({ isOpen, onClose, onSave, event, availableZoos }) {
         <DialogHeader>
           <DialogTitle>{event ? "Edit Event" : "Add New Event"}</DialogTitle>
           <DialogDescription>
-            {event ? "Make changes to the event here." : "Create a new event for the zoo."}
+            {event
+              ? "Make changes to the event here."
+              : "Create a new event for the zoo."}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
@@ -133,7 +160,10 @@ export function EventModal({ isOpen, onClose, onSave, event, availableZoos }) {
               <Label htmlFor="type" className="text-right">
                 Type
               </Label>
-              <Select value={formData.type} onValueChange={(value) => handleSelectChange("type", value)}>
+              <Select
+                value={formData.type}
+                onValueChange={(value) => handleSelectChange("type", value)}
+              >
                 <SelectTrigger className="col-span-3">
                   <SelectValue placeholder="Select type" />
                 </SelectTrigger>
@@ -149,7 +179,10 @@ export function EventModal({ isOpen, onClose, onSave, event, availableZoos }) {
               <Label htmlFor="status" className="text-right">
                 Status
               </Label>
-              <Select value={formData.status} onValueChange={(value) => handleSelectChange("status", value)}>
+              <Select
+                value={formData.status}
+                onValueChange={(value) => handleSelectChange("status", value)}
+              >
                 <SelectTrigger className="col-span-3">
                   <SelectValue placeholder="Select status" />
                 </SelectTrigger>
@@ -164,14 +197,22 @@ export function EventModal({ isOpen, onClose, onSave, event, availableZoos }) {
               <Label htmlFor="zoo" className="text-right">
                 Zoo
               </Label>
-              <Select value={formData.zoo} onValueChange={(value) => handleSelectChange("zoo", value)}>
+              <Select
+                value={formData.zoo}
+                onValueChange={(value) => handleSelectChange("zoo", value)}
+              >
                 <SelectTrigger className="col-span-3">
                   <SelectValue placeholder="Select zoo" />
                 </SelectTrigger>
                 <SelectContent>
                   {availableZoos.map((zoo) => (
-                    <SelectItem key={zoo.id} value={zoo.name} disabled={zoo.status === "maintenance"}>
-                      {zoo.name} {zoo.status === "maintenance" && "(Maintenance)"}
+                    <SelectItem
+                      key={zoo.id}
+                      value={zoo.name}
+                      disabled={zoo.status === "maintenance"}
+                    >
+                      {zoo.name}{" "}
+                      {zoo.status === "maintenance" && "(Maintenance)"}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -179,10 +220,12 @@ export function EventModal({ isOpen, onClose, onSave, event, availableZoos }) {
             </div>
           </div>
           <DialogFooter>
-            <Button type="submit">{event ? "Save Changes" : "Create Event"}</Button>
+            <Button type="submit">
+              {event ? "Save Changes" : "Create Event"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

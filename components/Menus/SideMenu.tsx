@@ -16,57 +16,71 @@ import {
   Stethoscope,
   X,
   LogOutIcon,
+  LogOut,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
-
-const sidebarItems = [
-  {
-    title: "Dashboard",
-    href: "/home",
-    icon: <Home className="h-3 w-3" />,
-  },
-  {
-    title: "Zoo Profiles",
-    href: "/home/zoo-profiles",
-    icon: <Building className="h-3 w-3" />,
-  },
-  {
-    title: "Animal Directory",
-    href: "/home/animal-directory",
-    icon: <Paw className="h-3 w-3" />,
-  },
-  {
-    title: "Visit Planning",
-    href: "/home/visit-planning",
-    icon: <Calendar className="h-3 w-3" />,
-  },
-  {
-    title: "Digital Guide",
-    href: "/home/digital-guide",
-    icon: <Info className="h-3 w-3" />,
-  },
-  {
-    title: "Visitor Services",
-    href: "/home/visitor-services",
-    icon: <MapPin className="h-3 w-3" />,
-  },
-  {
-    title: "Veterinary Inspection",
-    href: "/home/veterinary-inspection",
-    icon: <Stethoscope className="h-3 w-3" />,
-  },
-];
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@radix-ui/react-dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 
 export function SideMenu() {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const sidebarItems = [
+    {
+      title: "Dashboard",
+      href: "/home",
+      icon: <Home className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />,
+    },
+    {
+      title: "Zoo Profiles",
+      href: "/home/zoo-profiles",
+      icon: <Building className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />,
+    },
+    {
+      title: "Animal Directory",
+      href: "/home/animal-directory",
+      icon: <Paw className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />,
+    },
+    {
+      title: "Visit Planning",
+      href: "/home/visit-planning",
+      icon: <Calendar className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />,
+    },
+    {
+      title: "Digital Guide",
+      href: "/home/digital-guide",
+      icon: <Info className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />,
+    },
+    {
+      title: "Visitor Services",
+      href: "/home/visitor-services",
+      icon: <MapPin className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />,
+    },
+    {
+      title: "Veterinary Inspection",
+      href: "/home/veterinary-inspection",
+      icon: (
+        <Stethoscope className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />
+      ),
+    },
+  ];
 
   return (
     <>
-      <div className="md:hidden flex items-center h-16 px-4 border-b z-50 bg-white font-faustina">
+      <div className="md:hidden flex items-center h-16 px-4 border-b z-50 bg-main-background font-faustina">
         <Button
           variant="ghost"
           size="icon"
@@ -76,7 +90,7 @@ export function SideMenu() {
           <Menu className="h-6 w-6" />
           <span className="sr-only">Toggle Menu</span>
         </Button>
-        <h1 className="font-semibold">Zoo Management System</h1>
+        <h1 className="font-semibold">ZMS</h1>
       </div>
 
       {/* Mobile Sidebar */}
@@ -119,17 +133,37 @@ export function SideMenu() {
       )}
 
       {/* Desktop Sidebar */}
-      <div className="h-screen hidden border-r bg-gray-50 md:block md:w-[20vw] xl:w-[15vw] font-syne">
+      <div
+        className={`h-screen hidden pt-4 bg-main-background to-transparent md:block ${
+          isCollapsed ? "md:w-[5vw]" : "md:w-[17vw]"
+        } xl:w-[10vw] font-syne transition-all duration-300 ease-in-out`}
+      >
         <div className="flex h-full max-h-screen flex-col gap-2">
-          <div className="flex h-14 items-center border-b px-4">
+          <div
+            className={`flex ${
+              isCollapsed? "flex-col":"flex-row-reverse"
+            } h-14 items-center px-4 justify-between`}
+          >
+            <button
+              onClick={() => setIsCollapsed(!isCollapsed)}
+              className="p-1 rounded-full hover:bg-gray-100"
+            >
+              {isCollapsed ? (
+                <ChevronRight size={20} />
+              ) : (
+                <ChevronLeft size={20} />
+              )}
+            </button>
             <Link
               href="/home"
               className="flex items-center gap-2 font-semibold"
             >
               <Image src={"/PWL_logo.png"} height={30} width={30} alt="Logo" />
-              <span className="uppercase tracking-tighter text-lg">
-                Zoo Management
-              </span>
+              {!isCollapsed && (
+                <span className="uppercase tracking-tighter text-4xl leading-5">
+                  ZMS
+                </span>
+              )}
             </Link>
           </div>
           <div className="flex-1 overflow-auto py-2">
@@ -139,32 +173,66 @@ export function SideMenu() {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all hover:text-main-jungleGreen",
+                    "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all hover:text-gray-900",
                     pathname === item.href
-                      ? "bg-main-jungleGreen/5 font-medium text-main-jungleGreen"
-                      : "text-muted-foreground"
+                      ? "bg-main-background/50 font-medium text-black"
+                      : "text-muted-foreground",
+                    isCollapsed ? "justify-center" : ""
                   )}
                 >
                   {item.icon}
-                  {item.title}
+                  {!isCollapsed && item.title}
                 </Link>
               ))}
             </nav>
           </div>
-          <div className="mt-auto p-4 border-t w-full">
-            <div className="flex items-center gap-3 rounded-lg px-3 py-2">
-              <div className="rounded-full bg-main-safariBrown/30 p-1">
-                <Paw className="h-4 w-4 text-main-safariBrown" />
-              </div>
-              <div className="text-sm w-full">
-                <div className="flex justify-between">
-                  <p className="font-medium">Admin User</p>
-                  <LogOutIcon className="h-5 w-5 text-red-600 bg-red-200 cursor-pointer rounded-md p-1" />
+          <div className="mt-auto pl-2 py-[6px] border-t w-full">
+            <div
+              className={`flex items-center gap-3 rounded-lg px-3 py-2 ${
+                isCollapsed ? "justify-center flex-col" : ""
+              }`}
+            >
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Avatar className={`h-8 w-8 cursor-pointer rounded-full`}>
+                    <AvatarImage
+                      src="/placeholder.svg?height=32&width=32"
+                      alt="User"
+                      className="rounded-full"
+                    />
+                    <AvatarFallback>{"Admin"}</AvatarFallback>
+                  </Avatar>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    className="text-red-500 focus:text-red-500"
+                    onClick={() => {
+                      localStorage.clear();
+                      // router.push("/");
+                    }}
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Log out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              {!isCollapsed ? (
+                <div className="text-sm flex-1">
+                  <div className="flex justify-between">
+                    <p className="font-medium">Admin User</p>
+                    <LogOut className="h-5 w-5 text-black bg-gray-300 cursor-pointer rounded-md p-1" />
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    admin@zoosystem.com
+                  </p>
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  admin@zoosystem.com
-                </p>
-              </div>
+              ) : (
+                <div className="rounded-lg flex px-2 py-1 justify-center bg-main-background/50 cursor-pointer">
+                  <LogOut className="h-5 w-5 !text-black rounded-md p-1" />
+                </div>
+              )}
             </div>
           </div>
         </div>
