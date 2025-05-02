@@ -1,8 +1,23 @@
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+"use client";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { InspectionModal } from "@/components/veterinary-inspection/inspection-modal";
 import {
   Calendar,
   Check,
@@ -14,230 +29,338 @@ import {
   Search,
   Stethoscope,
   Upload,
-} from "lucide-react"
-import Image from "next/image"
+} from "lucide-react";
+import Image from "next/image";
+import { useState } from "react";
 
 export default function VeterinaryInspectionPage() {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("all");
+  const [data, setData] = useState([
+    {
+      id: "INS-2023-001",
+      animal: "Zara",
+      species: "African Elephant",
+      inspector: "Dr. Sarah Johnson",
+      date: "2023-04-15",
+      status: "completed",
+    },
+    {
+      id: "INS-2023-002",
+      animal: "Raja",
+      species: "Bengal Tiger",
+      inspector: "Dr. Michael Chen",
+      date: "2023-04-18",
+      status: "completed",
+    },
+    {
+      id: "INS-2023-003",
+      animal: "Leo",
+      species: "African Lion",
+      inspector: "Dr. Sarah Johnson",
+      date: "2023-04-20",
+      status: "completed",
+    },
+    {
+      id: "INS-2023-004",
+      animal: "Bubbles",
+      species: "Bottlenose Dolphin",
+      inspector: "Dr. Emily Rodriguez",
+      date: "2023-04-25",
+      status: "scheduled",
+    },
+    {
+      id: "INS-2023-005",
+      animal: "Koko",
+      species: "Western Gorilla",
+      inspector: "Dr. Michael Chen",
+      date: "2023-04-10",
+      status: "overdue",
+    },
+    {
+      id: "INS-2023-006",
+      animal: "Melman",
+      species: "Reticulated Giraffe",
+      inspector: "Dr. Sarah Johnson",
+      date: "2023-04-30",
+      status: "scheduled",
+    },
+    {
+      id: "INS-2023-007",
+      animal: "Spike",
+      species: "Komodo Dragon",
+      inspector: "Dr. Emily Rodriguez",
+      date: "2023-04-05",
+      status: "completed",
+    },
+  ]);
+  const [showInspectionModal, setShowInspectionModal] = useState({
+    open: false,
+    id: "",
+    mode: "",
+  });
+  const [statuses, setStatuses] = useState([
+    { value: "completed", label: "Completed" },
+    { value: "scheduled", label: "Scheduled" },
+    { value: "overdue", label: "Overdue" },
+  ]);
+
+  const filteredData = data.filter((inspection) => {
+    const matchesSearch =
+      inspection.animal.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      inspection.species.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      inspection.id.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesStatus =
+      selectedStatus == "all" || selectedStatus == inspection.status;
+    return matchesSearch && matchesStatus;
+  });
+
   return (
-    <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold tracking-tight">Veterinary Field Inspection</h2>
-        <Button className="bg-green-700 hover:bg-green-800">
+    <>
+      <InspectionModal
+        isOpen={showInspectionModal.open}
+        id={showInspectionModal.id}
+        mode={showInspectionModal.mode}
+        onClose={() => {
+          setShowInspectionModal({
+            id: "",
+            mode: "",
+            open: false,
+          });
+        }}
+      />
+      <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-3xl font-bold tracking-tight">
+            Veterinary Field Inspection
+          </h2>
+          {/* <Button className="bg-green-700 hover:bg-green-800">
           <Plus className="mr-2 h-4 w-4" /> New Inspection
-        </Button>
-      </div>
+        </Button> */}
+        </div>
 
-      <Tabs defaultValue="inspections" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="inspections">Inspections</TabsTrigger>
-          <TabsTrigger value="health">Health Records</TabsTrigger>
-          <TabsTrigger value="enclosures">Enclosures</TabsTrigger>
-          <TabsTrigger value="reports">Reports</TabsTrigger>
-        </TabsList>
+        <Tabs defaultValue="inspections" className="space-y-4">
+          <TabsList>
+            <TabsTrigger value="inspections">Inspections</TabsTrigger>
+            {/* <TabsTrigger value="health">Health Records</TabsTrigger>
+            <TabsTrigger value="enclosures">Enclosures</TabsTrigger> */}
+            <TabsTrigger value="reports">Reports</TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="inspections" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Inspection Management</CardTitle>
-              <CardDescription>Schedule, track, and manage animal health inspections</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex flex-col sm:flex-row gap-2">
-                <div className="relative flex-1">
-                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <Input type="search" placeholder="Search inspections..." className="w-full pl-8" />
-                </div>
-                <div className="flex gap-2">
-                  <Select>
-                    <SelectTrigger className="w-[180px]">
-                      <SelectValue placeholder="All Statuses" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="scheduled">Scheduled</SelectItem>
-                      <SelectItem value="completed">Completed</SelectItem>
-                      <SelectItem value="overdue">Overdue</SelectItem>
-                      <SelectItem value="cancelled">Cancelled</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Button variant="outline">
-                    <Filter className="mr-2 h-4 w-4" /> More Filters
-                  </Button>
-                </div>
-              </div>
-
-              <div className="rounded-md border">
-                <div className="relative w-full overflow-auto">
-                  <table className="w-full caption-bottom text-sm">
-                    <thead className="[&_tr]:border-b">
-                      <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                        <th className="h-12 px-4 text-left align-middle font-medium">ID</th>
-                        <th className="h-12 px-4 text-left align-middle font-medium">Animal</th>
-                        <th className="h-12 px-4 text-left align-middle font-medium">Species</th>
-                        <th className="h-12 px-4 text-left align-middle font-medium">Inspector</th>
-                        <th className="h-12 px-4 text-left align-middle font-medium">Date</th>
-                        <th className="h-12 px-4 text-left align-middle font-medium">Status</th>
-                        <th className="h-12 px-4 text-left align-middle font-medium">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="[&_tr:last-child]:border-0">
-                      {[
-                        {
-                          id: "INS-2023-001",
-                          animal: "Zara",
-                          species: "African Elephant",
-                          inspector: "Dr. Sarah Johnson",
-                          date: "2023-04-15",
-                          status: "completed",
-                        },
-                        {
-                          id: "INS-2023-002",
-                          animal: "Raja",
-                          species: "Bengal Tiger",
-                          inspector: "Dr. Michael Chen",
-                          date: "2023-04-18",
-                          status: "completed",
-                        },
-                        {
-                          id: "INS-2023-003",
-                          animal: "Leo",
-                          species: "African Lion",
-                          inspector: "Dr. Sarah Johnson",
-                          date: "2023-04-20",
-                          status: "completed",
-                        },
-                        {
-                          id: "INS-2023-004",
-                          animal: "Bubbles",
-                          species: "Bottlenose Dolphin",
-                          inspector: "Dr. Emily Rodriguez",
-                          date: "2023-04-25",
-                          status: "scheduled",
-                        },
-                        {
-                          id: "INS-2023-005",
-                          animal: "Koko",
-                          species: "Western Gorilla",
-                          inspector: "Dr. Michael Chen",
-                          date: "2023-04-10",
-                          status: "overdue",
-                        },
-                        {
-                          id: "INS-2023-006",
-                          animal: "Melman",
-                          species: "Reticulated Giraffe",
-                          inspector: "Dr. Sarah Johnson",
-                          date: "2023-04-30",
-                          status: "scheduled",
-                        },
-                        {
-                          id: "INS-2023-007",
-                          animal: "Spike",
-                          species: "Komodo Dragon",
-                          inspector: "Dr. Emily Rodriguez",
-                          date: "2023-04-05",
-                          status: "completed",
-                        },
-                      ].map((inspection) => (
-                        <tr
-                          key={inspection.id}
-                          className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
-                        >
-                          <td className="p-4 align-middle">{inspection.id}</td>
-                          <td className="p-4 align-middle">{inspection.animal}</td>
-                          <td className="p-4 align-middle">{inspection.species}</td>
-                          <td className="p-4 align-middle">{inspection.inspector}</td>
-                          <td className="p-4 align-middle">{inspection.date}</td>
-                          <td className="p-4 align-middle">
-                            <span
-                              className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                                inspection.status === "completed"
-                                  ? "bg-green-100 text-green-800"
-                                  : inspection.status === "scheduled"
-                                    ? "bg-blue-100 text-blue-800"
-                                    : inspection.status === "overdue"
-                                      ? "bg-red-100 text-red-800"
-                                      : "bg-gray-100 text-gray-800"
-                              }`}
-                            >
-                              {inspection.status.charAt(0).toUpperCase() + inspection.status.slice(1)}
-                            </span>
-                          </td>
-                          <td className="p-4 align-middle">
-                            <div className="flex gap-2">
-                              <Button variant="outline" size="sm">
-                                View
-                              </Button>
-                              <Button variant="outline" size="sm">
-                                Edit
-                              </Button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <div className="grid gap-4 md:grid-cols-2">
+          <TabsContent value="inspections" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle>Upcoming Inspections</CardTitle>
-                <CardDescription>Scheduled inspections for the next 7 days</CardDescription>
+                <CardTitle>Inspection Management</CardTitle>
+                <CardDescription>
+                  Schedule, track, and manage animal health inspections
+                </CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {[
-                    {
-                      animal: "Bubbles",
-                      species: "Bottlenose Dolphin",
-                      date: "2023-04-25",
-                      time: "10:00 AM",
-                      inspector: "Dr. Emily Rodriguez",
-                    },
-                    {
-                      animal: "Melman",
-                      species: "Reticulated Giraffe",
-                      date: "2023-04-30",
-                      time: "2:00 PM",
-                      inspector: "Dr. Sarah Johnson",
-                    },
-                  ].map((inspection, index) => (
-                    <div key={index} className="flex gap-4 border rounded-lg p-4">
-                      <div className="flex-shrink-0 flex items-center justify-center h-12 w-12 bg-blue-100 text-blue-800 rounded-full">
-                        <Calendar className="h-6 w-6" />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="font-medium">
-                          {inspection.animal} ({inspection.species})
-                        </h3>
-                        <div className="text-sm text-muted-foreground mt-1">
-                          {inspection.date} at {inspection.time}
+              <CardContent className="space-y-4">
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <div className="relative flex-1">
+                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      type="search"
+                      placeholder="Search inspections..."
+                      className="w-full pl-8"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    <Select
+                      value={selectedStatus}
+                      onValueChange={setSelectedStatus}
+                    >
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="All Statuses" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All</SelectItem>
+                        {statuses.map((status: any, index: number) => (
+                          <SelectItem value={status.value} key={index}>
+                            {status.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div className="rounded-md border">
+                  <div className="relative w-full overflow-auto">
+                    <table className="w-full caption-bottom text-sm">
+                      <thead className="[&_tr]:border-b">
+                        <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                          <th className="h-12 px-4 text-left align-middle font-medium">
+                            ID
+                          </th>
+                          <th className="h-12 px-4 text-left align-middle font-medium">
+                            Animal
+                          </th>
+                          <th className="h-12 px-4 text-left align-middle font-medium">
+                            Species
+                          </th>
+                          <th className="h-12 px-4 text-left align-middle font-medium">
+                            Inspector
+                          </th>
+                          <th className="h-12 px-4 text-left align-middle font-medium">
+                            Date
+                          </th>
+                          <th className="h-12 px-4 text-left align-middle font-medium">
+                            Status
+                          </th>
+                          <th className="h-12 px-4 text-left align-middle font-medium">
+                            Actions
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="[&_tr:last-child]:border-0">
+                        {filteredData.map((inspection) => (
+                          <tr
+                            key={inspection.id}
+                            className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
+                          >
+                            <td className="p-4 align-middle">
+                              {inspection.id}
+                            </td>
+                            <td className="p-4 align-middle">
+                              {inspection.animal}
+                            </td>
+                            <td className="p-4 align-middle">
+                              {inspection.species}
+                            </td>
+                            <td className="p-4 align-middle">
+                              {inspection.inspector}
+                            </td>
+                            <td className="p-4 align-middle">
+                              {inspection.date}
+                            </td>
+                            <td className="p-4 align-middle">
+                              <span
+                                className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                                  inspection.status === "completed"
+                                    ? "bg-green-100 text-green-800"
+                                    : inspection.status === "scheduled"
+                                    ? "bg-blue-100 text-blue-800"
+                                    : inspection.status === "overdue"
+                                    ? "bg-red-100 text-red-800"
+                                    : "bg-gray-100 text-gray-800"
+                                }`}
+                              >
+                                {inspection.status.charAt(0).toUpperCase() +
+                                  inspection.status.slice(1)}
+                              </span>
+                            </td>
+                            <td className="p-4 align-middle">
+                              <div className="flex gap-2">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => {
+                                    setShowInspectionModal({
+                                      id: inspection.id,
+                                      mode: "view",
+                                      open: true,
+                                    });
+                                  }}
+                                >
+                                  View
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => {
+                                    setShowInspectionModal({
+                                      id: inspection.id,
+                                      mode: "edit",
+                                      open: true,
+                                    });
+                                  }}
+                                >
+                                  Edit
+                                </Button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <div className="grid gap-4">
+              {" "}
+              {/*md:grid-cols-2*/}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Upcoming Inspections</CardTitle>
+                  <CardDescription>
+                    Scheduled inspections for the next 7 days
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {[
+                      {
+                        animal: "Bubbles",
+                        species: "Bottlenose Dolphin",
+                        date: "2023-04-25",
+                        time: "10:00 AM",
+                        inspector: "Dr. Emily Rodriguez",
+                      },
+                      {
+                        animal: "Melman",
+                        species: "Reticulated Giraffe",
+                        date: "2023-04-30",
+                        time: "2:00 PM",
+                        inspector: "Dr. Sarah Johnson",
+                      },
+                    ].map((inspection, index) => (
+                      <div
+                        key={index}
+                        className="flex gap-4 border rounded-lg p-4"
+                      >
+                        <div className="flex-shrink-0 flex items-center justify-center h-12 w-12 bg-blue-100 text-blue-800 rounded-full">
+                          <Calendar className="h-6 w-6" />
                         </div>
-                        <div className="text-sm mt-1">Inspector: {inspection.inspector}</div>
-                      </div>
-                      <div className="flex-shrink-0">
+                        <div className="flex-1">
+                          <h3 className="font-medium">
+                            {inspection.animal} ({inspection.species})
+                          </h3>
+                          <div className="flex justify-between">
+                            <div className="text-sm text-muted-foreground mt-1">
+                              {inspection.date} at {inspection.time}
+                            </div>
+                            <div className="text-sm mt-1">
+                              Inspector: {inspection.inspector}
+                            </div>
+                          </div>
+                        </div>
+                        {/* <div className="flex-shrink-0">
                         <Button variant="outline" size="sm">
                           Reschedule
                         </Button>
+                      </div> */}
                       </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-              <CardFooter>
-                <Button variant="outline" className="w-full">
+                    ))}
+                  </div>
+                </CardContent>
+                <CardFooter>
+                  {/* <Button variant="outline" className="w-full">
                   <Calendar className="mr-2 h-4 w-4" /> View Full Schedule
-                </Button>
-              </CardFooter>
-            </Card>
-
-            <Card>
+                </Button> */}
+                </CardFooter>
+              </Card>
+              {/* <Card>
               <CardHeader>
                 <CardTitle>Inspection Templates</CardTitle>
-                <CardDescription>Standardized templates for different species</CardDescription>
+                <CardDescription>
+                  Standardized templates for different species
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -263,14 +386,18 @@ export default function VeterinaryInspectionPage() {
                       lastUpdated: "2023-03-15",
                     },
                   ].map((template) => (
-                    <div key={template.name} className="flex gap-4 border rounded-lg p-4">
+                    <div
+                      key={template.name}
+                      className="flex gap-4 border rounded-lg p-4"
+                    >
                       <div className="flex-shrink-0 flex items-center justify-center h-12 w-12 bg-gray-100 rounded-full">
                         <ClipboardList className="h-6 w-6 text-gray-600" />
                       </div>
                       <div className="flex-1">
                         <h3 className="font-medium">{template.name}</h3>
                         <div className="text-sm text-muted-foreground mt-1">
-                          {template.fields} fields • Last updated: {template.lastUpdated}
+                          {template.fields} fields • Last updated:{" "}
+                          {template.lastUpdated}
                         </div>
                       </div>
                       <div className="flex-shrink-0">
@@ -287,646 +414,770 @@ export default function VeterinaryInspectionPage() {
                   <Plus className="mr-2 h-4 w-4" /> Create New Template
                 </Button>
               </CardFooter>
-            </Card>
-          </div>
-        </TabsContent>
+            </Card> */}
+            </div>
+          </TabsContent>
 
-        <TabsContent value="health" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Animal Health Records</CardTitle>
-              <CardDescription>Comprehensive health records for all animals</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex flex-col sm:flex-row gap-2">
-                <div className="relative flex-1">
-                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <Input type="search" placeholder="Search animals..." className="w-full pl-8" />
+          <TabsContent value="health" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Animal Health Records</CardTitle>
+                <CardDescription>
+                  Comprehensive health records for all animals
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <div className="relative flex-1">
+                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      type="search"
+                      placeholder="Search animals..."
+                      className="w-full pl-8"
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    <Select>
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="All Species" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="mammals">Mammals</SelectItem>
+                        <SelectItem value="birds">Birds</SelectItem>
+                        <SelectItem value="reptiles">Reptiles</SelectItem>
+                        <SelectItem value="amphibians">Amphibians</SelectItem>
+                        <SelectItem value="fish">Fish</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    {/* <Button variant="outline">
+                      <Filter className="mr-2 h-4 w-4" /> More Filters
+                    </Button> */}
+                  </div>
                 </div>
-                <div className="flex gap-2">
-                  <Select>
-                    <SelectTrigger className="w-[180px]">
-                      <SelectValue placeholder="All Species" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="mammals">Mammals</SelectItem>
-                      <SelectItem value="birds">Birds</SelectItem>
-                      <SelectItem value="reptiles">Reptiles</SelectItem>
-                      <SelectItem value="amphibians">Amphibians</SelectItem>
-                      <SelectItem value="fish">Fish</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Button variant="outline">
-                    <Filter className="mr-2 h-4 w-4" /> More Filters
-                  </Button>
-                </div>
-              </div>
 
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {[
-                  {
-                    name: "Zara",
-                    id: "ANI-001",
-                    species: "African Elephant",
-                    age: "15 years",
-                    status: "healthy",
-                    lastCheck: "2023-04-15",
-                    image: "/placeholder.svg?height=200&width=200",
-                  },
-                  {
-                    name: "Raja",
-                    id: "ANI-002",
-                    species: "Bengal Tiger",
-                    age: "8 years",
-                    status: "treatment",
-                    lastCheck: "2023-04-18",
-                    image: "/placeholder.svg?height=200&width=200",
-                  },
-                  {
-                    name: "Leo",
-                    id: "ANI-003",
-                    species: "African Lion",
-                    age: "12 years",
-                    status: "healthy",
-                    lastCheck: "2023-04-20",
-                    image: "/placeholder.svg?height=200&width=200",
-                  },
-                  {
-                    name: "Bubbles",
-                    id: "ANI-004",
-                    species: "Bottlenose Dolphin",
-                    age: "10 years",
-                    status: "monitoring",
-                    lastCheck: "2023-03-25",
-                    image: "/placeholder.svg?height=200&width=200",
-                  },
-                  {
-                    name: "Koko",
-                    id: "ANI-005",
-                    species: "Western Gorilla",
-                    age: "18 years",
-                    status: "healthy",
-                    lastCheck: "2023-03-10",
-                    image: "/placeholder.svg?height=200&width=200",
-                  },
-                  {
-                    name: "Melman",
-                    id: "ANI-006",
-                    species: "Reticulated Giraffe",
-                    age: "7 years",
-                    status: "healthy",
-                    lastCheck: "2023-03-30",
-                    image: "/placeholder.svg?height=200&width=200",
-                  },
-                ].map((animal) => (
-                  <Card key={animal.id} className="overflow-hidden">
-                    <div className="relative h-40">
-                      <Image src={animal.image || "/placeholder.svg"} alt={animal.name} fill className="object-cover" />
-                      <div
-                        className={`absolute top-2 right-2 px-2 py-1 rounded-full text-xs font-medium ${
-                          animal.status === "healthy"
-                            ? "bg-green-100 text-green-800"
-                            : animal.status === "monitoring"
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {[
+                    {
+                      name: "Zara",
+                      id: "ANI-001",
+                      species: "African Elephant",
+                      age: "15 years",
+                      status: "healthy",
+                      lastCheck: "2023-04-15",
+                      image: "/placeholder.svg?height=200&width=200",
+                    },
+                    {
+                      name: "Raja",
+                      id: "ANI-002",
+                      species: "Bengal Tiger",
+                      age: "8 years",
+                      status: "treatment",
+                      lastCheck: "2023-04-18",
+                      image: "/placeholder.svg?height=200&width=200",
+                    },
+                    {
+                      name: "Leo",
+                      id: "ANI-003",
+                      species: "African Lion",
+                      age: "12 years",
+                      status: "healthy",
+                      lastCheck: "2023-04-20",
+                      image: "/placeholder.svg?height=200&width=200",
+                    },
+                    {
+                      name: "Bubbles",
+                      id: "ANI-004",
+                      species: "Bottlenose Dolphin",
+                      age: "10 years",
+                      status: "monitoring",
+                      lastCheck: "2023-03-25",
+                      image: "/placeholder.svg?height=200&width=200",
+                    },
+                    {
+                      name: "Koko",
+                      id: "ANI-005",
+                      species: "Western Gorilla",
+                      age: "18 years",
+                      status: "healthy",
+                      lastCheck: "2023-03-10",
+                      image: "/placeholder.svg?height=200&width=200",
+                    },
+                    {
+                      name: "Melman",
+                      id: "ANI-006",
+                      species: "Reticulated Giraffe",
+                      age: "7 years",
+                      status: "healthy",
+                      lastCheck: "2023-03-30",
+                      image: "/placeholder.svg?height=200&width=200",
+                    },
+                  ].map((animal) => (
+                    <Card key={animal.id} className="overflow-hidden">
+                      <div className="relative h-40">
+                        <Image
+                          src={animal.image || "/placeholder.svg"}
+                          alt={animal.name}
+                          fill
+                          className="object-cover"
+                        />
+                        <div
+                          className={`absolute top-2 right-2 px-2 py-1 rounded-full text-xs font-medium ${
+                            animal.status === "healthy"
+                              ? "bg-green-100 text-green-800"
+                              : animal.status === "monitoring"
                               ? "bg-amber-100 text-amber-800"
                               : "bg-red-100 text-red-800"
-                        }`}
-                      >
-                        {animal.status.charAt(0).toUpperCase() + animal.status.slice(1)}
-                      </div>
-                    </div>
-                    <CardHeader className="pb-2">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <CardTitle>{animal.name}</CardTitle>
-                          <CardDescription>{animal.species}</CardDescription>
-                        </div>
-                        <div className="text-sm font-medium">ID: {animal.id}</div>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="pb-2">
-                      <div className="space-y-1 text-sm">
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">Age:</span>
-                          <span>{animal.age}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">Last Check:</span>
-                          <span>{animal.lastCheck}</span>
-                        </div>
-                      </div>
-                    </CardContent>
-                    <CardFooter className="flex justify-between">
-                      <Button variant="outline" size="sm">
-                        View Records
-                      </Button>
-                      <Button variant="outline" size="sm">
-                        <Stethoscope className="h-4 w-4 mr-2" /> New Check
-                      </Button>
-                    </CardFooter>
-                  </Card>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="enclosures" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Enclosure Assessments</CardTitle>
-              <CardDescription>Monitor and manage animal enclosure conditions</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex flex-col sm:flex-row gap-2">
-                <div className="relative flex-1">
-                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <Input type="search" placeholder="Search enclosures..." className="w-full pl-8" />
-                </div>
-                <div className="flex gap-2">
-                  <Select>
-                    <SelectTrigger className="w-[180px]">
-                      <SelectValue placeholder="All Statuses" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="excellent">Excellent</SelectItem>
-                      <SelectItem value="good">Good</SelectItem>
-                      <SelectItem value="fair">Fair</SelectItem>
-                      <SelectItem value="poor">Needs Attention</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Button variant="outline">
-                    <Filter className="mr-2 h-4 w-4" /> More Filters
-                  </Button>
-                </div>
-              </div>
-
-              <div className="rounded-md border">
-                <div className="relative w-full overflow-auto">
-                  <table className="w-full caption-bottom text-sm">
-                    <thead className="[&_tr]:border-b">
-                      <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                        <th className="h-12 px-4 text-left align-middle font-medium">ID</th>
-                        <th className="h-12 px-4 text-left align-middle font-medium">Enclosure</th>
-                        <th className="h-12 px-4 text-left align-middle font-medium">Zone</th>
-                        <th className="h-12 px-4 text-left align-middle font-medium">Animals</th>
-                        <th className="h-12 px-4 text-left align-middle font-medium">Last Inspection</th>
-                        <th className="h-12 px-4 text-left align-middle font-medium">Status</th>
-                        <th className="h-12 px-4 text-left align-middle font-medium">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="[&_tr:last-child]:border-0">
-                      {[
-                        {
-                          id: "ENC-001",
-                          name: "Elephant Habitat",
-                          zone: "African Savanna",
-                          animals: "3 African Elephants",
-                          lastInspection: "2023-04-15",
-                          status: "excellent",
-                        },
-                        {
-                          id: "ENC-002",
-                          name: "Tiger Enclosure",
-                          zone: "Asian Forest",
-                          animals: "2 Bengal Tigers",
-                          lastInspection: "2023-04-18",
-                          status: "good",
-                        },
-                        {
-                          id: "ENC-003",
-                          name: "Lion Pride",
-                          zone: "African Savanna",
-                          animals: "4 African Lions",
-                          lastInspection: "2023-04-20",
-                          status: "good",
-                        },
-                        {
-                          id: "ENC-004",
-                          name: "Dolphin Pool",
-                          zone: "Marine Zone",
-                          animals: "5 Bottlenose Dolphins",
-                          lastInspection: "2023-03-25",
-                          status: "fair",
-                        },
-                        {
-                          id: "ENC-005",
-                          name: "Gorilla Habitat",
-                          zone: "Rainforest",
-                          animals: "6 Western Gorillas",
-                          lastInspection: "2023-03-10",
-                          status: "poor",
-                        },
-                        {
-                          id: "ENC-006",
-                          name: "Giraffe Yard",
-                          zone: "African Savanna",
-                          animals: "4 Reticulated Giraffes",
-                          lastInspection: "2023-03-30",
-                          status: "good",
-                        },
-                        {
-                          id: "ENC-007",
-                          name: "Reptile House",
-                          zone: "Herpetology",
-                          animals: "12 Various Reptiles",
-                          lastInspection: "2023-04-05",
-                          status: "fair",
-                        },
-                      ].map((enclosure) => (
-                        <tr
-                          key={enclosure.id}
-                          className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
-                        >
-                          <td className="p-4 align-middle">{enclosure.id}</td>
-                          <td className="p-4 align-middle">{enclosure.name}</td>
-                          <td className="p-4 align-middle">{enclosure.zone}</td>
-                          <td className="p-4 align-middle">{enclosure.animals}</td>
-                          <td className="p-4 align-middle">{enclosure.lastInspection}</td>
-                          <td className="p-4 align-middle">
-                            <span
-                              className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                                enclosure.status === "excellent"
-                                  ? "bg-green-100 text-green-800"
-                                  : enclosure.status === "good"
-                                    ? "bg-blue-100 text-blue-800"
-                                    : enclosure.status === "fair"
-                                      ? "bg-amber-100 text-amber-800"
-                                      : "bg-red-100 text-red-800"
-                              }`}
-                            >
-                              {enclosure.status.charAt(0).toUpperCase() + enclosure.status.slice(1)}
-                            </span>
-                          </td>
-                          <td className="p-4 align-middle">
-                            <div className="flex gap-2">
-                              <Button variant="outline" size="sm">
-                                View
-                              </Button>
-                              <Button variant="outline" size="sm">
-                                Inspect
-                              </Button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <div className="grid gap-4 md:grid-cols-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>Maintenance Requests</CardTitle>
-                <CardDescription>Pending maintenance for enclosures</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {[
-                    {
-                      enclosure: "Gorilla Habitat",
-                      issue: "Damaged climbing structure",
-                      priority: "high",
-                      requestedBy: "Dr. Michael Chen",
-                      requestDate: "2023-04-12",
-                    },
-                    {
-                      enclosure: "Reptile House",
-                      issue: "Temperature control malfunction",
-                      priority: "medium",
-                      requestedBy: "Dr. Emily Rodriguez",
-                      requestDate: "2023-04-08",
-                    },
-                    {
-                      enclosure: "Dolphin Pool",
-                      issue: "Water filtration system needs service",
-                      priority: "medium",
-                      requestedBy: "Dr. Emily Rodriguez",
-                      requestDate: "2023-04-02",
-                    },
-                  ].map((request, index) => (
-                    <div key={index} className="flex gap-4 border rounded-lg p-4">
-                      <div
-                        className={`flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full ${
-                          request.priority === "high"
-                            ? "bg-red-100 text-red-800"
-                            : request.priority === "medium"
-                              ? "bg-amber-100 text-amber-800"
-                              : "bg-blue-100 text-blue-800"
-                        }`}
-                      >
-                        <span className="text-xs font-bold uppercase">{request.priority.charAt(0)}</span>
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="font-medium">{request.enclosure}</h3>
-                        <p className="text-sm mt-1">{request.issue}</p>
-                        <div className="text-xs text-muted-foreground mt-2">
-                          Requested by {request.requestedBy} on {request.requestDate}
-                        </div>
-                      </div>
-                      <div className="flex-shrink-0">
-                        <Button variant="outline" size="sm">
-                          <Check className="h-4 w-4 mr-2" /> Mark Complete
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-              <CardFooter>
-                <Button variant="outline" className="w-full">
-                  <Plus className="mr-2 h-4 w-4" /> New Maintenance Request
-                </Button>
-              </CardFooter>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Environmental Monitoring</CardTitle>
-                <CardDescription>Real-time environmental conditions</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {[
-                    {
-                      enclosure: "Tropical Rainforest",
-                      temperature: "78°F",
-                      humidity: "85%",
-                      status: "optimal",
-                    },
-                    {
-                      enclosure: "Desert Habitat",
-                      temperature: "92°F",
-                      humidity: "15%",
-                      status: "optimal",
-                    },
-                    {
-                      enclosure: "Polar Zone",
-                      temperature: "34°F",
-                      humidity: "60%",
-                      status: "warning",
-                    },
-                    {
-                      enclosure: "Aquatic Tanks",
-                      temperature: "72°F",
-                      humidity: "N/A",
-                      status: "optimal",
-                    },
-                  ].map((env, index) => (
-                    <div key={index} className="border rounded-lg p-4">
-                      <div className="flex justify-between items-center">
-                        <h3 className="font-medium">{env.enclosure}</h3>
-                        <span
-                          className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                            env.status === "optimal"
-                              ? "bg-green-100 text-green-800"
-                              : env.status === "warning"
-                                ? "bg-amber-100 text-amber-800"
-                                : "bg-red-100 text-red-800"
                           }`}
                         >
-                          {env.status.charAt(0).toUpperCase() + env.status.slice(1)}
-                        </span>
-                      </div>
-                      <div className="grid grid-cols-2 gap-4 mt-2">
-                        <div>
-                          <div className="text-sm text-muted-foreground">Temperature</div>
-                          <div className="text-lg font-medium">{env.temperature}</div>
-                        </div>
-                        <div>
-                          <div className="text-sm text-muted-foreground">Humidity</div>
-                          <div className="text-lg font-medium">{env.humidity}</div>
+                          {animal.status.charAt(0).toUpperCase() +
+                            animal.status.slice(1)}
                         </div>
                       </div>
-                    </div>
+                      <CardHeader className="pb-2">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <CardTitle>{animal.name}</CardTitle>
+                            <CardDescription>{animal.species}</CardDescription>
+                          </div>
+                          <div className="text-sm font-medium">
+                            ID: {animal.id}
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="pb-2">
+                        <div className="space-y-1 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Age:</span>
+                            <span>{animal.age}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">
+                              Last Check:
+                            </span>
+                            <span>{animal.lastCheck}</span>
+                          </div>
+                        </div>
+                      </CardContent>
+                      <CardFooter className="flex justify-between">
+                        <Button variant="outline" size="sm">
+                          View Records
+                        </Button>
+                        <Button variant="outline" size="sm">
+                          <Stethoscope className="h-4 w-4 mr-2" /> New Check
+                        </Button>
+                      </CardFooter>
+                    </Card>
                   ))}
                 </div>
               </CardContent>
-              <CardFooter>
-                <Button variant="outline" className="w-full">
-                  View All Environments
-                </Button>
-              </CardFooter>
             </Card>
-          </div>
-        </TabsContent>
+          </TabsContent>
 
-        <TabsContent value="reports" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Veterinary Reports</CardTitle>
-              <CardDescription>Generate and manage veterinary reports</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Health Summary</CardTitle>
-                    <CardDescription>Overall animal health status</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <span>Healthy</span>
-                        <span className="font-medium">78%</span>
-                      </div>
-                      <div className="h-2 bg-muted rounded-full overflow-hidden">
-                        <div className="h-full bg-green-500 rounded-full" style={{ width: "78%" }} />
-                      </div>
+          <TabsContent value="enclosures" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Enclosure Assessments</CardTitle>
+                <CardDescription>
+                  Monitor and manage animal enclosure conditions
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <div className="relative flex-1">
+                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      type="search"
+                      placeholder="Search enclosures..."
+                      className="w-full pl-8"
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    <Select>
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="All Statuses" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="excellent">Excellent</SelectItem>
+                        <SelectItem value="good">Good</SelectItem>
+                        <SelectItem value="fair">Fair</SelectItem>
+                        <SelectItem value="poor">Needs Attention</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    {/* <Button variant="outline">
+                      <Filter className="mr-2 h-4 w-4" /> More Filters
+                    </Button> */}
+                  </div>
+                </div>
 
-                      <div className="flex items-center justify-between">
-                        <span>Under Monitoring</span>
-                        <span className="font-medium">15%</span>
-                      </div>
-                      <div className="h-2 bg-muted rounded-full overflow-hidden">
-                        <div className="h-full bg-amber-500 rounded-full" style={{ width: "15%" }} />
-                      </div>
+                <div className="rounded-md border">
+                  <div className="relative w-full overflow-auto">
+                    <table className="w-full caption-bottom text-sm">
+                      <thead className="[&_tr]:border-b">
+                        <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                          <th className="h-12 px-4 text-left align-middle font-medium">
+                            ID
+                          </th>
+                          <th className="h-12 px-4 text-left align-middle font-medium">
+                            Enclosure
+                          </th>
+                          <th className="h-12 px-4 text-left align-middle font-medium">
+                            Zone
+                          </th>
+                          <th className="h-12 px-4 text-left align-middle font-medium">
+                            Animals
+                          </th>
+                          <th className="h-12 px-4 text-left align-middle font-medium">
+                            Last Inspection
+                          </th>
+                          <th className="h-12 px-4 text-left align-middle font-medium">
+                            Status
+                          </th>
+                          <th className="h-12 px-4 text-left align-middle font-medium">
+                            Actions
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="[&_tr:last-child]:border-0">
+                        {[
+                          {
+                            id: "ENC-001",
+                            name: "Elephant Habitat",
+                            zone: "African Savanna",
+                            animals: "3 African Elephants",
+                            lastInspection: "2023-04-15",
+                            status: "excellent",
+                          },
+                          {
+                            id: "ENC-002",
+                            name: "Tiger Enclosure",
+                            zone: "Asian Forest",
+                            animals: "2 Bengal Tigers",
+                            lastInspection: "2023-04-18",
+                            status: "good",
+                          },
+                          {
+                            id: "ENC-003",
+                            name: "Lion Pride",
+                            zone: "African Savanna",
+                            animals: "4 African Lions",
+                            lastInspection: "2023-04-20",
+                            status: "good",
+                          },
+                          {
+                            id: "ENC-004",
+                            name: "Dolphin Pool",
+                            zone: "Marine Zone",
+                            animals: "5 Bottlenose Dolphins",
+                            lastInspection: "2023-03-25",
+                            status: "fair",
+                          },
+                          {
+                            id: "ENC-005",
+                            name: "Gorilla Habitat",
+                            zone: "Rainforest",
+                            animals: "6 Western Gorillas",
+                            lastInspection: "2023-03-10",
+                            status: "poor",
+                          },
+                          {
+                            id: "ENC-006",
+                            name: "Giraffe Yard",
+                            zone: "African Savanna",
+                            animals: "4 Reticulated Giraffes",
+                            lastInspection: "2023-03-30",
+                            status: "good",
+                          },
+                          {
+                            id: "ENC-007",
+                            name: "Reptile House",
+                            zone: "Herpetology",
+                            animals: "12 Various Reptiles",
+                            lastInspection: "2023-04-05",
+                            status: "fair",
+                          },
+                        ].map((enclosure) => (
+                          <tr
+                            key={enclosure.id}
+                            className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
+                          >
+                            <td className="p-4 align-middle">{enclosure.id}</td>
+                            <td className="p-4 align-middle">
+                              {enclosure.name}
+                            </td>
+                            <td className="p-4 align-middle">
+                              {enclosure.zone}
+                            </td>
+                            <td className="p-4 align-middle">
+                              {enclosure.animals}
+                            </td>
+                            <td className="p-4 align-middle">
+                              {enclosure.lastInspection}
+                            </td>
+                            <td className="p-4 align-middle">
+                              <span
+                                className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                                  enclosure.status === "excellent"
+                                    ? "bg-green-100 text-green-800"
+                                    : enclosure.status === "good"
+                                    ? "bg-blue-100 text-blue-800"
+                                    : enclosure.status === "fair"
+                                    ? "bg-amber-100 text-amber-800"
+                                    : "bg-red-100 text-red-800"
+                                }`}
+                              >
+                                {enclosure.status.charAt(0).toUpperCase() +
+                                  enclosure.status.slice(1)}
+                              </span>
+                            </td>
+                            <td className="p-4 align-middle">
+                              <div className="flex gap-2">
+                                <Button variant="outline" size="sm">
+                                  View
+                                </Button>
+                                <Button variant="outline" size="sm">
+                                  Inspect
+                                </Button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-                      <div className="flex items-center justify-between">
-                        <span>Under Treatment</span>
-                        <span className="font-medium">7%</span>
-                      </div>
-                      <div className="h-2 bg-muted rounded-full overflow-hidden">
-                        <div className="h-full bg-red-500 rounded-full" style={{ width: "7%" }} />
-                      </div>
-                    </div>
-                  </CardContent>
-                  <CardFooter>
-                    <Button variant="outline" className="w-full">
-                      <Download className="mr-2 h-4 w-4" /> Download Report
-                    </Button>
-                  </CardFooter>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Inspection Compliance</CardTitle>
-                    <CardDescription>Scheduled vs. completed inspections</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex flex-col items-center justify-center h-40">
-                      <div className="text-5xl font-bold text-green-600">92%</div>
-                      <div className="text-sm text-muted-foreground mt-2">Compliance Rate</div>
-                      <div className="text-xs mt-4">
-                        <span className="text-muted-foreground">Total Scheduled: </span>
-                        <span className="font-medium">125</span>
-                        <span className="text-muted-foreground ml-2">Completed: </span>
-                        <span className="font-medium">115</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                  <CardFooter>
-                    <Button variant="outline" className="w-full">
-                      <Download className="mr-2 h-4 w-4" /> Download Report
-                    </Button>
-                  </CardFooter>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Medication Usage</CardTitle>
-                    <CardDescription>Medication inventory and usage</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <span>Antibiotics</span>
-                        <span className="font-medium">32%</span>
-                      </div>
-                      <div className="h-2 bg-muted rounded-full overflow-hidden">
-                        <div className="h-full bg-blue-500 rounded-full" style={{ width: "32%" }} />
-                      </div>
-
-                      <div className="flex items-center justify-between">
-                        <span>Anti-inflammatory</span>
-                        <span className="font-medium">28%</span>
-                      </div>
-                      <div className="h-2 bg-muted rounded-full overflow-hidden">
-                        <div className="h-full bg-purple-500 rounded-full" style={{ width: "28%" }} />
-                      </div>
-
-                      <div className="flex items-center justify-between">
-                        <span>Parasiticides</span>
-                        <span className="font-medium">25%</span>
-                      </div>
-                      <div className="h-2 bg-muted rounded-full overflow-hidden">
-                        <div className="h-full bg-yellow-500 rounded-full" style={{ width: "25%" }} />
-                      </div>
-
-                      <div className="flex items-center justify-between">
-                        <span>Others</span>
-                        <span className="font-medium">15%</span>
-                      </div>
-                      <div className="h-2 bg-muted rounded-full overflow-hidden">
-                        <div className="h-full bg-gray-500 rounded-full" style={{ width: "15%" }} />
-                      </div>
-                    </div>
-                  </CardContent>
-                  <CardFooter>
-                    <Button variant="outline" className="w-full">
-                      <Download className="mr-2 h-4 w-4" /> Download Report
-                    </Button>
-                  </CardFooter>
-                </Card>
-              </div>
-
+            <div className="grid gap-4 md:grid-cols-2">
               <Card>
                 <CardHeader>
-                  <CardTitle>Generated Reports</CardTitle>
-                  <CardDescription>Recently generated and saved reports</CardDescription>
+                  <CardTitle>Maintenance Requests</CardTitle>
+                  <CardDescription>
+                    Pending maintenance for enclosures
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="rounded-md border">
-                    <div className="relative w-full overflow-auto">
-                      <table className="w-full caption-bottom text-sm">
-                        <thead className="[&_tr]:border-b">
-                          <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                            <th className="h-12 px-4 text-left align-middle font-medium">Report Name</th>
-                            <th className="h-12 px-4 text-left align-middle font-medium">Type</th>
-                            <th className="h-12 px-4 text-left align-middle font-medium">Generated By</th>
-                            <th className="h-12 px-4 text-left align-middle font-medium">Date</th>
-                            <th className="h-12 px-4 text-left align-middle font-medium">Actions</th>
-                          </tr>
-                        </thead>
-                        <tbody className="[&_tr:last-child]:border-0">
-                          {[
-                            {
-                              name: "Monthly Health Summary - April 2023",
-                              type: "Health Summary",
-                              generatedBy: "Dr. Sarah Johnson",
-                              date: "2023-04-30",
-                            },
-                            {
-                              name: "Quarterly Inspection Report - Q1 2023",
-                              type: "Inspection Report",
-                              generatedBy: "Dr. Michael Chen",
-                              date: "2023-04-15",
-                            },
-                            {
-                              name: "Medication Usage Report - April 2023",
-                              type: "Medication Report",
-                              generatedBy: "Dr. Emily Rodriguez",
-                              date: "2023-04-28",
-                            },
-                            {
-                              name: "Enclosure Condition Assessment - Q1 2023",
-                              type: "Enclosure Report",
-                              generatedBy: "Dr. Michael Chen",
-                              date: "2023-04-10",
-                            },
-                            {
-                              name: "Nutrition Analysis - April 2023",
-                              type: "Nutrition Report",
-                              generatedBy: "Dr. Sarah Johnson",
-                              date: "2023-04-25",
-                            },
-                          ].map((report, index) => (
-                            <tr
-                              key={index}
-                              className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
-                            >
-                              <td className="p-4 align-middle">
-                                <div className="flex items-center">
-                                  <FileText className="h-4 w-4 mr-2 text-muted-foreground" />
-                                  {report.name}
-                                </div>
-                              </td>
-                              <td className="p-4 align-middle">{report.type}</td>
-                              <td className="p-4 align-middle">{report.generatedBy}</td>
-                              <td className="p-4 align-middle">{report.date}</td>
-                              <td className="p-4 align-middle">
-                                <div className="flex gap-2">
-                                  <Button variant="outline" size="sm">
-                                    View
-                                  </Button>
-                                  <Button variant="outline" size="sm">
-                                    <Download className="h-4 w-4" />
-                                    <span className="sr-only">Download</span>
-                                  </Button>
-                                </div>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
+                  <div className="space-y-4">
+                    {[
+                      {
+                        enclosure: "Gorilla Habitat",
+                        issue: "Damaged climbing structure",
+                        priority: "high",
+                        requestedBy: "Dr. Michael Chen",
+                        requestDate: "2023-04-12",
+                      },
+                      {
+                        enclosure: "Reptile House",
+                        issue: "Temperature control malfunction",
+                        priority: "medium",
+                        requestedBy: "Dr. Emily Rodriguez",
+                        requestDate: "2023-04-08",
+                      },
+                      {
+                        enclosure: "Dolphin Pool",
+                        issue: "Water filtration system needs service",
+                        priority: "medium",
+                        requestedBy: "Dr. Emily Rodriguez",
+                        requestDate: "2023-04-02",
+                      },
+                    ].map((request, index) => (
+                      <div
+                        key={index}
+                        className="flex gap-4 border rounded-lg p-4"
+                      >
+                        <div
+                          className={`flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full ${
+                            request.priority === "high"
+                              ? "bg-red-100 text-red-800"
+                              : request.priority === "medium"
+                              ? "bg-amber-100 text-amber-800"
+                              : "bg-blue-100 text-blue-800"
+                          }`}
+                        >
+                          <span className="text-xs font-bold uppercase">
+                            {request.priority.charAt(0)}
+                          </span>
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-medium">{request.enclosure}</h3>
+                          <p className="text-sm mt-1">{request.issue}</p>
+                          <div className="text-xs text-muted-foreground mt-2">
+                            Requested by {request.requestedBy} on{" "}
+                            {request.requestDate}
+                          </div>
+                        </div>
+                        <div className="flex-shrink-0">
+                          <Button variant="outline" size="sm">
+                            <Check className="h-4 w-4 mr-2" /> Mark Complete
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </CardContent>
-                <CardFooter className="flex justify-between">
-                  <Button variant="outline">
-                    <Upload className="mr-2 h-4 w-4" /> Upload Report
-                  </Button>
-                  <Button className="bg-green-700 hover:bg-green-800">
-                    <Plus className="mr-2 h-4 w-4" /> Generate New Report
+                <CardFooter>
+                  <Button variant="outline" className="w-full">
+                    <Plus className="mr-2 h-4 w-4" /> New Maintenance Request
                   </Button>
                 </CardFooter>
               </Card>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-    </div>
-  )
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Environmental Monitoring</CardTitle>
+                  <CardDescription>
+                    Real-time environmental conditions
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {[
+                      {
+                        enclosure: "Tropical Rainforest",
+                        temperature: "78°F",
+                        humidity: "85%",
+                        status: "optimal",
+                      },
+                      {
+                        enclosure: "Desert Habitat",
+                        temperature: "92°F",
+                        humidity: "15%",
+                        status: "optimal",
+                      },
+                      {
+                        enclosure: "Polar Zone",
+                        temperature: "34°F",
+                        humidity: "60%",
+                        status: "warning",
+                      },
+                      {
+                        enclosure: "Aquatic Tanks",
+                        temperature: "72°F",
+                        humidity: "N/A",
+                        status: "optimal",
+                      },
+                    ].map((env, index) => (
+                      <div key={index} className="border rounded-lg p-4">
+                        <div className="flex justify-between items-center">
+                          <h3 className="font-medium">{env.enclosure}</h3>
+                          <span
+                            className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                              env.status === "optimal"
+                                ? "bg-green-100 text-green-800"
+                                : env.status === "warning"
+                                ? "bg-amber-100 text-amber-800"
+                                : "bg-red-100 text-red-800"
+                            }`}
+                          >
+                            {env.status.charAt(0).toUpperCase() +
+                              env.status.slice(1)}
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4 mt-2">
+                          <div>
+                            <div className="text-sm text-muted-foreground">
+                              Temperature
+                            </div>
+                            <div className="text-lg font-medium">
+                              {env.temperature}
+                            </div>
+                          </div>
+                          <div>
+                            <div className="text-sm text-muted-foreground">
+                              Humidity
+                            </div>
+                            <div className="text-lg font-medium">
+                              {env.humidity}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+                <CardFooter>
+                  <Button variant="outline" className="w-full">
+                    View All Environments
+                  </Button>
+                </CardFooter>
+              </Card>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="reports" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Veterinary Reports</CardTitle>
+                <CardDescription>
+                  Generate and manage veterinary reports
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg">Health Summary</CardTitle>
+                      <CardDescription>
+                        Overall animal health status
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <span>Healthy</span>
+                          <span className="font-medium">78%</span>
+                        </div>
+                        <div className="h-2 bg-muted rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-green-500 rounded-full"
+                            style={{ width: "78%" }}
+                          />
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <span>Under Monitoring</span>
+                          <span className="font-medium">15%</span>
+                        </div>
+                        <div className="h-2 bg-muted rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-amber-500 rounded-full"
+                            style={{ width: "15%" }}
+                          />
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <span>Under Treatment</span>
+                          <span className="font-medium">7%</span>
+                        </div>
+                        <div className="h-2 bg-muted rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-red-500 rounded-full"
+                            style={{ width: "7%" }}
+                          />
+                        </div>
+                      </div>
+                    </CardContent>
+                    <CardFooter>
+                      <Button variant="outline" className="w-full">
+                        <Download className="mr-2 h-4 w-4" /> Download Report
+                      </Button>
+                    </CardFooter>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg">
+                        Inspection Compliance
+                      </CardTitle>
+                      <CardDescription>
+                        Scheduled vs. completed inspections
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex flex-col items-center justify-center h-40">
+                        <div className="text-5xl font-bold text-green-600">
+                          92%
+                        </div>
+                        <div className="text-sm text-muted-foreground mt-2">
+                          Compliance Rate
+                        </div>
+                        <div className="text-xs mt-4">
+                          <span className="text-muted-foreground">
+                            Total Scheduled:{" "}
+                          </span>
+                          <span className="font-medium">125</span>
+                          <span className="text-muted-foreground ml-2">
+                            Completed:{" "}
+                          </span>
+                          <span className="font-medium">115</span>
+                        </div>
+                      </div>
+                    </CardContent>
+                    <CardFooter>
+                      <Button variant="outline" className="w-full">
+                        <Download className="mr-2 h-4 w-4" /> Download Report
+                      </Button>
+                    </CardFooter>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg">
+                        Medication Usage
+                      </CardTitle>
+                      <CardDescription>
+                        Medication inventory and usage
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <span>Antibiotics</span>
+                          <span className="font-medium">32%</span>
+                        </div>
+                        <div className="h-2 bg-muted rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-blue-500 rounded-full"
+                            style={{ width: "32%" }}
+                          />
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <span>Anti-inflammatory</span>
+                          <span className="font-medium">28%</span>
+                        </div>
+                        <div className="h-2 bg-muted rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-purple-500 rounded-full"
+                            style={{ width: "28%" }}
+                          />
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <span>Parasiticides</span>
+                          <span className="font-medium">25%</span>
+                        </div>
+                        <div className="h-2 bg-muted rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-yellow-500 rounded-full"
+                            style={{ width: "25%" }}
+                          />
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <span>Others</span>
+                          <span className="font-medium">15%</span>
+                        </div>
+                        <div className="h-2 bg-muted rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-gray-500 rounded-full"
+                            style={{ width: "15%" }}
+                          />
+                        </div>
+                      </div>
+                    </CardContent>
+                    <CardFooter>
+                      <Button variant="outline" className="w-full">
+                        <Download className="mr-2 h-4 w-4" /> Download Report
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                </div>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Generated Reports</CardTitle>
+                    <CardDescription>
+                      Recently generated and saved reports
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="rounded-md border">
+                      <div className="relative w-full overflow-auto">
+                        <table className="w-full caption-bottom text-sm">
+                          <thead className="[&_tr]:border-b">
+                            <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                              <th className="h-12 px-4 text-left align-middle font-medium">
+                                Report Name
+                              </th>
+                              <th className="h-12 px-4 text-left align-middle font-medium">
+                                Type
+                              </th>
+                              <th className="h-12 px-4 text-left align-middle font-medium">
+                                Generated By
+                              </th>
+                              <th className="h-12 px-4 text-left align-middle font-medium">
+                                Date
+                              </th>
+                              <th className="h-12 px-4 text-left align-middle font-medium">
+                                Actions
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody className="[&_tr:last-child]:border-0">
+                            {[
+                              {
+                                name: "Monthly Health Summary - April 2023",
+                                type: "Health Summary",
+                                generatedBy: "Dr. Sarah Johnson",
+                                date: "2023-04-30",
+                              },
+                              {
+                                name: "Quarterly Inspection Report - Q1 2023",
+                                type: "Inspection Report",
+                                generatedBy: "Dr. Michael Chen",
+                                date: "2023-04-15",
+                              },
+                              {
+                                name: "Medication Usage Report - April 2023",
+                                type: "Medication Report",
+                                generatedBy: "Dr. Emily Rodriguez",
+                                date: "2023-04-28",
+                              },
+                              {
+                                name: "Enclosure Condition Assessment - Q1 2023",
+                                type: "Enclosure Report",
+                                generatedBy: "Dr. Michael Chen",
+                                date: "2023-04-10",
+                              },
+                              {
+                                name: "Nutrition Analysis - April 2023",
+                                type: "Nutrition Report",
+                                generatedBy: "Dr. Sarah Johnson",
+                                date: "2023-04-25",
+                              },
+                            ].map((report, index) => (
+                              <tr
+                                key={index}
+                                className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
+                              >
+                                <td className="p-4 align-middle">
+                                  <div className="flex items-center">
+                                    <FileText className="h-4 w-4 mr-2 text-muted-foreground" />
+                                    {report.name}
+                                  </div>
+                                </td>
+                                <td className="p-4 align-middle">
+                                  {report.type}
+                                </td>
+                                <td className="p-4 align-middle">
+                                  {report.generatedBy}
+                                </td>
+                                <td className="p-4 align-middle">
+                                  {report.date}
+                                </td>
+                                <td className="p-4 align-middle">
+                                  <div className="flex gap-2">
+                                    <Button variant="outline" size="sm">
+                                      View
+                                    </Button>
+                                    <Button variant="outline" size="sm">
+                                      <Download className="h-4 w-4" />
+                                      <span className="sr-only">Download</span>
+                                    </Button>
+                                  </div>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </CardContent>
+                  <CardFooter className="flex justify-between">
+                    <Button variant="outline">
+                      <Upload className="mr-2 h-4 w-4" /> Upload Report
+                    </Button>
+                    <Button className="bg-green-700 hover:bg-green-800">
+                      <Plus className="mr-2 h-4 w-4" /> Generate New Report
+                    </Button>
+                  </CardFooter>
+                </Card>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
+    </>
+  );
 }

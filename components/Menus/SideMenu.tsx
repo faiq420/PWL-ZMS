@@ -69,18 +69,18 @@ export function SideMenu() {
     //   href: "/home/visitor-services",
     //   icon: <MapPin className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />,
     // },
-    // {
-    //   title: "Veterinary Inspection",
-    //   href: "/home/veterinary-inspection",
-    //   icon: (
-    //     <Stethoscope className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />
-    //   ),
-    // },
+    {
+      title: "Veterinary Inspection",
+      href: "/home/veterinary-inspection",
+      icon: (
+        <Stethoscope className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />
+      ),
+    },
   ];
 
   return (
     <>
-      <div className="md:hidden flex items-center h-16 px-4 border-b z-50 font-faustina bg-white">
+      <div className="md:hidden flex items-center h-16 px-4 z-50 font-faustina bg-white">
         <Button
           variant="ghost"
           size="icon"
@@ -141,7 +141,7 @@ export function SideMenu() {
         <div className="flex h-full max-h-screen flex-col gap-2">
           <div
             className={`flex ${
-              isCollapsed? "flex-col":"flex-row-reverse"
+              isCollapsed ? "flex-col" : "flex-row-reverse"
             } h-14 items-center px-4 justify-between`}
           >
             <button
@@ -166,14 +166,14 @@ export function SideMenu() {
               )}
             </Link>
           </div>
-          <div className="flex-1 overflow-auto py-2">
+          <div className="flex-1 overflow-auto flex flex-col py-2">
             <nav className="grid gap-1 px-2">
               {sidebarItems.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all hover:text-gray-900",
+                    "flex items-center h-fit gap-3 rounded-lg px-3 py-2 text-sm transition-all hover:text-gray-900",
                     pathname === item.href
                       ? "bg-main-background/50 font-medium text-black"
                       : "text-muted-foreground",
@@ -186,7 +186,7 @@ export function SideMenu() {
               ))}
             </nav>
           </div>
-          <div className="mt-auto pl-2 py-[6px] border-t w-full">
+          <div className="mt-auto pl-2 py-[6px] w-full">
             <div
               className={`flex items-center gap-3 rounded-lg px-3 py-2 ${
                 isCollapsed ? "justify-center flex-col" : ""
@@ -203,7 +203,7 @@ export function SideMenu() {
                     <AvatarFallback>{"Admin"}</AvatarFallback>
                   </Avatar>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
+                {/* <DropdownMenuContent align="end">
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
@@ -216,24 +216,29 @@ export function SideMenu() {
                     <LogOut className="mr-2 h-4 w-4" />
                     <span>Log out</span>
                   </DropdownMenuItem>
-                </DropdownMenuContent>
+                </DropdownMenuContent> */}
               </DropdownMenu>
-              {!isCollapsed ? (
+              {!isCollapsed && (
                 <div className="text-sm flex-1">
                   <div className="flex justify-between">
                     <p className="font-medium">Admin User</p>
-                    <LogOut className="h-5 w-5 text-black bg-gray-300 cursor-pointer rounded-md p-1" />
                   </div>
                   <p className="text-xs text-muted-foreground">
                     admin@zoosystem.com
                   </p>
                 </div>
-              ) : (
-                <div className="rounded-lg flex px-2 py-1 justify-center bg-main-background/50 cursor-pointer">
-                  <LogOut className="h-5 w-5 !text-black rounded-md p-1" />
-                </div>
               )}
             </div>
+            <Link
+              href={"/"}
+              className={cn(
+                "flex-1 flex items-end gap-3 rounded-lg px-5 py-2 text-sm transition-all hover:text-gray-900 text-muted-foreground space-x-3",
+                isCollapsed ? "justify-center" : ""
+              )}
+            >
+              <LogOut className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />
+              {!isCollapsed && <span>Logout</span>}
+            </Link>
           </div>
         </div>
       </div>

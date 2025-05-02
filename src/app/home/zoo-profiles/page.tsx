@@ -27,7 +27,7 @@ export default function ZooProfilesPage() {
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold tracking-tight">Zoo Profiles</h2>
+        <h2 className="text-3xl font-semibold tracking-tight font-faustina">Zoo Profiles</h2>
         {/* <Button className="bg-green-700 hover:bg-green-800">
           <Plus className="mr-2 h-4 w-4" /> Add New Zoo
         </Button> */}
@@ -129,7 +129,7 @@ export default function ZooProfilesPage() {
                 />
               </div>
             </CardContent>
-            <CardFooter className="flex justify-between">
+            <CardFooter className="flex justify-end">
               <Link href={`/home/zoo-profiles/${zoo.slug}`}>
                 <Button variant="outline" size="sm">
                   View Details
