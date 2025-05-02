@@ -58,7 +58,7 @@ export function GroupVisitModal({
     if (groupVisit) {
       setFormData({
         ...groupVisit,
-        groupSize: groupVisit.groupSize.toString(),
+        groupSize: groupVisit.groupSize,
       });
     } else {
       setFormData({
@@ -111,7 +111,7 @@ export function GroupVisitModal({
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
-          <div className="grid gap-4 py-4">
+          <div className="grid gap-4 py-4 max-h-[60vh] overflow-y-auto">
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="name" className="text-right">
                 Group Name

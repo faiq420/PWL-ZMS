@@ -8,15 +8,15 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-1 flex-col md:flex-row font-barlow">
+    <div className="flex flex-1 flex-col md:flex-row font-barlow bg-white">
       <div className="sticky top-0 md:h-screen md:block">
         <SideMenu />
       </div>
-      <main className="flex-1 h-screen shadow-2xl flex flex-col p-4 pl-0 bg-main-background">
-        <div className="flex-1 rounded-lg overflow-auto bg-white/80 border">
+      <main className="flex-1 h-screen flex flex-col p-4 pl-0 ">
+        <div className="flex-1 rounded-lg overflow-auto bg-main-background border">
           {children}
-          <Footer />
         </div>
+        <Footer />
       </main>
     </div>
   );

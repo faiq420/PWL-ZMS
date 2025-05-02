@@ -21,11 +21,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import Image from "next/image";
 
 interface Animal {
   name: string;
   count: number;
   category: string;
+  image?: string;
+  health?: string;
 }
 
 interface AnimalModalProps {
@@ -50,6 +53,8 @@ export function AnimalModal({
       name: "",
       count: 1,
       category: "Mammals",
+      image: "/placeholder.svg?height=200&width=300",
+      health: "Fit",
     }
   );
 
@@ -88,8 +93,16 @@ export function AnimalModal({
         </DialogHeader>
         <form onSubmit={handleSubmit}>
           <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="name" className="text-right">
+            <div className="relative h-48">
+              <Image
+                src={formData.image || "/placeholder.svg?height=200&width=300"}
+                alt={formData.name}
+                fill
+                className="object-cover rounded-md"
+              />
+            </div>
+            <div className="grid grid-cols-4 justify-between items-center gap-4">
+              <Label htmlFor="name" className="">
                 Name
               </Label>
               <Input
@@ -101,8 +114,8 @@ export function AnimalModal({
                 required
               />
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="category" className="text-right">
+            <div className="grid grid-cols-4 justify-between items-center gap-4">
+              <Label htmlFor="category" className="">
                 Category
               </Label>
               <Select
@@ -123,8 +136,8 @@ export function AnimalModal({
                 </SelectContent>
               </Select>
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="count" className="text-right">
+            <div className="grid grid-cols-4 justify-between items-center gap-4">
+              <Label htmlFor="count" className="">
                 Count
               </Label>
               <Input
@@ -135,6 +148,19 @@ export function AnimalModal({
                 onChange={(e) =>
                   handleChange("count", Number.parseInt(e.target.value))
                 }
+                className="col-span-3"
+                disabled={isViewOnly}
+                required
+              />
+            </div>
+            <div className="grid grid-cols-4 justify-between items-center gap-4">
+              <Label htmlFor="health" className="">
+                Health Status
+              </Label>
+              <Input
+                id="health"
+                value={formData.health}
+                onChange={(e) => handleChange("health", e.target.value)}
                 className="col-span-3"
                 disabled={isViewOnly}
                 required

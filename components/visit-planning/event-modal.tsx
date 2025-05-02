@@ -54,7 +54,7 @@ export function EventModal({
     if (event) {
       setFormData({
         ...event,
-        attendees: event.attendees.toString(),
+        attendees: event.attendees,
       });
     } else {
       setFormData({
@@ -69,7 +69,7 @@ export function EventModal({
     }
   }, [event, availableZoos]);
 
-  const handleChange = (e:React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };

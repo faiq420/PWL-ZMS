@@ -109,6 +109,11 @@ export default function AnimalDirectoryPage() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [activeTab, setActiveTab] = useState("all");
   const [animalToDelete, setAnimalToDelete] = useState<string | null>(null);
+  const [zoos, setZoos] = useState([
+    { value: "lahore-zoo", label: "Lahore Zoo" },
+    { value: "lahore-safari-park", label: "Lahore Safari Park" },
+    { value: "bahawalpur-zoo", label: "Bahawalpur Zoo" },
+  ]);
 
   const filteredAnimals = animals.filter((animal) => {
     const matchesSearch =
@@ -126,7 +131,12 @@ export default function AnimalDirectoryPage() {
           )
         : true;
 
-    return matchesSearch && matchesCategory && matchesEndangered;
+    const matchesLocation =
+      selectedCategory == "all" ||
+      animal.location.some((location) => selectedCategory == location);
+    return (
+      matchesSearch && matchesCategory && matchesEndangered && matchesLocation
+    );
   });
 
   const handleDelete = (animalId: string) => {
@@ -162,25 +172,21 @@ export default function AnimalDirectoryPage() {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        {/* <div className="flex gap-2">
+        <div className="flex gap-2">
           <Select value={selectedCategory} onValueChange={setSelectedCategory}>
             <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="All Categories" />
+              <SelectValue placeholder="All Zoos" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Categories</SelectItem>
-              <SelectItem value="mammals">Mammals</SelectItem>
-              <SelectItem value="birds">Birds</SelectItem>
-              <SelectItem value="reptiles">Reptiles</SelectItem>
-              <SelectItem value="amphibians">Amphibians</SelectItem>
-              <SelectItem value="fish">Fish</SelectItem>
-              <SelectItem value="invertebrates">Invertebrates</SelectItem>
+              <SelectItem value="all">All</SelectItem>
+              {zoos.map((zoo: any, index: number) => (
+                <SelectItem key={index} value={zoo.value}>
+                  {zoo.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
-          <Button variant="outline">
-            <Filter className="mr-2 h-4 w-4" /> More Filters
-          </Button>
-        </div> */}
+        </div>
       </div>
 
       <Tabs
@@ -240,8 +246,9 @@ export default function AnimalDirectoryPage() {
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Location:</span>
                         <span>
-                          {animal.location.length} Zoo
-                          {animal.location.length !== 1 ? "s" : ""}
+                          {/* {animal.location.length} Zoo
+                          {animal.location.length !== 1 ? "s" : ""} */}
+                          {animal.location.join(", ")}
                         </span>
                       </div>
                       <div className="flex items-center text-sm mt-2">
@@ -261,7 +268,7 @@ export default function AnimalDirectoryPage() {
                       <Eye className="mr-1 h-4 w-4" /> View
                     </Button>
                     <div className="flex space-x-2">
-                      <Button
+                      {/* <Button
                         variant="outline"
                         size="sm"
                         onClick={() =>
@@ -271,7 +278,7 @@ export default function AnimalDirectoryPage() {
                         }
                       >
                         <Edit className="mr-1 h-4 w-4" /> Edit
-                      </Button>
+                      </Button> */}
                       <Button
                         variant="outline"
                         size="sm"

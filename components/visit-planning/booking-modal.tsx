@@ -64,13 +64,17 @@ export function BookingModal({
   });
 
   const [date, setDate] = useState<string | null>(null);
-
+  const [zoos, setZoos] = useState([
+    { value: "lahore-zoo", label: "Lahore Zoo" },
+    { value: "lahore-safari-park", label: "Lahore Safari Park" },
+    { value: "bahawalpur-zoo", label: "Bahawalpur Zoo" },
+  ]);
   // Prices
   const prices = {
-    adult: 24.99,
-    child: 14.99,
-    senior: 19.99,
-    familyPack: 64.99,
+    adult: 200,
+    child: 100,
+    senior: 150,
+    familyPack: 500,
   };
 
   useEffect(() => {
@@ -244,21 +248,9 @@ export function BookingModal({
                     <SelectValue placeholder="Select a zoo" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Central City Zoo">
-                      Central City Zoo
-                    </SelectItem>
-                    <SelectItem value="Savanna Wildlife Park">
-                      Savanna Wildlife Park
-                    </SelectItem>
-                    <SelectItem value="Pacific Marine World">
-                      Pacific Marine World
-                    </SelectItem>
-                    <SelectItem value="Alpine Nature Reserve">
-                      Alpine Nature Reserve
-                    </SelectItem>
-                    <SelectItem value="Tropical Rainforest Zoo">
-                      Tropical Rainforest Zoo
-                    </SelectItem>
+                    {zoos.map((zoo: any, index: number) => (
+                      <SelectItem value={zoo.value} key={index}>{zoo.label}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -289,7 +281,7 @@ export function BookingModal({
               </div>
             </div>
 
-            <div className="space-y-2">
+            {/* <div className="space-y-2">
               <Label htmlFor="time">Visit Time</Label>
               <Input
                 id="time"
@@ -300,7 +292,7 @@ export function BookingModal({
                 disabled={viewMode}
                 required
               />
-            </div>
+            </div> */}
 
             <div className="space-y-2">
               <Label>Ticket Types</Label>
@@ -313,7 +305,7 @@ export function BookingModal({
                     </div>
                   </div>
                   <div className="flex items-center">
-                    <div className="font-medium mr-4">${prices.adult}</div>
+                    <div className="font-medium mr-4">{prices.adult}</div>
                     <div className="flex items-center space-x-2">
                       <Button
                         type="button"
@@ -357,7 +349,7 @@ export function BookingModal({
                     </div>
                   </div>
                   <div className="flex items-center">
-                    <div className="font-medium mr-4">${prices.child}</div>
+                    <div className="font-medium mr-4">{prices.child}</div>
                     <div className="flex items-center space-x-2">
                       <Button
                         type="button"
@@ -403,7 +395,7 @@ export function BookingModal({
                     </div>
                   </div>
                   <div className="flex items-center">
-                    <div className="font-medium mr-4">${prices.senior}</div>
+                    <div className="font-medium mr-4">{prices.senior}</div>
                     <div className="flex items-center space-x-2">
                       <Button
                         type="button"
@@ -449,7 +441,7 @@ export function BookingModal({
                     </div>
                   </div>
                   <div className="flex items-center">
-                    <div className="font-medium mr-4">${prices.familyPack}</div>
+                    <div className="font-medium mr-4">{prices.familyPack}</div>
                     <div className="flex items-center space-x-2">
                       <Button
                         type="button"

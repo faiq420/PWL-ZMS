@@ -212,7 +212,7 @@ export default function VisitPlanningPage() {
       totalPrice: "$120.00",
       paymentStatus: "Paid",
       bookingMethod: "Online",
-      zoo: "Central City Zoo",
+      zoo: "Lahore Zoo",
     },
     {
       id: 2,
@@ -223,7 +223,7 @@ export default function VisitPlanningPage() {
       totalPrice: "$50.00",
       paymentStatus: "Paid",
       bookingMethod: "Phone",
-      zoo: "Woodland Wildlife Park",
+      zoo: "Lahore Safari Park",
     },
     {
       id: 3,
@@ -234,7 +234,7 @@ export default function VisitPlanningPage() {
       totalPrice: "$150.00",
       paymentStatus: "Pending",
       bookingMethod: "Online",
-      zoo: "Oceanview Marine World",
+      zoo: "Lahore World",
     },
     {
       id: 4,
@@ -245,7 +245,7 @@ export default function VisitPlanningPage() {
       totalPrice: "$20.00",
       paymentStatus: "Paid",
       bookingMethod: "In Person",
-      zoo: "Desert Oasis Zoo",
+      zoo: "Bahalwalpur Zoo",
     },
   ]);
 
@@ -469,7 +469,7 @@ export default function VisitPlanningPage() {
                 placeholder="Search events..."
                 className="h-8 w-[150px] lg:w-[250px]"
               />
-              <Select defaultValue="all">
+              {/* <Select defaultValue="all">
                 <SelectTrigger className="h-8 w-[150px]">
                   <SelectValue placeholder="Filter by status" />
                 </SelectTrigger>
@@ -479,7 +479,7 @@ export default function VisitPlanningPage() {
                   <SelectItem value="pending">Pending</SelectItem>
                   <SelectItem value="cancelled">Cancelled</SelectItem>
                 </SelectContent>
-              </Select>
+              </Select> */}
             </div>
             <Button onClick={() => setEventModalOpen(true)}>
               <Plus className="mr-2 h-4 w-4" /> Add Event
@@ -488,7 +488,7 @@ export default function VisitPlanningPage() {
 
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {events.map((event) => (
-              <Card key={event.id}>
+              <Card key={event.id} className="flex flex-col">
                 <CardHeader className="pb-2">
                   <div className="flex justify-between">
                     <CardTitle>{event.title}</CardTitle>
@@ -509,7 +509,7 @@ export default function VisitPlanningPage() {
                     {event.date} at {event.time}
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="flex-1">
                   <div className="grid gap-1">
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Attendees:</span>
@@ -583,7 +583,7 @@ export default function VisitPlanningPage() {
                   <div className="flex justify-between">
                     <CardTitle>{visit.name}</CardTitle>
                     <p
-                      className={`px-2 py-1 rounded-2xl !h-4 text-xs font-medium ${
+                      className={`px-2 py-1 rounded-2xl !h-6 text-xs font-medium ${
                         visit.status === "confirmed"
                           ? "bg-green-100 text-green-800"
                           : visit.status === "pending"
@@ -744,7 +744,7 @@ export default function VisitPlanningPage() {
                 placeholder="Search bookings..."
                 className="h-8 w-[150px] lg:w-[250px]"
               />
-              <Select defaultValue="all">
+              {/* <Select defaultValue="all">
                 <SelectTrigger className="h-8 w-[150px]">
                   <SelectValue placeholder="Filter by payment" />
                 </SelectTrigger>
@@ -754,7 +754,7 @@ export default function VisitPlanningPage() {
                   <SelectItem value="pending">Pending</SelectItem>
                   <SelectItem value="refunded">Refunded</SelectItem>
                 </SelectContent>
-              </Select>
+              </Select> */}
             </div>
             <Button onClick={() => setBookingModalOpen(true)}>
               <Plus className="mr-2 h-4 w-4" /> Add Booking

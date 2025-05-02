@@ -33,7 +33,7 @@ export default function ZooProfilesPage() {
         </Button> */}
       </div>
 
-      <div className="flex items-center space-x-2">
+      {/* <div className="flex items-center space-x-2">
         <div className="relative flex-1">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
@@ -42,7 +42,7 @@ export default function ZooProfilesPage() {
             className="w-full pl-8"
           />
         </div>
-      </div>
+      </div> */}
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {[
@@ -50,7 +50,7 @@ export default function ZooProfilesPage() {
             name: "Lahore Zoo",
             location: "Lahore, Punjab, Pakistan",
             type: "Urban Wildlife",
-            image: "/placeholder.svg?height=200&width=300",
+            image: "https://zameenblog.s3.amazonaws.com/blog/wp-content/uploads/2021/03/Cover-1440x625-2.jpg",
             status: "active",
             slug: "lahore-zoo",
             description:
@@ -60,7 +60,7 @@ export default function ZooProfilesPage() {
             name: "Lahore Safari Park",
             location: "Lahore, Punjab, Pakistan",
             type: "Safari & Conservation",
-            image: "/placeholder.svg?height=200&width=300",
+            image: "https://th.bing.com/th/id/R.e967112c84d6ab332fc76717b9e719e6?rik=6S3jtZUUfJiEcg&riu=http%3a%2f%2flocallylahore.com%2fwp-content%2fuploads%2fsp12-768x333.jpg&ehk=90kBmeb3p9n97hicdZ0p8Ce4ksUZTRA7lWP7usT%2f8QQ%3d&risl=&pid=ImgRaw&r=0",
             status: "active",
             slug: "lahore-safari-park",
             description:
@@ -70,7 +70,7 @@ export default function ZooProfilesPage() {
             name: "Bahawalpur Zoo",
             location: "Bahawalpur, Punjab, Pakistan",
             type: "Historical Zoo",
-            image: "/placeholder.svg?height=200&width=300",
+            image: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiPAtR3czeDrdxYuNt34NIhDJ7t68uGAqmgSrEXxDuNByIBeBiha-xvXOwklndvWxgO0f_Hnt1FslVyLKL8ORRtISYOknzzv8x8AtB9kPFHo5lkSM_0fBhtMhUx_ZkTJW0GenRctADnzlNR/s1600/Bahawalpur20Zoo201-76-1516796494.jpg",
             status: "active",
             slug: "bahawalpur-zoo",
             description:
@@ -85,7 +85,7 @@ export default function ZooProfilesPage() {
                 fill
                 className="object-cover"
               />
-              <div
+              {/* <div
                 className={`absolute top-2 right-2 px-2 py-1 rounded-full text-xs font-medium ${
                   zoo.status === "active"
                     ? "bg-green-100 text-green-800"
@@ -99,7 +99,7 @@ export default function ZooProfilesPage() {
                   : zoo.status === "seasonal"
                   ? "Seasonal"
                   : "Maintenance"}
-              </div>
+              </div> */}
             </div>
             <CardHeader>
               <CardTitle>
@@ -135,9 +135,9 @@ export default function ZooProfilesPage() {
                   View Details
                 </Button>
               </Link>
-              <Button variant="outline" size="sm">
+              {/* <Button variant="outline" size="sm">
                 Edit
-              </Button>
+              </Button> */}
             </CardFooter>
           </Card>
         ))}

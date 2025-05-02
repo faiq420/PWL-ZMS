@@ -55,7 +55,7 @@ export function SideMenu() {
       icon: <Paw className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />,
     },
     {
-      title: "Visit Planning",
+      title: "Planned Visits",
       href: "/home/visit-planning",
       icon: <Calendar className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />,
     },
@@ -64,23 +64,23 @@ export function SideMenu() {
       href: "/home/digital-guide",
       icon: <Info className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />,
     },
-    {
-      title: "Visitor Services",
-      href: "/home/visitor-services",
-      icon: <MapPin className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />,
-    },
-    {
-      title: "Veterinary Inspection",
-      href: "/home/veterinary-inspection",
-      icon: (
-        <Stethoscope className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />
-      ),
-    },
+    // {
+    //   title: "Visitor Services",
+    //   href: "/home/visitor-services",
+    //   icon: <MapPin className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />,
+    // },
+    // {
+    //   title: "Veterinary Inspection",
+    //   href: "/home/veterinary-inspection",
+    //   icon: (
+    //     <Stethoscope className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />
+    //   ),
+    // },
   ];
 
   return (
     <>
-      <div className="md:hidden flex items-center h-16 px-4 border-b z-50 bg-main-background font-faustina">
+      <div className="md:hidden flex items-center h-16 px-4 border-b z-50 font-faustina bg-white">
         <Button
           variant="ghost"
           size="icon"
@@ -134,7 +134,7 @@ export function SideMenu() {
 
       {/* Desktop Sidebar */}
       <div
-        className={`h-screen hidden pt-4 bg-main-background to-transparent md:block ${
+        className={`h-screen hidden pt-4 bg-white md:block ${
           isCollapsed ? "md:w-[5vw]" : "md:w-[17vw]"
         } xl:w-[10vw] font-syne transition-all duration-300 ease-in-out`}
       >

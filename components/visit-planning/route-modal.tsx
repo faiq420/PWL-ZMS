@@ -97,7 +97,7 @@ const RouteModal = ({
   route,
   availableZoos,
 }: Props) => {
-  return <div>routeRouteModal</div>;
+  return <div></div>;
 };
 
 export default RouteModal;

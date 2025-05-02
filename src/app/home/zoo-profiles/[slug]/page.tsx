@@ -42,7 +42,7 @@ import { TripModal } from "@/components/modals/trip-modal";
 import { HistoryModal } from "@/components/modals/history-modal";
 import { MilestoneModal } from "@/components/modals/milestone-modal";
 // import { DeleteConfirmation } from "@/components/modals/delete-confirmation";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { DeleteConfirmation } from "@/components/modals/delete-confirmation";
 import BodyText from "@/components/utils/Headings/BodyText";
 
@@ -131,7 +131,7 @@ const zooData = {
     location: "Raiwind Road, Lahore, Punjab, Pakistan",
     established: "1982",
     imagePath:
-      "https://zameenblog.s3.amazonaws.com/blog/wp-content/uploads/2021/03/Cover-1440x625-2.jpg",
+      "https://th.bing.com/th/id/R.e967112c84d6ab332fc76717b9e719e6?rik=6S3jtZUUfJiEcg&riu=http%3a%2f%2flocallylahore.com%2fwp-content%2fuploads%2fsp12-768x333.jpg&ehk=90kBmeb3p9n97hicdZ0p8Ce4ksUZTRA7lWP7usT%2f8QQ%3d&risl=&pid=ImgRaw&r=0",
     area: "242 acres",
     description:
       "Lahore Safari Park, also known as Lahore Wildlife Park, is a large safari park located on Raiwind Road in Lahore. It offers visitors a chance to see animals in more natural settings compared to traditional zoos.",
@@ -213,7 +213,7 @@ const zooData = {
     name: "Bahawalpur Zoo",
     location: "Bahawalpur, Punjab, Pakistan",
     imagePath:
-      "https://zameenblog.s3.amazonaws.com/blog/wp-content/uploads/2021/03/Cover-1440x625-2.jpg",
+      "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiPAtR3czeDrdxYuNt34NIhDJ7t68uGAqmgSrEXxDuNByIBeBiha-xvXOwklndvWxgO0f_Hnt1FslVyLKL8ORRtISYOknzzv8x8AtB9kPFHo5lkSM_0fBhtMhUx_ZkTJW0GenRctADnzlNR/s1600/Bahawalpur20Zoo201-76-1516796494.jpg",
     established: "1942",
     area: "25 acres",
     description:
@@ -290,6 +290,7 @@ const zooData = {
 
 export default function ZooProfilePage() {
   // State for zoo data
+  const router=useRouter()
   const params = useParams();
   const slug = params?.slug;
   const [zooInfo, setZooInfo] = useState(() => {
@@ -807,14 +808,14 @@ export default function ZooProfilePage() {
                     Complete list of animals at {zooInfo.name}
                   </CardDescription>
                 </div>
-                <Button
+                {/* <Button
                   className="bg-green-700 hover:bg-green-800"
                   onClick={() =>
                     setAnimalModal({ isOpen: true, mode: "create", data: null })
                   }
                 >
                   <Paw className="mr-2 h-4 w-4" /> Add Animal
-                </Button>
+                </Button> */}
               </div>
             </CardHeader>
             <CardContent>
@@ -835,90 +836,6 @@ export default function ZooProfilePage() {
                     </Button>
                   </div>
                 </div>
-
-                <div className="rounded-md border">
-                  <div className="relative w-full overflow-auto">
-                    <table className="w-full caption-bottom text-sm">
-                      <thead className="[&_tr]:border-b">
-                        <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                          <th className="h-12 px-4 text-left align-middle font-medium">
-                            Animal Name
-                          </th>
-                          <th className="h-12 px-4 text-left align-middle font-medium">
-                            Category
-                          </th>
-                          <th className="h-12 px-4 text-left align-middle font-medium">
-                            Count
-                          </th>
-                          <th className="h-12 px-4 text-right align-middle font-medium">
-                            Actions
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="[&_tr:last-child]:border-0">
-                        {zooInfo.animals.map((animal: any, index: number) => (
-                          <tr
-                            key={index}
-                            className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
-                          >
-                            <td className="p-4 align-middle font-medium">
-                              {animal.name}
-                            </td>
-                            <td className="p-4 align-middle">
-                              {animal.category}
-                            </td>
-                            <td className="p-4 align-middle">{animal.count}</td>
-                            <td className="p-4 align-middle text-right">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() =>
-                                  setAnimalModal({
-                                    isOpen: true,
-                                    mode: "view",
-                                    data: { animal, index },
-                                  })
-                                }
-                              >
-                                <Eye className="h-4 w-4 mr-2" /> View
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() =>
-                                  setAnimalModal({
-                                    isOpen: true,
-                                    mode: "edit",
-                                    data: { animal, index },
-                                  })
-                                }
-                              >
-                                <Edit className="h-4 w-4 mr-2" /> Edit
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="text-red-500"
-                                onClick={() =>
-                                  setDeleteConfirmation({
-                                    isOpen: true,
-                                    type: "animal",
-                                    index,
-                                    title: "Delete Animal",
-                                    description: `Are you sure you want to delete ${animal.name} from the animal directory? This action cannot be undone.`,
-                                  })
-                                }
-                              >
-                                <Trash2 className="h-4 w-4 mr-2" /> Delete
-                              </Button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-
                 <div className="grid gap-4 md:grid-cols-3">
                   <Card>
                     <CardHeader className="pb-2">
@@ -995,6 +912,89 @@ export default function ZooProfilePage() {
                       </p>
                     </CardContent>
                   </Card>
+                </div>
+                <div className="rounded-md border">
+                  <div className="relative w-full overflow-auto">
+                    <table className="w-full caption-bottom text-sm">
+                      <thead className="[&_tr]:border-b">
+                        <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                          <th className="h-12 px-4 text-left align-middle font-medium">
+                            Animal Name
+                          </th>
+                          <th className="h-12 px-4 text-left align-middle font-medium">
+                            Category
+                          </th>
+                          <th className="h-12 px-4 text-left align-middle font-medium">
+                            Count
+                          </th>
+                          <th className="h-12 px-4 text-right align-middle font-medium">
+                            Actions
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="[&_tr:last-child]:border-0">
+                        {zooInfo.animals.map((animal: any, index: number) => (
+                          <tr
+                            key={index}
+                            className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
+                          >
+                            <td className="p-4 align-middle font-medium">
+                              {animal.name}
+                            </td>
+                            <td className="p-4 align-middle">
+                              {animal.category}
+                            </td>
+                            <td className="p-4 align-middle">{animal.count}</td>
+                            <td className="p-4 align-middle text-right">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() =>
+                                  // setAnimalModal({
+                                  //   isOpen: true,
+                                  //   mode: "view",
+                                  //   data: { animal, index },
+                                  // })
+                                  router.push('/home/animal-directory/bengal-tiger')
+                                }
+                              >
+                                <Eye className="h-4 w-4 mr-2" /> View
+                              </Button>
+                              {/* <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() =>
+                                  setAnimalModal({
+                                    isOpen: true,
+                                    mode: "edit",
+                                    data: { animal, index },
+                                  })
+                                }
+                              >
+                                <Edit className="h-4 w-4 mr-2" /> Edit
+                              </Button> */}
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-red-500"
+                                onClick={() =>
+                                  setDeleteConfirmation({
+                                    isOpen: true,
+                                    type: "animal",
+                                    index,
+                                    title: "Delete Animal",
+                                    description: `Are you sure you want to delete ${animal.name} from the animal directory? This action cannot be undone.`,
+                                  })
+                                }
+                              >
+                                <Trash2 className="h-4 w-4 mr-2" /> Delete
+                              </Button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
             </CardContent>

@@ -146,111 +146,70 @@ export default function DashboardPage() {
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 py-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold tracking-tight uppercase">Dashboard</h2>
-      </div>
+  <div className="flex items-center justify-between">
+    <h2 className="text-xl font-bold tracking-tight uppercase ">Dashboard</h2>
+  </div>
 
-      {/* <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList className="">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="overview" className="space-y-4"> */}
-      <div className="bg-white rounded-md p-4 ">
-        <Subheading text="Activity Metrics" className="text-lg" />
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 pt-5">
-          {cards.map((card: Card, index: number) => (
-            <div
-              key={index}
-              // className={`${card.colorCode} border-none shadow-md`}
-            >
-              {/* <Paragraph text={card.label} /> */}
-              <div className="flex gap-2 items-center text-gray-400">
-                {card.icon}
-                <p className="text-sm font-medium">{card.label}</p>
-              </div>
-              <p className="text-gray-800 font-semibold text-lg ml-7">
-                {card.metrics.toLocaleString()}
-              </p>
-              {/* <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    {card.label}
-                  </CardTitle>
-                  {card.icon}
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    {card.metrics.toLocaleString()}
-                  </div>
-                </CardContent> */}
-            </div>
-          ))}
+  <div className="bg-white backdrop-blur-lg rounded-xl p-4 border ">
+    <Subheading text="Activity Metrics" className="text-lg " />
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 pt-5">
+      {cards.map((card: Card, index: number) => (
+        <div
+          key={index}
+          className=" backdrop-blur-sm rounded-lg p-4 transition-all duration-300"
+        >
+          <div className="flex gap-2 items-center ">
+            {card.icon}
+            <p className="text-sm font-medium">{card.label}</p>
+          </div>
+          <p className=" font-semibold text-lg ml-7">
+            {card.metrics.toLocaleString()}
+          </p>
         </div>
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="col-span-4 border-none ">
-          <CardHeader>
-            <CardTitle>Visitor Traffic</CardTitle>
-            <CardDescription>
-              Visitor count over the past 02 weeks
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="pl-2">
-            <Chart options={options} series={series} type="line" height={350} />
-          </CardContent>
-        </Card>
-
-        <Card className="col-span-3 border-none ">
-          <CardHeader>
-            <CardTitle>Popular Exhibits</CardTitle>
-            <CardDescription>Most visited exhibits this month</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {[
-                "African Safari",
-                "Penguin Cove",
-                "Reptile House",
-                "Primate Paradise",
-                "Aquatic World",
-              ].map((exhibit, i) => (
-                <div key={exhibit} className="flex items-center">
-                  <div className="w-[30%] text-sm">{exhibit}</div>
-                  <div className="w-[55%] h-2 bg-muted rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-main-jungleGreen rounded-full"
-                      style={{ width: `${90 - i * 12}%` }}
-                    />
-                  </div>
-                  <div className="w-[15%] text-right text-sm text-muted-foreground">
-                    {90 - i * 12}%
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-      {/* </TabsContent> */}
-
-      {/* <TabsContent value="analytics" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Analytics</CardTitle>
-              <CardDescription>
-                Detailed analytics data will be displayed here.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="h-[400px] w-full bg-muted/20 rounded-md flex items-center justify-center">
-                <p className="text-muted-foreground">Analytics Dashboard</p>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs> */}
+      ))}
     </div>
+  </div>
+
+  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+    <div className="col-span-4 bg-white rounded-xl p-6 ">
+      <div className=" font-semibold text-lg">Visitor Traffic</div>
+      <div className="text-sm pb-4">
+        Visitor count over the past 02 weeks
+      </div>
+      <div className="pl-2">
+        <Chart options={options} series={series} type="line" height={350} />
+      </div>
+    </div>
+
+    <div className="col-span-3 bg-white rounded-xl p-6 ">
+      <div className=" font-semibold text-lg">Popular Exhibits</div>
+      <div className=" text-sm pb-4">
+        Most visited exhibits this month
+      </div>
+      <div className="space-y-4">
+        {[
+          "African Safari",
+          "Penguin Cove",
+          "Reptile House",
+          "Primate Paradise",
+          "Aquatic World",
+        ].map((exhibit, i) => (
+          <div key={exhibit} className="flex items-center">
+            <div className="w-[30%] text-sm ">{exhibit}</div>
+            <div className="w-[55%] h-2 bg-main-safariBrown/20 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-main-safariBrown/80 rounded-full"
+                style={{ width: `${90 - i * 12}%` }}
+              />
+            </div>
+            <div className="w-[15%] text-right text-sm ">
+              {90 - i * 12}%
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</div>
   );
 }
