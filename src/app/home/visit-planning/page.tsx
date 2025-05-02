@@ -209,7 +209,7 @@ export default function VisitPlanningPage() {
       visitDate: "2023-05-15",
       ticketType: "Family Pass",
       quantity: 4,
-      totalPrice: "$120.00",
+      totalPrice: "120.00",
       paymentStatus: "Paid",
       bookingMethod: "Online",
       zoo: "Lahore Zoo",
@@ -220,7 +220,7 @@ export default function VisitPlanningPage() {
       visitDate: "2023-05-16",
       ticketType: "Adult",
       quantity: 2,
-      totalPrice: "$50.00",
+      totalPrice: "50.00",
       paymentStatus: "Paid",
       bookingMethod: "Phone",
       zoo: "Lahore Safari Park",
@@ -231,7 +231,7 @@ export default function VisitPlanningPage() {
       visitDate: "2023-05-18",
       ticketType: "Family Pass",
       quantity: 5,
-      totalPrice: "$150.00",
+      totalPrice: "150.00",
       paymentStatus: "Pending",
       bookingMethod: "Online",
       zoo: "Lahore World",
@@ -242,7 +242,7 @@ export default function VisitPlanningPage() {
       visitDate: "2023-05-20",
       ticketType: "Senior",
       quantity: 1,
-      totalPrice: "$20.00",
+      totalPrice: "20.00",
       paymentStatus: "Paid",
       bookingMethod: "In Person",
       zoo: "Bahalwalpur Zoo",
@@ -670,9 +670,9 @@ export default function VisitPlanningPage() {
                 </SelectContent>
               </Select>
             </div>
-            <Button onClick={() => setRouteModalOpen(true)}>
+            {/* <Button onClick={() => setRouteModalOpen(true)}>
               <Plus className="mr-2 h-4 w-4" /> Add Route
-            </Button>
+            </Button> */}
           </div>
 
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -756,9 +756,9 @@ export default function VisitPlanningPage() {
                 </SelectContent>
               </Select> */}
             </div>
-            <Button onClick={() => setBookingModalOpen(true)}>
+            {/* <Button onClick={() => setBookingModalOpen(true)}>
               <Plus className="mr-2 h-4 w-4" /> Add Booking
-            </Button>
+            </Button> */}
           </div>
 
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
