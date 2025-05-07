@@ -13,7 +13,7 @@ export default function DashboardLayout({
         <SideMenu />
       </div>
       <main className="flex-1 h-screen flex flex-col p-4 pl-0 ">
-        <div className="flex-1 rounded-lg overflow-auto bg-main-background border">
+        <div className="flex flex-col flex-1 rounded-lg overflow-auto bg-main-background border">
           <div className="flex-1">{children}</div>
           <Footer />
         </div>

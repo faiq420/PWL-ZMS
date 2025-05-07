@@ -64,11 +64,11 @@ export function SideMenu() {
       href: "/home/digital-guide",
       icon: <Info className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />,
     },
-    // {
-    //   title: "Visitor Services",
-    //   href: "/home/visitor-services",
-    //   icon: <MapPin className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />,
-    // },
+    {
+      title: "Visitor Services",
+      href: "/home/visitor-services",
+      icon: <MapPin className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />,
+    },
     {
       title: "Veterinary Inspection",
       href: "/home/veterinary-inspection",
