@@ -135,8 +135,8 @@ export function SideMenu() {
       {/* Desktop Sidebar */}
       <div
         className={`h-screen hidden pt-4 bg-white md:block ${
-          isCollapsed ? "md:w-[5vw]" : "md:w-[17vw]"
-        } xl:w-[10vw] font-syne transition-all duration-300 ease-in-out`}
+          isCollapsed ? "md:w-[5vw]" : "md:w-[17vw] xl:w-[15vw]"
+        } font-syne transition-all duration-300 ease-in-out`}
       >
         <div className="flex h-full max-h-screen flex-col gap-2">
           <div
