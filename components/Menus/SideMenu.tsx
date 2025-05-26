@@ -80,7 +80,7 @@ export function SideMenu() {
 
   return (
     <>
-      <div className="md:hidden flex items-center h-16 px-4 z-50 font-faustina bg-white">
+      <div className="md:hidden flex items-center h-16 px-4 z-50 font-roboto bg-main-background">
         <Button
           variant="ghost"
           size="icon"
@@ -95,38 +95,40 @@ export function SideMenu() {
 
       {/* Mobile Sidebar */}
       {sidebarOpen && (
-        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm md:hidden font-syne">
-          <div className="fixed inset-y-0 left-0 z-50 w-3/4 max-w-xs bg-background shadow-lg">
-            <div className="flex items-center justify-between h-16 px-6 border-b">
-              <h2 className="font-semibold">Navigation</h2>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setSidebarOpen(false)}
-              >
-                <X className="h-5 w-5" />
-                <span className="sr-only">Close</span>
-              </Button>
-            </div>
-            <div className="py-4">
-              <nav className="grid gap-1 px-2">
-                {sidebarItems.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setSidebarOpen(false)}
-                    className={cn(
-                      "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all hover:text-main-jungleGreen",
-                      pathname === item.href
-                        ? "bg-main-jungleGreen/10 font-medium text-main-jungleGreen"
-                        : "text-muted-foreground"
-                    )}
-                  >
-                    {item.icon}
-                    {item.title}
-                  </Link>
-                ))}
-              </nav>
+        <div className="fixed inset-0 z-[1000] bg-background/80 backdrop-blur-sm md:hidden font-roboto">
+          <div className="isolate">
+            <div className="fixed inset-y-0 left-0 z-[1000] w-3/4 max-w-xs bg-background shadow-lg">
+              <div className="flex items-center justify-between h-16 px-6 border-b">
+                <h2 className="font-semibold">Navigation</h2>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setSidebarOpen(false)}
+                >
+                  <X className="h-5 w-5" />
+                  <span className="sr-only">Close</span>
+                </Button>
+              </div>
+              <div className="py-4">
+                <nav className="grid gap-1 px-2">
+                  {sidebarItems.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => setSidebarOpen(false)}
+                      className={cn(
+                        "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all hover:text-main-jungleGreen",
+                        pathname === item.href
+                          ? "bg-main-jungleGreen/10 font-medium text-main-jungleGreen"
+                          : "text-muted-foreground"
+                      )}
+                    >
+                      {item.icon}
+                      {item.title}
+                    </Link>
+                  ))}
+                </nav>
+              </div>
             </div>
           </div>
         </div>
@@ -134,13 +136,13 @@ export function SideMenu() {
 
       {/* Desktop Sidebar */}
       <div
-        className={`h-screen hidden pt-4 bg-white md:block ${
+        className={`h-full hidden border border-[#d7d7d7] rounded-md bg-main-background md:block ${
           isCollapsed ? "md:w-[5vw]" : "md:w-[17vw] xl:w-[15vw]"
-        } font-syne transition-all duration-300 ease-in-out`}
+        } font-roboto transition-all duration-300 ease-in-out`}
       >
         <div className="flex h-full max-h-screen flex-col gap-2">
           <div
-            className={`flex ${
+            className={`flex border-b border-b-[#d7d7d7] ${
               isCollapsed ? "flex-col" : "flex-row-reverse"
             } h-14 items-center px-4 justify-between`}
           >
@@ -149,9 +151,9 @@ export function SideMenu() {
               className="p-1 rounded-full hover:bg-gray-100"
             >
               {isCollapsed ? (
-                <ChevronRight size={20} />
+                <ChevronRight size={20} color="#c7c7c7" />
               ) : (
-                <ChevronLeft size={20} />
+                <ChevronLeft size={20} color="#c7c7c7" />
               )}
             </button>
             <Link
@@ -160,7 +162,7 @@ export function SideMenu() {
             >
               <Image src={"/PWL_logo.png"} height={30} width={30} alt="Logo" />
               {!isCollapsed && (
-                <span className="uppercase tracking-tighter text-4xl leading-5">
+                <span className="uppercase text-4xl leading-5 font-montserrat font-semibold">
                   ZMS
                 </span>
               )}
@@ -173,9 +175,9 @@ export function SideMenu() {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "flex items-center h-fit gap-3 rounded-lg px-3 py-2 text-sm transition-all hover:text-gray-900",
+                    "flex items-center h-fit gap-3 rounded-lg px-3 py-2 text-xs transition-all hover:text-main-skyBlue/70",
                     pathname === item.href
-                      ? "bg-main-background/50 font-medium text-black"
+                      ? "bg-main-skyBlue/10 font-medium text-main-skyBlue"
                       : "text-muted-foreground",
                     isCollapsed ? "justify-center" : ""
                   )}
@@ -232,7 +234,7 @@ export function SideMenu() {
             <Link
               href={"/"}
               className={cn(
-                "flex-1 flex items-end gap-3 rounded-lg px-5 py-2 text-sm transition-all hover:text-gray-900 text-muted-foreground space-x-3",
+                "flex-1 flex items-end gap-3 rounded-lg px-5 py-2 text-xs transition-all hover:text-gray-900 text-muted-foreground space-x-3",
                 isCollapsed ? "justify-center" : ""
               )}
             >

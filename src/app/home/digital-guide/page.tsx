@@ -522,11 +522,11 @@ export default function DigitalGuidePage() {
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold tracking-tight">Digital Guide</h2>
-        <div className="flex gap-2">
+        {/* <div className="flex gap-2">
           <Button variant="outline">
             <QrCode className="mr-2 h-4 w-4" /> Generate QR Code
           </Button>
-        </div>
+        </div> */}
       </div>
 
       <Tabs
@@ -556,7 +556,7 @@ export default function DigitalGuidePage() {
                     points
                   </CardDescription>
                 </div>
-                <Button
+                {/* <Button
                   className="bg-green-700 hover:bg-green-800"
                   onClick={() => {
                     setModalMode("create");
@@ -565,7 +565,7 @@ export default function DigitalGuidePage() {
                   }}
                 >
                   <PlusCircle className="mr-2 h-4 w-4" /> New Exhibit
-                </Button>
+                </Button> */}
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -620,7 +620,7 @@ export default function DigitalGuidePage() {
                       </div>
                     </CardContent>
                     <CardFooter className="flex justify-between">
-                      <div className="flex space-x-2">
+                      {/* <div className="flex space-x-2">
                         <Button
                           variant="outline"
                           size="sm"
@@ -643,8 +643,8 @@ export default function DigitalGuidePage() {
                         >
                           <Edit className="h-4 w-4" />
                         </Button>
-                      </div>
-                      <div className="flex space-x-2">
+                      </div> */}
+                      <div className="w-full flex justify-between space-x-2">
                         <Button
                           variant="outline"
                           size="sm"
@@ -1021,7 +1021,7 @@ export default function DigitalGuidePage() {
                     key={event.id}
                     className="flex gap-4 border rounded-lg p-4"
                   >
-                    <div className="flex-shrink-0 w-24 text-center">
+                    <div className="flex-shrink-0 w-24 text-center flex flex-col justify-center">
                       <div className="text-lg font-bold">{event.time}</div>
                       <div
                         className={`mt-1 px-2 py-1 rounded-full text-xs font-medium ${
@@ -1039,7 +1039,7 @@ export default function DigitalGuidePage() {
                           : "Upcoming"}
                       </div>
                     </div>
-                    <div className="flex-1">
+                    <div className="flex-1 flex flex-col justify-center">
                       <h3 className="font-medium">{event.title}</h3>
                       <div className="text-sm text-muted-foreground mt-1">
                         {event.location}

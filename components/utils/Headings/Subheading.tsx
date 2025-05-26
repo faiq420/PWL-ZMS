@@ -8,7 +8,7 @@ interface Props {
 const Subheading = ({ text, className }: Props) => {
   return (
     <h2
-      className={`text-xl md:text-2xl font-semibold font-faustina tracking-tighter heading-color ${className}`}
+      className={`text-xl md:text-2xl font-semibold font-poppins tracking-tighter heading-color ${className}`}
     >
       {text}
     </h2>

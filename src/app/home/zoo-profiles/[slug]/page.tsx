@@ -290,7 +290,7 @@ const zooData = {
 
 export default function ZooProfilePage() {
   // State for zoo data
-  const router=useRouter()
+  const router = useRouter();
   const params = useParams();
   const slug = params?.slug;
   const [zooInfo, setZooInfo] = useState(() => {
@@ -373,9 +373,10 @@ export default function ZooProfilePage() {
       }`,
       participants: Math.floor(Math.random() * 50) + 10,
       date: new Date(
-        2023,
-        Math.floor(Math.random() * 12),
-        Math.floor(Math.random() * 28) + 1
+        2025,
+        // Math.floor(Math.random() * 12),
+        5,20
+        // Math.floor(Math.random() * 28) + 1
       ),
       status: statuses[Math.floor(Math.random() * statuses.length)],
     }));
@@ -955,7 +956,9 @@ export default function ZooProfilePage() {
                                   //   mode: "view",
                                   //   data: { animal, index },
                                   // })
-                                  router.push('/home/animal-directory/bengal-tiger')
+                                  router.push(
+                                    "/home/animal-directory/bengal-tiger"
+                                  )
                                 }
                               >
                                 <Eye className="h-4 w-4 mr-2" /> View
@@ -1011,7 +1014,7 @@ export default function ZooProfilePage() {
                     Cafeterias and food options at {zooInfo.name}
                   </CardDescription>
                 </div>
-                <Button
+                {/* <Button
                   className="bg-green-700 hover:bg-green-800"
                   onClick={() =>
                     setCafeteriaModal({
@@ -1022,7 +1025,7 @@ export default function ZooProfilePage() {
                   }
                 >
                   <Coffee className="mr-2 h-4 w-4" /> Add Cafeteria
-                </Button>
+                </Button> */}
               </div>
             </CardHeader>
             <CardContent>
@@ -1038,7 +1041,7 @@ export default function ZooProfilePage() {
 
                 <div className="grid gap-4 md:grid-cols-2">
                   {zooInfo.cafeterias.map((cafeteria: any, index: number) => (
-                    <Card key={index}>
+                    <Card key={index} className="flex flex-col">
                       <CardHeader>
                         <CardTitle>{cafeteria.name}</CardTitle>
                         <CardDescription className="flex items-center">
@@ -1046,7 +1049,7 @@ export default function ZooProfilePage() {
                           {cafeteria.location}
                         </CardDescription>
                       </CardHeader>
-                      <CardContent>
+                      <CardContent className="flex-1">
                         <div className="space-y-2">
                           <div className="grid grid-cols-3 gap-4">
                             <div>
@@ -1140,7 +1143,7 @@ export default function ZooProfilePage() {
                     </CardHeader>
                     <CardContent>
                       <div className="text-3xl font-bold">
-                        {ticketData.totalSold}
+                        {ticketData.totalSold.toLocaleString()}
                       </div>
                       <p className="text-sm text-muted-foreground">
                         Since January 1, 2023
@@ -1153,7 +1156,7 @@ export default function ZooProfilePage() {
                     </CardHeader>
                     <CardContent>
                       <div className="text-3xl font-bold">
-                        ${ticketData.revenue}
+                        {ticketData.revenue.toLocaleString()}
                       </div>
                       <p className="text-sm text-muted-foreground">
                         Since January 1, 2023
@@ -1162,14 +1165,14 @@ export default function ZooProfilePage() {
                   </Card>
                 </div>
 
-                <div className="grid gap-4 md:grid-cols-4">
+                <div className="grid gap-4 md:grid-cols-3">
                   <Card>
                     <CardHeader>
                       <CardTitle>Adult</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="text-2xl font-bold">
-                        {ticketData.categories.adult}
+                        {ticketData.categories.adult.toLocaleString()}
                       </div>
                       <p className="text-sm text-muted-foreground">
                         Tickets sold
@@ -1182,7 +1185,7 @@ export default function ZooProfilePage() {
                     </CardHeader>
                     <CardContent>
                       <div className="text-2xl font-bold">
-                        {ticketData.categories.child}
+                        {ticketData.categories.child.toLocaleString()}
                       </div>
                       <p className="text-sm text-muted-foreground">
                         Tickets sold
@@ -1195,14 +1198,14 @@ export default function ZooProfilePage() {
                     </CardHeader>
                     <CardContent>
                       <div className="text-2xl font-bold">
-                        {ticketData.categories.senior}
+                        {ticketData.categories.senior.toLocaleString()}
                       </div>
                       <p className="text-sm text-muted-foreground">
                         Tickets sold
                       </p>
                     </CardContent>
                   </Card>
-                  <Card>
+                  {/* <Card>
                     <CardHeader>
                       <CardTitle>Student</CardTitle>
                     </CardHeader>
@@ -1214,7 +1217,7 @@ export default function ZooProfilePage() {
                         Tickets sold
                       </p>
                     </CardContent>
-                  </Card>
+                  </Card> */}
                 </div>
 
                 <div className="rounded-md border">
@@ -1241,39 +1244,45 @@ export default function ZooProfilePage() {
                           <td className="p-4 align-middle font-medium">
                             Adult
                           </td>
-                          <td className="p-4 align-middle">$25</td>
+                          <td className="p-4 align-middle">200</td>
                           <td className="p-4 align-middle">
-                            {ticketData.categories.adult}
+                            {ticketData.categories.adult.toLocaleString()}
                           </td>
                           <td className="p-4 align-middle text-right">
-                            ${ticketData.categories.adult * 25}
+                            {(
+                              ticketData.categories.adult * 25
+                            ).toLocaleString()}
                           </td>
                         </tr>
                         <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
                           <td className="p-4 align-middle font-medium">
                             Child
                           </td>
-                          <td className="p-4 align-middle">$15</td>
+                          <td className="p-4 align-middle">100</td>
                           <td className="p-4 align-middle">
-                            {ticketData.categories.child}
+                            {ticketData.categories.child.toLocaleString()}
                           </td>
                           <td className="p-4 align-middle text-right">
-                            ${ticketData.categories.child * 15}
+                            {(
+                              ticketData.categories.child * 15
+                            ).toLocaleString()}
                           </td>
                         </tr>
                         <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
                           <td className="p-4 align-middle font-medium">
                             Senior
                           </td>
-                          <td className="p-4 align-middle">$20</td>
+                          <td className="p-4 align-middle">150</td>
                           <td className="p-4 align-middle">
-                            {ticketData.categories.senior}
+                            {ticketData.categories.senior.toLocaleString()}
                           </td>
                           <td className="p-4 align-middle text-right">
-                            ${ticketData.categories.senior * 20}
+                            {(
+                              ticketData.categories.senior * 20
+                            ).toLocaleString()}
                           </td>
                         </tr>
-                        <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                        {/* <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
                           <td className="p-4 align-middle font-medium">
                             Student
                           </td>
@@ -1282,9 +1291,9 @@ export default function ZooProfilePage() {
                             {ticketData.categories.student}
                           </td>
                           <td className="p-4 align-middle text-right">
-                            ${ticketData.categories.student * 18}
+                            {ticketData.categories.student * 18}
                           </td>
-                        </tr>
+                        </tr> */}
                       </tbody>
                     </table>
                   </div>
@@ -1304,14 +1313,14 @@ export default function ZooProfilePage() {
                     Schedule of shows and demonstrations at {zooInfo.name}
                   </CardDescription>
                 </div>
-                <Button
+                {/* <Button
                   className="bg-green-700 hover:bg-green-800"
                   onClick={() =>
                     setShowModal({ isOpen: true, mode: "create", data: null })
                   }
                 >
                   <Clock className="mr-2 h-4 w-4" /> Add Show
-                </Button>
+                </Button> */}
               </div>
             </CardHeader>
             <CardContent>
@@ -1421,14 +1430,14 @@ export default function ZooProfilePage() {
                     List of scheduled trips and visits to {zooInfo.name}
                   </CardDescription>
                 </div>
-                <Button
+                {/* <Button
                   className="bg-green-700 hover:bg-green-800"
                   onClick={() =>
                     setTripModal({ isOpen: true, mode: "create", data: null })
                   }
                 >
                   <Users className="mr-2 h-4 w-4" /> Add Trip
-                </Button>
+                </Button> */}
               </div>
             </CardHeader>
             <CardContent>

@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Heading from "@/components/utils/Headings/Heading";
 import Paragraph from "@/components/utils/Headings/Paragraph";
 import Subheading from "@/components/utils/Headings/Subheading";
-import { changeDateFormat } from "@/Helper/DateFormats";
+import { changeDateFormat, formatISOStringDate } from "@/Helper/DateFormats";
 import { Calendar, PawPrintIcon as Paw, Ticket, Users } from "lucide-react";
 import dynamic from "next/dynamic";
 import { use, useEffect, useState } from "react";
@@ -152,26 +152,33 @@ export default function DashboardPage() {
   }, []);
 
   return (
-    <div className="flex-1 space-y-4 p-4 md:p-8 py-4">
+    <div className="flex-1 space-y-4 p-4 md:p-6 py-3 font-poppins">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold tracking-tight uppercase ">
-          Dashboard
-        </h2>
+        <h2 className="text-2xl font-semibold">Dashboard</h2>
       </div>
 
       <div className="bg-white backdrop-blur-lg rounded-xl p-4 border ">
-        <Subheading text="Activity Metrics" className="text-lg " />
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 pt-5">
+        <Paragraph
+          text="Activity Metrics"
+          className="text-base tracking-normal font-medium"
+        />
+        <p className="text-sm text-gray-500">
+          {changeDateFormat(formatISOStringDate(new Date()))}
+        </p>
+        <hr className="bg-gray-500 mt-4" />
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {cards.map((card: Card, index: number) => (
             <div
               key={index}
-              className=" backdrop-blur-sm rounded-lg p-4 transition-all duration-300"
+              className={`pt-4 ${
+                index != cards.length - 1 && "border-r border-r-main-background"
+              } transition-all duration-300`}
             >
               <div className="flex gap-2 items-center ">
                 {card.icon}
                 <p className="text-sm font-medium">{card.label}</p>
               </div>
-              <p className=" font-semibold text-lg ml-7">
+              <p className=" font-semibold text-lg">
                 {card.metrics.toLocaleString()}
               </p>
             </div>
@@ -180,7 +187,7 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <div className="col-span-4 bg-white rounded-xl p-6 ">
+        <div className="md:col-span-4 bg-white rounded-xl p-6 ">
           <div className=" font-semibold text-lg">Visitor Traffic</div>
           <div className="text-sm pb-4">
             Visitor count over the past 02 weeks
@@ -190,7 +197,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className="col-span-3 bg-white rounded-xl p-6 ">
+        <div className="md:col-span-3 bg-white rounded-xl p-6 ">
           <div className=" font-semibold text-lg">Health Summary</div>
           <div className=" text-sm pb-4">
             Overall animal's count by health status

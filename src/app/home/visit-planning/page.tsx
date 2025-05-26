@@ -234,7 +234,7 @@ export default function VisitPlanningPage() {
       totalPrice: "150.00",
       paymentStatus: "Pending",
       bookingMethod: "Online",
-      zoo: "Lahore World",
+      zoo: "Lahore Zoo",
     },
     {
       id: 4,
@@ -458,7 +458,7 @@ export default function VisitPlanningPage() {
         <TabsList>
           <TabsTrigger value="events">Events</TabsTrigger>
           <TabsTrigger value="group-visits">Group Visits</TabsTrigger>
-          <TabsTrigger value="suggested-routes">Suggested Routes</TabsTrigger>
+          {/* <TabsTrigger value="suggested-routes">Suggested Routes</TabsTrigger> */}
           <TabsTrigger value="bookings">Bookings</TabsTrigger>
         </TabsList>
 
@@ -509,7 +509,7 @@ export default function VisitPlanningPage() {
                     {event.date} at {event.time}
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="flex-1">
+                <CardContent className="flex-1 flex flex-col justify-end">
                   <div className="grid gap-1">
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Attendees:</span>
@@ -763,7 +763,7 @@ export default function VisitPlanningPage() {
 
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {bookings.map((booking) => (
-              <Card key={booking.id}>
+              <Card key={booking.id} className="flex flex-col">
                 <CardHeader className="pb-2">
                   <div className="flex justify-between">
                     <CardTitle>{booking.visitorName}</CardTitle>
@@ -783,7 +783,7 @@ export default function VisitPlanningPage() {
                     Visit Date: {booking.visitDate}
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="flex-1">
                   <div className="grid gap-1">
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">
@@ -799,10 +799,10 @@ export default function VisitPlanningPage() {
                       <span className="text-muted-foreground">Total:</span>
                       <span>{booking.totalPrice}</span>
                     </div>
-                    <div className="flex justify-between text-sm">
+                    {/* <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Method:</span>
                       <span>{booking.bookingMethod}</span>
-                    </div>
+                    </div> */}
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Zoo:</span>
                       <span>{booking.zoo}</span>

@@ -8,6 +8,8 @@ import {
   Syne,
   Faustina,
   Tajawal,
+  Roboto,
+  Montserrat,
 } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "../../components/theme-provider";
@@ -28,6 +30,21 @@ const barlow = Barlow({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-barlow",
+});
+const montserrat = Montserrat({
+  weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-montserrat",
+});
+
+const roboto = Roboto({
+  weight: ["400", "500", "700"],
+  style: ["normal", "italic"],
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-roboto",
 });
 
 const DMSans = DM_Sans({
@@ -72,7 +89,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${poppins.variable} ${barlow.variable} ${DMSans.variable} ${syne.variable} ${faustina.variable} ${tajawal.variable} min-h-screen`}
+      className={`${poppins.variable} ${barlow.variable} ${montserrat.variable} ${roboto.variable} ${DMSans.variable} ${syne.variable} ${faustina.variable} ${tajawal.variable} min-h-screen`}
     >
       <body className="flex-1 flex flex-col min-h-screen">
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>

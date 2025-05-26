@@ -107,6 +107,8 @@ const config: Config = {
         poppins: ["var(--font-poppins)"],
         syne: ["var(--font-syne)"],
         faustina: ["var(--font-faustina)"],
+        roboto: ["var(--font-roboto)"],
+        montserrat: ["var(--font-montserrat)"],
         tajawal: ["var(--font-tajawal)"],
         sans: ["Inter", "sans-serif"],
         serif: ["Merriweather", "serif"],

@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -9,64 +9,82 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { QrCode, Download, Share2 } from "lucide-react"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Slider } from "@/components/ui/slider"
-import { useToast } from "@/components/ui/use-toast"
+} from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { QrCode, Download, Share2 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
+import { useToast } from "@/components/ui/use-toast";
 
 export function QrCodeModal({ isOpen, onClose, qrCode }) {
-  const { toast } = useToast()
-  const [qrSize, setQrSize] = useState(300)
-  const [qrColor, setQrColor] = useState("#000000")
-  const [qrBackground, setQrBackground] = useState("#FFFFFF")
-  const [qrFormat, setQrFormat] = useState("png")
-  const [qrErrorCorrection, setQrErrorCorrection] = useState("M")
+  const { toast } = useToast();
+  const [qrSize, setQrSize] = useState(100);
+  const [qrColor, setQrColor] = useState("#000000");
+  const [qrBackground, setQrBackground] = useState("#FFFFFF");
+  const [qrFormat, setQrFormat] = useState("png");
+  const [qrErrorCorrection, setQrErrorCorrection] = useState("M");
 
   const handleDownload = () => {
     // In a real app, this would generate and download the QR code
     toast({
       title: "QR Code Downloaded",
-      description: `QR code for "${qrCode?.name}" has been downloaded as ${qrFormat.toUpperCase()}.`,
-    })
-  }
+      description: `QR code for "${
+        qrCode?.name
+      }" has been downloaded as ${qrFormat.toUpperCase()}.`,
+    });
+  };
 
   const handleShare = () => {
     // In a real app, this would share the QR code
     toast({
       title: "QR Code Shared",
       description: `A shareable link for "${qrCode?.name}" QR code has been copied to clipboard.`,
-    })
-  }
+    });
+  };
 
-  if (!qrCode) return null
+  if (!qrCode) return null;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle>QR Code for {qrCode.name}</DialogTitle>
-          <DialogDescription>Customize and download the QR code for this exhibit.</DialogDescription>
+          <DialogDescription>
+            Customize and download the QR code for this exhibit.
+          </DialogDescription>
         </DialogHeader>
 
-        <Tabs defaultValue="preview" className="w-full">
+        {/* <Tabs defaultValue="preview" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="preview">Preview</TabsTrigger>
             <TabsTrigger value="customize">Customize</TabsTrigger>
           </TabsList>
-          <TabsContent value="preview" className="flex flex-col items-center justify-center py-4">
-            <div
-              className="border rounded-lg p-4 flex items-center justify-center"
-              style={{ width: `${qrSize}px`, height: `${qrSize}px`, backgroundColor: qrBackground }}
-            >
-              <QrCode size={qrSize * 0.8} color={qrColor} />
-            </div>
-            <div className="mt-4 text-center">
-              <p className="text-sm text-muted-foreground">QR ID: {qrCode.id}</p>
-              <p className="text-sm text-muted-foreground">Scans: {qrCode.scans || 0}</p>
-            </div>
-          </TabsContent>
+          <TabsContent value="preview" className="flex flex-col items-center justify-center py-4"> */}
+        <div className="w-full  flex items-center justify-center">
+          <div
+            className="border rounded-lg  flex items-center justify-center"
+            style={{
+              width: `${qrSize}px`,
+              height: `${qrSize}px`,
+              backgroundColor: qrBackground,
+            }}
+          >
+            <QrCode size={qrSize * 0.8} color={qrColor} />
+          </div>
+        </div>
+        <div className="mt-4 text-center">
+          <p className="text-sm text-muted-foreground">QR ID: {qrCode.id}</p>
+          <p className="text-sm text-muted-foreground">
+            Scans: {qrCode.scans || 0}
+          </p>
+        </div>
+        {/* </TabsContent>
           <TabsContent value="customize" className="space-y-4">
             <div className="space-y-2">
               <label className="text-sm font-medium">Size</label>
@@ -152,7 +170,7 @@ export function QrCodeModal({ isOpen, onClose, qrCode }) {
               </div>
             </div>
           </TabsContent>
-        </Tabs>
+        </Tabs> */}
 
         <DialogFooter className="flex justify-between">
           <div className="flex gap-2">
@@ -161,10 +179,11 @@ export function QrCodeModal({ isOpen, onClose, qrCode }) {
             </Button>
           </div>
           <Button onClick={handleDownload}>
-            <Download className="mr-2 h-4 w-4" /> Download {qrFormat.toUpperCase()}
+            <Download className="mr-2 h-4 w-4" /> Download{" "}
+            {qrFormat.toUpperCase()}
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
