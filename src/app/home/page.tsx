@@ -7,6 +7,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Heading from "@/components/utils/Headings/Heading";
 import Paragraph from "@/components/utils/Headings/Paragraph";
@@ -61,6 +68,25 @@ export default function DashboardPage() {
       icon: <Calendar className="h-4 w-4 text-black" />,
     },
   ]);
+  const [years, setYears] = useState<string[]>([]);
+  const months = [
+    { value: "Jan", label: "January" },
+    { value: "Feb", label: "February" },
+    { value: "Mar", label: "March" },
+    { value: "Apr", label: "April" },
+    { value: "May", label: "May" },
+    { value: "Jun", label: "June" },
+    { value: "Jul", label: "July" },
+    { value: "Aug", label: "August" },
+    { value: "Sep", label: "September" },
+    { value: "Oct", label: "October" },
+    { value: "Nov", label: "November" },
+    { value: "Dec", label: "December" },
+  ];
+  const [weeks, setWeeks] = useState<number[]>([]);
+  const [selectedMonth, setSelectedMonth] = useState<string>("");
+  const [selectedYear, setSelectedYear] = useState<string>("");
+  const [selectedWeek, setSelectedWeek] = useState<string>("");
   const [healthSummary, setHealthSummary] = useState([
     { label: "Healthy", count: 365, color: "bg-green-500" },
     { label: "Under Monitoring", count: 52, color: "bg-yellow-500" },
@@ -96,7 +122,9 @@ export default function DashboardPage() {
     },
     colors: ["#5DADE2"],
     xaxis: {
-      categories: chartParams.dates.map((x: string) => changeDateFormat(x)),
+      categories: chartParams.dates.map(
+        (x: string) => changeDateFormat(x).split(",")[0]
+      ),
       title: { text: "Month" },
       labels: {
         rotate: -30,
@@ -122,22 +150,28 @@ export default function DashboardPage() {
   };
 
   useEffect(() => {
-    const visitorTrafficData = [
-      { date: "2025-04-01T00:00:00.000Z", count: 1200 },
-      { date: "2025-04-02T00:00:00.000Z", count: 1500 },
-      { date: "2025-04-03T00:00:00.000Z", count: 1800 },
-      { date: "2025-04-04T00:00:00.000Z", count: 2200 },
-      { date: "2025-04-05T00:00:00.000Z", count: 2000 },
-      { date: "2025-04-06T00:00:00.000Z", count: 2500 },
-      { date: "2025-04-07T00:00:00.000Z", count: 2700 },
-      { date: "2025-04-08T00:00:00.000Z", count: 3000 },
-      { date: "2025-04-09T00:00:00.000Z", count: 2800 },
-      { date: "2025-04-10T00:00:00.000Z", count: 3200 },
-      { date: "2025-04-11T00:00:00.000Z", count: 3400 },
-      { date: "2025-04-12T00:00:00.000Z", count: 3600 },
-      { date: "2025-04-13T00:00:00.000Z", count: 3200 },
-      { date: "2025-04-14T00:00:00.000Z", count: 400 },
-    ];
+    const YEARS = [];
+    for (let i = new Date().getFullYear(); i > 1970; i--) {
+      YEARS.push(i.toString());
+    }
+    setYears(YEARS);
+  }, []);
+
+  function GetChartData(start: string, end: string) {
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+    const visitorTrafficData = [];
+
+    for (
+      let d = new Date(startDate);
+      d <= endDate;
+      d.setDate(d.getDate() + 1)
+    ) {
+      visitorTrafficData.push({
+        date: new Date(d).toISOString().split("T")[0] + "T00:00:00.000Z",
+        count: Math.floor(Math.random() * (3500 - 500 + 1)) + 500,
+      });
+    }
 
     const dates = visitorTrafficData.map((item) => item.date);
     const counts = visitorTrafficData.map((item) => item.count);
@@ -149,7 +183,52 @@ export default function DashboardPage() {
         data: counts,
       },
     ]);
-  }, []);
+  }
+
+  useEffect(() => {
+    if (selectedMonth != "" && selectedYear != "") {
+      setWeeks(
+        Array.from(
+          { length: getMaxWeeksInMonth(selectedMonth, Number(selectedYear)) },
+          (_, i) => i + 1
+        )
+      );
+    }
+  }, [selectedMonth, selectedYear]);
+
+  useEffect(() => {
+    if (selectedMonth != "" && selectedYear != "" && selectedWeek != "") {
+      const { start, end } = getWeekDateRange(
+        selectedMonth,
+        Number(selectedYear),
+        Number(selectedWeek)
+      );
+      GetChartData(start, end);
+      console.log(start, end);
+    }
+  }, [selectedWeek, selectedMonth, selectedYear]);
+
+  const getMaxWeeksInMonth = (monthStr: string, year: number) => {
+    const monthIndex = new Date(`${monthStr} 1, ${year}`).getMonth(); // 0-based index
+    const totalDays = new Date(year, monthIndex + 1, 0).getDate();
+    const weeks = Math.ceil(totalDays / 7);
+    return weeks;
+  };
+
+  const getWeekDateRange = (monthStr: string, year: number, week: number) => {
+    const monthIndex = new Date(`${monthStr} 1, ${year}`).getMonth(); // 0-based
+    const startDay = (week - 1) * 7 + 1;
+    const totalDays = new Date(year, monthIndex + 1, 0).getDate(); // last day of the month
+    const endDay = Math.min(startDay + 6, totalDays);
+
+    const format = (y: number, m: number, d: number) =>
+      `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+
+    return {
+      start: format(year, monthIndex, startDay),
+      end: format(year, monthIndex, endDay),
+    };
+  };
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-6 py-3 font-poppins">
@@ -188,10 +267,55 @@ export default function DashboardPage() {
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
         <div className="md:col-span-4 bg-white rounded-xl p-6 ">
-          <div className=" font-semibold text-lg">Visitor Traffic</div>
-          <div className="text-sm pb-4">
-            Visitor count over the past 02 weeks
+          <div className="flex justify-between items-center gap-2">
+            <div className="font-semibold text-nowrap text-lg">
+              Visitor Traffic
+            </div>
+            <div className="grid grid-cols-3 gap-1">
+              <Select value={selectedYear} onValueChange={setSelectedYear}>
+                <SelectTrigger id="category">
+                  <SelectValue placeholder="Select year" />
+                </SelectTrigger>
+                <SelectContent>
+                  {years.map((year: string, index: number) => (
+                    <SelectItem key={index} value={year}>
+                      {year}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+                <SelectTrigger id="category">
+                  <SelectValue placeholder="Select month" />
+                </SelectTrigger>
+                <SelectContent>
+                  {months.map(
+                    (
+                      month: { value: string; label: string },
+                      index: number
+                    ) => (
+                      <SelectItem key={index} value={month.value}>
+                        {month.label}
+                      </SelectItem>
+                    )
+                  )}
+                </SelectContent>
+              </Select>
+              <Select value={selectedWeek} onValueChange={setSelectedWeek}>
+                <SelectTrigger id="category">
+                  <SelectValue placeholder="Select week" />
+                </SelectTrigger>
+                <SelectContent>
+                  {weeks.map((week: number, index: number) => (
+                    <SelectItem key={index} value={week.toString()}>
+                      Week-0{week}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
+
           <div className="pl-2">
             <Chart options={options} series={series} type="line" height={350} />
           </div>

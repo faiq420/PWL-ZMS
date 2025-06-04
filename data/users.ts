@@ -1,0 +1,76 @@
+import type { User, Zoo, Permission } from "@/types/user"
+
+export const zoos: Zoo[] = [
+  { id: "1", name: "Lahore Zoo", location: "Lahore", city: "Lahore" },
+  { id: "2", name: "Lahore Safari Park", location: "Lahore", city: "Lahore" },
+  { id: "3", name: "Bahawalpur Zoo", location: "Bahawalpur", city: "Bahawalpur" },
+  { id: "4", name: "Karachi Zoo", location: "Karachi", city: "Karachi" },
+  { id: "5", name: "Islamabad Zoo", location: "Islamabad", city: "Islamabad" },
+]
+
+export const permissions: Permission[] = [
+  { id: "1", name: "user_management", description: "Manage users and roles", module: "users" },
+  { id: "2", name: "zoo_management", description: "Manage zoo profiles and data", module: "zoos" },
+  { id: "3", name: "animal_management", description: "Manage animal directory", module: "animals" },
+  { id: "4", name: "veterinary_access", description: "Access veterinary features", module: "veterinary" },
+  { id: "5", name: "visitor_services", description: "Manage visitor services", module: "visitors" },
+  { id: "6", name: "reports_access", description: "Access reports and analytics", module: "reports" },
+]
+
+export const mockUsers: User[] = [
+  {
+    id: "1",
+    email: "admin@zooapp.com",
+    firstName: "System",
+    lastName: "Administrator",
+    role: "admin",
+    status: "active",
+    createdAt: "2024-01-15T08:00:00Z",
+    updatedAt: "2024-01-15T08:00:00Z",
+    lastLogin: "2024-01-20T10:30:00Z",
+    department: "IT Administration",
+    permissions: permissions,
+  },
+  {
+    id: "2",
+    email: "john.doe@lahore-zoo.com",
+    firstName: "John",
+    lastName: "Doe",
+    role: "zoo_incharge",
+    status: "active",
+    createdAt: "2024-01-16T09:00:00Z",
+    updatedAt: "2024-01-16T09:00:00Z",
+    lastLogin: "2024-01-19T14:20:00Z",
+    phone: "+92-300-1234567",
+    assignedZoos: ["1"],
+    department: "Zoo Operations",
+  },
+  {
+    id: "3",
+    email: "dr.smith@lahore-zoo.com",
+    firstName: "Dr. Sarah",
+    lastName: "Smith",
+    role: "veterinary_doctor",
+    status: "active",
+    createdAt: "2024-01-17T10:00:00Z",
+    updatedAt: "2024-01-17T10:00:00Z",
+    lastLogin: "2024-01-20T08:45:00Z",
+    phone: "+92-301-2345678",
+    assignedZoos: ["1", "2"],
+    specialization: "Large Animal Medicine",
+    licenseNumber: "VET-2024-001",
+  },
+  {
+    id: "4",
+    email: "citizen@example.com",
+    firstName: "Ahmed",
+    lastName: "Khan",
+    role: "citizen",
+    status: "active",
+    createdAt: "2024-01-18T11:00:00Z",
+    updatedAt: "2024-01-18T11:00:00Z",
+    lastLogin: "2024-01-20T16:15:00Z",
+    phone: "+92-302-3456789",
+    address: "Gulberg III, Lahore",
+  },
+]

@@ -54,7 +54,7 @@ export default function InspectionDetailsPage({ params }: { params: { slug: stri
   }
 
   return (
-    <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
+    <div className="flex-1 space-y-4">
       <div className="flex items-center">
         <Button variant="ghost" size="sm" asChild className="mr-2">
           <Link href="/home/veterinary-inspection">

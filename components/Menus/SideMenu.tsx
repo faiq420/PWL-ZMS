@@ -19,6 +19,9 @@ import {
   LogOut,
   ChevronLeft,
   ChevronRight,
+  User,
+  TowerControl,
+  UserCog,
 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "../ui/button";
@@ -76,6 +79,28 @@ export function SideMenu() {
         <Stethoscope className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />
       ),
     },
+    {
+      title: "User Management",
+      href: "/home/user-management",
+      icon: <User className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />,
+    },
+    {
+      title: "Menu Management",
+      href: "/home/menu-management",
+      icon: <Menu className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />,
+    },
+    {
+      title: "Role Management",
+      href: "/home/role-management",
+      icon: <UserCog className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />,
+    },
+    {
+      title: "Access Control",
+      href: "/home/access-control",
+      icon: (
+        <TowerControl className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />
+      ),
+    },
   ];
 
   return (
@@ -97,7 +122,7 @@ export function SideMenu() {
       {sidebarOpen && (
         <div className="fixed inset-0 z-[1000] bg-background/80 backdrop-blur-sm md:hidden font-roboto">
           <div className="isolate">
-            <div className="fixed inset-y-0 left-0 z-[1000] w-3/4 max-w-xs bg-background shadow-lg">
+            <div className="fixed inset-y-0 left-0 z-[1000] w-3/4 max-w-xs bg-background shadow-lg flex flex-col">
               <div className="flex items-center justify-between h-16 px-6 border-b">
                 <h2 className="font-semibold">Navigation</h2>
                 <Button
@@ -109,7 +134,7 @@ export function SideMenu() {
                   <span className="sr-only">Close</span>
                 </Button>
               </div>
-              <div className="py-4">
+              <div className="py-4 flex-1">
                 <nav className="grid gap-1 px-2">
                   {sidebarItems.map((item) => (
                     <Link
@@ -129,6 +154,54 @@ export function SideMenu() {
                   ))}
                 </nav>
               </div>
+              <div className="mt-auto pl-2 py-[6px] w-full">
+                <div className={`flex items-center gap-3 rounded-lg px-3 py-2`}>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <div className="h-8 w-8 bg-slate-200 rounded-full cursor-pointer">
+                        <Image
+                          src="/userProfile.svg"
+                          height={32}
+                          width={32}
+                          className="rounded-full"
+                          alt="User"
+                        />
+                      </div>
+                    </DropdownMenuTrigger>
+                    {/* <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    className="text-red-500 focus:text-red-500"
+                    onClick={() => {
+                      localStorage.clear();
+                      // router.push("/");
+                    }}
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Log out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent> */}
+                  </DropdownMenu>
+                  <div className="text-sm flex-1">
+                    <div className="flex justify-between">
+                      <p className="font-medium">Admin User</p>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      admin@zoosystem.com
+                    </p>
+                  </div>
+                </div>
+                <Link
+                  href={"/"}
+                  className={
+                    "flex-1 flex items-end gap-3 rounded-lg px-5 py-2 text-xs transition-all hover:text-gray-900 text-muted-foreground space-x-3"
+                  }
+                >
+                  <LogOut className={`h-3 w-3`} />
+                  <span>Logout</span>
+                </Link>
+              </div>
             </div>
           </div>
         </div>
@@ -136,18 +209,26 @@ export function SideMenu() {
 
       {/* Desktop Sidebar */}
       <div
-        className={`h-full hidden border border-[#d7d7d7] rounded-md bg-main-background md:block ${
+        className={`h-full hidden shadow-xl rounded-md bg-white md:block ${
+          //border border-[#d7d7d7]
           isCollapsed ? "md:w-[5vw]" : "md:w-[17vw] xl:w-[15vw]"
         } font-roboto transition-all duration-300 ease-in-out`}
       >
         <div className="flex h-full max-h-screen flex-col gap-2">
           <div
-            className={`flex border-b border-b-[#d7d7d7] ${
+            className={`flex  ${
+              //border-b border-b-[#d7d7d7]
               isCollapsed ? "flex-col" : "flex-row-reverse"
             } h-14 items-center px-4 justify-between`}
           >
             <button
-              onClick={() => setIsCollapsed(!isCollapsed)}
+              onClick={() => {
+                setIsCollapsed(!isCollapsed);
+                window.localStorage.setItem(
+                  "screenSize",
+                  isCollapsed ? (window.innerWidth >= 768 ? "83" : "85") : "5"
+                );
+              }}
               className="p-1 rounded-full hover:bg-gray-100"
             >
               {isCollapsed ? (
@@ -188,7 +269,7 @@ export function SideMenu() {
               ))}
             </nav>
           </div>
-          <div className="mt-auto pl-2 py-[6px] w-full">
+          <div className="mt-auto py-[6px] w-full">
             <div
               className={`flex items-center gap-3 rounded-lg px-3 py-2 ${
                 isCollapsed ? "justify-center flex-col" : ""
@@ -196,14 +277,15 @@ export function SideMenu() {
             >
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Avatar className={`h-8 w-8 cursor-pointer rounded-full`}>
-                    <AvatarImage
-                      src="/placeholder.svg?height=32&width=32"
-                      alt="User"
+                  <div className="h-8 w-8 bg-slate-200 rounded-full cursor-pointer">
+                    <Image
+                      src="/userProfile.svg"
+                      height={32}
+                      width={32}
                       className="rounded-full"
+                      alt="User"
                     />
-                    <AvatarFallback>{"Admin"}</AvatarFallback>
-                  </Avatar>
+                  </div>
                 </DropdownMenuTrigger>
                 {/* <DropdownMenuContent align="end">
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>

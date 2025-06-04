@@ -18,22 +18,9 @@ const Header = () => {
     <div className="flex justify-end">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Avatar className="cursor-pointer">
-            <AvatarImage
-              src="/template_user.png"
-              height={32}
-              width={32}
-              alt="User"
-            />
-            <AvatarFallback>
-              {/* <Image
-                src={"/template_user.png"}
-                height={40}
-                width={40}
-                alt="user image"
-              /> */}
-            </AvatarFallback>
-          </Avatar>
+          <div className="bg-slate-200 rounded-full cursor-pointer">
+            <Image src="/userProfile.svg" height={32} width={32} alt="User" />
+          </div>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>{userName}</DropdownMenuLabel>
