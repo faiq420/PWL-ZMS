@@ -24,10 +24,12 @@ import Image from "next/image";
 import Link from "next/link";
 
 export default function ZooProfilesPage() {
-  return 
+  return (
     <div className="flex-1 space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-semibold tracking-tight font-faustina">Zoo Profiles</h2>
+        <h2 className="text-3xl font-semibold tracking-tight font-faustina">
+          Zoo Profiles
+        </h2>
         {/* <Button className="bg-green-700 hover:bg-green-800">
           <Plus className="mr-2 h-4 w-4" /> Add New Zoo
         </Button> */}
@@ -50,7 +52,8 @@ export default function ZooProfilesPage() {
             name: "Lahore Zoo",
             location: "Lahore, Punjab, Pakistan",
             type: "Urban Wildlife",
-            image: "https://zameenblog.s3.amazonaws.com/blog/wp-content/uploads/2021/03/Cover-1440x625-2.jpg",
+            image:
+              "https://zameenblog.s3.amazonaws.com/blog/wp-content/uploads/2021/03/Cover-1440x625-2.jpg",
             status: "active",
             slug: "lahore-zoo",
             description:
@@ -60,7 +63,8 @@ export default function ZooProfilesPage() {
             name: "Lahore Safari Park",
             location: "Lahore, Punjab, Pakistan",
             type: "Safari & Conservation",
-            image: "https://th.bing.com/th/id/R.e967112c84d6ab332fc76717b9e719e6?rik=6S3jtZUUfJiEcg&riu=http%3a%2f%2flocallylahore.com%2fwp-content%2fuploads%2fsp12-768x333.jpg&ehk=90kBmeb3p9n97hicdZ0p8Ce4ksUZTRA7lWP7usT%2f8QQ%3d&risl=&pid=ImgRaw&r=0",
+            image:
+              "https://th.bing.com/th/id/R.e967112c84d6ab332fc76717b9e719e6?rik=6S3jtZUUfJiEcg&riu=http%3a%2f%2flocallylahore.com%2fwp-content%2fuploads%2fsp12-768x333.jpg&ehk=90kBmeb3p9n97hicdZ0p8Ce4ksUZTRA7lWP7usT%2f8QQ%3d&risl=&pid=ImgRaw&r=0",
             status: "active",
             slug: "lahore-safari-park",
             description:
@@ -70,7 +74,8 @@ export default function ZooProfilesPage() {
             name: "Bahawalpur Zoo",
             location: "Bahawalpur, Punjab, Pakistan",
             type: "Historical Zoo",
-            image: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiPAtR3czeDrdxYuNt34NIhDJ7t68uGAqmgSrEXxDuNByIBeBiha-xvXOwklndvWxgO0f_Hnt1FslVyLKL8ORRtISYOknzzv8x8AtB9kPFHo5lkSM_0fBhtMhUx_ZkTJW0GenRctADnzlNR/s1600/Bahawalpur20Zoo201-76-1516796494.jpg",
+            image:
+              "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiPAtR3czeDrdxYuNt34NIhDJ7t68uGAqmgSrEXxDuNByIBeBiha-xvXOwklndvWxgO0f_Hnt1FslVyLKL8ORRtISYOknzzv8x8AtB9kPFHo5lkSM_0fBhtMhUx_ZkTJW0GenRctADnzlNR/s1600/Bahawalpur20Zoo201-76-1516796494.jpg",
             status: "active",
             slug: "bahawalpur-zoo",
             description:
@@ -143,5 +148,5 @@ export default function ZooProfilesPage() {
         ))}
       </div>
     </div>
-  ;
+  );
 }

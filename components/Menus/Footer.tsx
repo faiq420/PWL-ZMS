@@ -10,7 +10,7 @@ const Footer = () => {
           © {new Date().getFullYear()} Punjab Wildlife & Parks. All rights
           reserved.
         </p>
-        <Image src={"/ppf_logo.png"} alt="PPF" height={30} width={30} />
+        <Image src={"/assets/logos/ppf_logo.png"} alt="PPF" height={30} width={30} />
       </div>
     </footer>
   );

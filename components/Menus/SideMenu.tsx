@@ -22,6 +22,8 @@ import {
   User,
   TowerControl,
   UserCog,
+  PanelLeftOpen,
+  PanelRightOpen,
 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "../ui/button";
@@ -160,7 +162,7 @@ export function SideMenu() {
                     <DropdownMenuTrigger asChild>
                       <div className="h-8 w-8 bg-slate-200 rounded-full cursor-pointer">
                         <Image
-                          src="/userProfile.svg"
+                          src="/assets/menu/userProfile.svg"
                           height={32}
                           width={32}
                           className="rounded-full"
@@ -209,15 +211,15 @@ export function SideMenu() {
 
       {/* Desktop Sidebar */}
       <div
-        className={`h-full hidden shadow-xl rounded-md bg-white md:block ${
-          //border border-[#d7d7d7]
+        className={`h-full hidden rounded-md bg-main-background md:block border border-main-borderColor ${
+          //
           isCollapsed ? "md:w-[5vw]" : "md:w-[17vw] xl:w-[15vw]"
         } font-roboto transition-all duration-300 ease-in-out`}
       >
         <div className="flex h-full max-h-screen flex-col gap-2">
           <div
-            className={`flex  ${
-              //border-b border-b-[#d7d7d7]
+            className={`flex border-b border-b-main-borderColor ${
+              //
               isCollapsed ? "flex-col" : "flex-row-reverse"
             } h-14 items-center px-4 justify-between`}
           >
@@ -231,17 +233,24 @@ export function SideMenu() {
               }}
               className="p-1 rounded-full hover:bg-gray-100"
             >
-              {isCollapsed ? (
-                <ChevronRight size={20} color="#c7c7c7" />
+              {!isCollapsed ? (
+                <PanelRightOpen size={20} color="#737373" />
               ) : (
-                <ChevronLeft size={20} color="#c7c7c7" />
+                <PanelLeftOpen size={20} color="#737373" />
               )}
             </button>
             <Link
               href="/home"
               className="flex items-center gap-2 font-semibold"
             >
-              <Image src={"/PWL_logo.png"} height={30} width={30} alt="Logo" />
+              {isCollapsed && (
+                <Image
+                  src={"/assets/logos/PWL_logo.png"}
+                  height={30}
+                  width={30}
+                  alt="Logo"
+                />
+              )}
               {!isCollapsed && (
                 <span className="uppercase text-4xl leading-5 font-montserrat font-semibold">
                   ZMS
@@ -256,9 +265,9 @@ export function SideMenu() {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "flex items-center h-fit gap-3 rounded-lg px-3 py-2 text-xs transition-all hover:text-main-skyBlue/70",
+                    "flex items-center h-fit gap-3 rounded-lg px-3 py-2 text-xs transition-all hover:text-black/70",
                     pathname === item.href
-                      ? "bg-main-skyBlue/10 font-medium text-main-skyBlue"
+                      ? "bg-[#CBE88C] font-medium text-black"
                       : "text-muted-foreground",
                     isCollapsed ? "justify-center" : ""
                   )}
@@ -279,7 +288,7 @@ export function SideMenu() {
                 <DropdownMenuTrigger asChild>
                   <div className="h-8 w-8 bg-slate-200 rounded-full cursor-pointer">
                     <Image
-                      src="/userProfile.svg"
+                      src="/assets/menu/userProfile.svg"
                       height={32}
                       width={32}
                       className="rounded-full"

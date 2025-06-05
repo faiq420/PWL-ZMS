@@ -21,7 +21,9 @@ const config: Config = {
           softRed: "#E74C3C",
           cream: "#FDF6E3",
           ashWhite: "#F5F5F5",
-          background: "#EBEFF1",
+          background: "#F2F3EE",
+          secondaryText: "#3D4844",
+          borderColor:'#'
         },
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",

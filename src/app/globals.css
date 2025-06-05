@@ -139,10 +139,14 @@ body {
 
 .loginBg {
   @apply bg-cover bg-center bg-no-repeat;
-  background-image: url("../../public/markhor_wallpaper.webp");
+  background-image: url("../../public/assets/bg/markhor_wallpaper.webp");
 }
 .loginBg::before {
   content: "";
   @apply absolute inset-0 bg-black opacity-30; /* Black overlay with 30% opacity */
   z-index: -1;
 }
+
+/* .apexcharts-bar-series .apexcharts-series path {
+  filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.2));
+} */
