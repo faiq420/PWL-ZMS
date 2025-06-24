@@ -127,8 +127,8 @@ export default function AnimalDirectoryPage() {
     const matchesEndangered =
       activeTab === "endangered"
         ? ["Endangered", "Critically Endangered"].includes(
-            animal.conservationStatus
-          )
+          animal.conservationStatus
+        )
         : true;
 
     const matchesLocation =
@@ -204,9 +204,9 @@ export default function AnimalDirectoryPage() {
 
         <TabsContent value={activeTab} className="space-y-4">
           {filteredAnimals.length > 0 ? (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {filteredAnimals.map((animal) => (
-                <Card key={animal.id} className="overflow-hidden">
+                <Card key={animal.id} className="overflow-hidden flex flex-col justify-between">
                   <div className="relative h-48">
                     <Image
                       src={animal.image || "/placeholder.svg"}
@@ -239,11 +239,11 @@ export default function AnimalDirectoryPage() {
                   </CardHeader>
                   <CardContent className="pb-2 font-syne">
                     <div className="space-y-1 text-sm">
-                      <div className="flex justify-between">
+                      <div className="flex gap-1">
                         <span className="text-muted-foreground">Category:</span>
                         <span>{animal.category}</span>
                       </div>
-                      <div className="flex justify-between">
+                      <div className="flex gap-1">
                         <span className="text-muted-foreground">Location:</span>
                         <span>
                           {/* {animal.location.length} Zoo
@@ -252,12 +252,15 @@ export default function AnimalDirectoryPage() {
                         </span>
                       </div>
                       <div className="flex items-center text-sm mt-2">
-                        <Clock className="h-4 w-4 mr-2 text-muted-foreground" />
-                        <span>Feeding Time: 2:00 PM</span>
+                        {/* <Clock className="h-4 w-4 mr-2 text-muted-foreground" /> */}
+                        <div className="flex gap-2">
+                        <span className="text-muted-foreground">Feeding Time: </span>
+                        <span>2:00 PM</span>
+                        </div>
                       </div>
                     </div>
                   </CardContent>
-                  <CardFooter className="flex justify-between">
+                  <CardFooter className="flex items-center gap-1">
                     <Button
                       variant="outline"
                       size="sm"
@@ -268,7 +271,7 @@ export default function AnimalDirectoryPage() {
                       <Eye className="mr-1 h-4 w-4" /> View
                     </Button>
                     <div className="flex space-x-2">
-                      {/* <Button
+                      <Button
                         variant="outline"
                         size="sm"
                         onClick={() =>
@@ -278,7 +281,7 @@ export default function AnimalDirectoryPage() {
                         }
                       >
                         <Edit className="mr-1 h-4 w-4" /> Edit
-                      </Button> */}
+                      </Button>
                       <Button
                         variant="outline"
                         size="sm"

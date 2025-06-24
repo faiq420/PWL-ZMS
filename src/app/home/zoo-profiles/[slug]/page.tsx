@@ -45,6 +45,7 @@ import { MilestoneModal } from "@/components/modals/milestone-modal";
 import { useParams, useRouter } from "next/navigation";
 import { DeleteConfirmation } from "@/components/modals/delete-confirmation";
 import BodyText from "@/components/utils/Headings/BodyText";
+import { AchievementModal } from "@/components/modals/achievement-modal";
 
 // Zoo data
 const zooData = {
@@ -120,10 +121,10 @@ const zooData = {
       { year: "2020", description: "Renovation of visitor facilities" },
     ],
     achievements: [
-      "First successful breeding program for endangered species",
-      "Award for excellence in zoo management",
-      "Recognition for conservation efforts",
-      "Educational outreach program development",
+      { year: "1960", description: "Conservation of native wildlife species", },
+      { year: "1975", description: "Educational programs for local schools", },
+      { year: "1990", description: "Research on animal behavior", },
+      { year: "2015", description: "Community engagement initiatives", },
     ],
   },
   "lahore-safari-park": {
@@ -203,10 +204,10 @@ const zooData = {
       { year: "2018", description: "Renovation of visitor facilities" },
     ],
     achievements: [
-      "Conservation of endangered native species",
-      "Development of breeding programs",
-      "Educational outreach to schools",
-      "Research partnerships with universities",
+      { year: "1960", description: "Conservation of native wildlife species", },
+      { year: "1975", description: "Educational programs for local schools", },
+      { year: "1990", description: "Research on animal behavior", },
+      { year: "2015", description: "Community engagement initiatives", },
     ],
   },
   "bahawalpur-zoo": {
@@ -280,10 +281,10 @@ const zooData = {
       { year: "2015", description: "Modernization of animal enclosures" },
     ],
     achievements: [
-      "Conservation of native wildlife species",
-      "Educational programs for local schools",
-      "Research on animal behavior",
-      "Community engagement initiatives",
+      { year: "1960", description: "Conservation of native wildlife species", },
+      { year: "1975", description: "Educational programs for local schools", },
+      { year: "1990", description: "Research on animal behavior", },
+      { year: "2015", description: "Community engagement initiatives", },
     ],
   },
 };
@@ -331,6 +332,11 @@ export default function ZooProfilePage() {
     mode: "create" as "create" | "edit" | "view",
     data: null as any,
   });
+  const [achievementModal, setAchievementModal] = useState({
+    isOpen: false,
+    mode: "create" as "create" | "edit" | "view",
+    data: null as any,
+  });
   const [deleteConfirmation, setDeleteConfirmation] = useState({
     isOpen: false,
     type: "",
@@ -366,16 +372,15 @@ export default function ZooProfilePage() {
     return Array.from({ length: count }, (_, i) => ({
       id: `TRIP-${Math.floor(Math.random() * 10000)}`,
       name: `${types[Math.floor(Math.random() * types.length)]} Trip`,
-      organizer: `${
-        ["ABC School", "XYZ College", "Corporate Group", "Family Group"][
-          Math.floor(Math.random() * 4)
-        ]
-      }`,
+      organizer: `${["ABC School", "XYZ College", "Corporate Group", "Family Group"][
+        Math.floor(Math.random() * 4)
+      ]
+        }`,
       participants: Math.floor(Math.random() * 50) + 10,
       date: new Date(
         2025,
         // Math.floor(Math.random() * 12),
-        5,20
+        5, 20
         // Math.floor(Math.random() * 28) + 1
       ),
       status: statuses[Math.floor(Math.random() * statuses.length)],
@@ -520,10 +525,11 @@ export default function ZooProfilePage() {
   };
 
   // History
-  const handleUpdateHistory = (history: string) => {
+  const handleUpdateHistory = (data: any) => {
     setZooInfo((prev: any) => ({
       ...prev,
-      history,
+      history: data.history,
+      imagePath: data.image
     }));
     setHistoryModal({ isOpen: false, mode: "edit" });
   };
@@ -537,6 +543,14 @@ export default function ZooProfilePage() {
     setMilestoneModal({ isOpen: false, mode: "create", data: null });
   };
 
+  const handleAddAchievement = (achievements: any) => {
+    setZooInfo((prev: any) => ({
+      ...prev,
+      achievements: [...prev.achievements, achievements],
+    }));
+    setAchievementModal({ isOpen: false, mode: "create", data: null });
+  };
+
   const handleEditMilestone = (milestone: any, index: number) => {
     setZooInfo((prev: any) => ({
       ...prev,
@@ -547,10 +561,34 @@ export default function ZooProfilePage() {
     setMilestoneModal({ isOpen: false, mode: "edit", data: null });
   };
 
+  const handleEditAchievement = (achievement: any, index: number) => {
+    setZooInfo((prev: any) => ({
+      ...prev,
+      achievements: prev.achievements.map((m: any, i: number) =>
+        i === index ? achievement : m
+      ),
+    }));
+    setAchievementModal({ isOpen: false, mode: "edit", data: null });
+  };
+
   const handleDeleteMilestone = (index: number) => {
     setZooInfo((prev: any) => ({
       ...prev,
       milestones: prev.milestones.filter((_: any, i: number) => i !== index),
+    }));
+    setDeleteConfirmation({
+      isOpen: false,
+      type: "",
+      index: -1,
+      title: "",
+      description: "",
+    });
+  };
+
+  const handleDeleteAchievement = (index: number) => {
+    setZooInfo((prev: any) => ({
+      ...prev,
+      achievements: prev.achievements.filter((_: any, i: number) => i !== index),
     }));
     setDeleteConfirmation({
       isOpen: false,
@@ -682,7 +720,8 @@ export default function ZooProfilePage() {
                     setHistoryModal({ isOpen: true, mode: "view" })
                   }
                 >
-                  <Eye className="h-4 w-4 mr-2" /> View Full History
+                  <Eye className="h-4 w-4 mr-2" />
+                  View Full History
                 </Button>
                 <Button
                   variant="outline"
@@ -691,7 +730,8 @@ export default function ZooProfilePage() {
                     setHistoryModal({ isOpen: true, mode: "edit" })
                   }
                 >
-                  <Edit className="h-4 w-4 mr-2" /> Edit History
+                  <Edit className="h-4 w-4 mr-2" />
+                  Edit History
                 </Button>
               </div>
             </CardHeader>
@@ -732,7 +772,7 @@ export default function ZooProfilePage() {
                         (milestone: any, index: number) => (
                           <li
                             key={index}
-                            className="flex items-center justify-between text-sm group"
+                            className="flex items-center justify-between text-sm group cursor-default"
                           >
                             <div className="flex items-center">
                               <span className="h-2 w-2 rounded-full bg-green-600 mr-2"></span>
@@ -779,17 +819,71 @@ export default function ZooProfilePage() {
                     </ul>
                   </div>
                   <div className="space-y-2">
-                    <h3 className="font-medium font-faustina">
-                      Notable Achievements
-                    </h3>
+                    <div className="flex justify-between items-center">
+                      <h3 className="font-medium font-faustina">
+                        Notable Achievements
+                      </h3>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          setAchievementModal({
+                            isOpen: true,
+                            mode: "create",
+                            data: null,
+                          })
+                        }
+                      >
+                        <Plus className="h-4 w-4 mr-2" /> Add
+                      </Button>
+                    </div>
                     <ul className="space-y-1 font-syne">
                       {zooInfo.achievements.map(
-                        (achievement: string, index: number) => (
-                          <li key={index} className="flex items-center text-sm">
-                            <span className="h-2 w-2 rounded-full bg-green-600 mr-2"></span>
-                            <span>{achievement}</span>
-                          </li>
-                        )
+                        (achievement: any, index: number) => {
+                          return (
+                            <li key={index} className="flex items-center justify-between text-sm group cursor-default">
+                              <div className="flex items-center">
+                                <span className="h-2 w-2 rounded-full bg-green-600 mr-2"></span>
+                                <span>{achievement.year}: {achievement.description}</span>
+                              </div>
+                              <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-6 w-6"
+                                  onClick={() => {
+                                    // console.log(achievement)
+                                    setAchievementModal({
+                                      isOpen: true,
+                                      mode: "edit",
+                                      data: { achievement, index },
+                                    })
+                                  }
+                                  }
+                                >
+                                  <Edit className="h-3 w-3" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-6 w-6 text-red-500"
+                                  onClick={() =>
+                                    setDeleteConfirmation({
+                                      isOpen: true,
+                                      type: "achievement",
+                                      index,
+                                      title: "Delete Achievement",
+                                      description:
+                                        "Are you sure you want to delete this achievement? This action cannot be undone.",
+                                    })
+                                  }
+                                >
+                                  <Trash2 className="h-3 w-3" />
+                                </Button>
+                              </div>
+                            </li>
+                          )
+                        }
                       )}
                     </ul>
                   </div>
@@ -1637,6 +1731,7 @@ export default function ZooProfilePage() {
         isOpen={historyModal.isOpen}
         mode={historyModal.mode}
         history={zooInfo.history}
+        image={zooInfo.imagePath}
         onClose={() => setHistoryModal({ isOpen: false, mode: "edit" })}
         onSave={handleUpdateHistory}
       />
@@ -1651,6 +1746,18 @@ export default function ZooProfilePage() {
         }
         onAdd={handleAddMilestone}
         onEdit={handleEditMilestone}
+      />
+
+      <AchievementModal
+        isOpen={achievementModal.isOpen}
+        mode={achievementModal.mode}
+        achievement={achievementModal.data?.achievement}
+        data={achievementModal.data}
+        onClose={() =>
+          setAchievementModal({ isOpen: false, mode: "create", data: null })
+        }
+        onAdd={handleAddAchievement}
+        onEdit={handleEditAchievement}
       />
 
       <DeleteConfirmation
@@ -1677,6 +1784,8 @@ export default function ZooProfilePage() {
             handleDeleteTrip(deleteConfirmation.index);
           } else if (deleteConfirmation.type === "milestone") {
             handleDeleteMilestone(deleteConfirmation.index);
+          } else if (deleteConfirmation.type === "achievement") {
+            handleDeleteAchievement(deleteConfirmation.index);
           }
         }}
       />

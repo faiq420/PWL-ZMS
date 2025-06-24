@@ -15,39 +15,36 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-interface Milestone {
-  year: string;
-  description: string;
-}
 
-interface MilestoneModalProps {
+interface AchievementModalProps {
   isOpen: boolean;
   onClose: () => void;
   mode: "create" | "edit" | "view";
-  milestone?: Milestone;
-  onAdd?: (milestone: Milestone) => void;
-  onEdit?: (milestone: Milestone, index: number) => void;
-  data?: { milestone: Milestone; index: number } | null;
+  achievement?: any;
+  onAdd?: (achievement: any) => void;
+  onEdit?: (achievement: any, index: number) => void;
+  data?: { achievement: any; index: number } | null;
 }
 
-export function MilestoneModal({
+export function AchievementModal({
   isOpen,
   onClose,
-  milestone,
+  achievement,
   mode,
   onAdd,
   onEdit,
   data,
-}: MilestoneModalProps) {
-  const [formData, setFormData] = useState<Milestone>(
-    milestone || {
-      year: "",
-      description: "",
-    }
+}: AchievementModalProps) {
+  const [formData, setFormData] = useState<any>({
+    year: achievement?.year,
+    description: achievement?.description,
+  }
   );
+  
+  console.log(formData);
 
-  const handleChange = (field: keyof Milestone, value: string) => {
-    setFormData((prev) => ({
+  const handleChange = (field: any, value: string) => {
+    setFormData((prev: any) => ({
       ...prev,
       [field]: value,
     }));
@@ -60,6 +57,10 @@ export function MilestoneModal({
     } else if (mode === "edit" && onEdit && data) {
       onEdit(formData, data.index);
     }
+    setFormData({
+      year: new Date().getFullYear(),
+      description: ''
+    })
     onClose();
   };
 
@@ -71,17 +72,17 @@ export function MilestoneModal({
         <DialogHeader>
           <DialogTitle>
             {mode === "create"
-              ? "Add New Milestone"
+              ? "Add New Achievement"
               : mode === "edit"
-              ? "Edit Milestone"
-              : "Milestone Details"}
+                ? "Edit Achievement"
+                : "Achievement Details"}
           </DialogTitle>
           <DialogDescription>
             {mode === "create"
-              ? "Add a new historical milestone."
+              ? "Add a new historical achievement."
               : mode === "edit"
-              ? "Edit this historical milestone."
-              : "View milestone details."}
+                ? "Edit this historical achievement."
+                : "View achievement details."}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
@@ -92,6 +93,7 @@ export function MilestoneModal({
               </Label>
               <Input
                 id="year"
+                type="number"
                 value={formData.year}
                 onChange={(e) => handleChange("year", e.target.value)}
                 className="col-span-3"
@@ -116,7 +118,7 @@ export function MilestoneModal({
           <DialogFooter>
             {!isViewOnly && (
               <Button type="submit" className="bg-green-700 hover:bg-green-800">
-                {mode === "create" ? "Add Milestone" : "Save Changes"}
+                {mode === "create" ? "Add Achievement" : "Save Changes"}
               </Button>
             )}
             {isViewOnly && (

@@ -34,9 +34,11 @@ import { BookingModal } from "@/components/visit-planning/booking-modal";
 import { useToast } from "@/components/ui/use-toast";
 import RouteModal from "@/components/visit-planning/route-modal";
 import { DeleteConfirmationDialog } from "@/components/visit-planning/delete-confirmation";
+import { useRouter } from "next/navigation";
 
 export default function VisitPlanningPage() {
   const { toast } = useToast();
+  const navigation = useRouter()
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [eventModalOpen, setEventModalOpen] = useState(false);
   const [groupVisitModalOpen, setGroupVisitModalOpen] = useState(false);
@@ -493,13 +495,12 @@ export default function VisitPlanningPage() {
                   <div className="flex justify-between">
                     <CardTitle>{event.title}</CardTitle>
                     <div
-                      className={`px-2 py-1 rounded-2xl h-6 text-xs font-medium ${
-                        event.status === "confirmed"
+                      className={`px-2 py-1 rounded-2xl h-6 text-xs font-medium ${event.status === "confirmed"
                           ? "bg-green-100 text-green-800"
                           : event.status === "pending"
-                          ? "bg-yellow-100 text-yellow-800"
-                          : "bg-red-100 text-red-800"
-                      }`}
+                            ? "bg-yellow-100 text-yellow-800"
+                            : "bg-red-100 text-red-800"
+                        }`}
                     >
                       {event.status.charAt(0).toUpperCase() +
                         event.status.slice(1)}
@@ -534,7 +535,8 @@ export default function VisitPlanningPage() {
                     size="sm"
                     onClick={() => {
                       setSelectedItem(event);
-                      setEventModalOpen(true);
+                      navigation.push(`/home/visit-planning/${event.title.split(" ").join("-").toLowerCase()}?edit=true`)
+                      // setEventModalOpen(true);
                     }}
                   >
                     Edit
@@ -583,13 +585,12 @@ export default function VisitPlanningPage() {
                   <div className="flex justify-between">
                     <CardTitle>{visit.name}</CardTitle>
                     <p
-                      className={`px-2 py-1 rounded-2xl !h-6 text-xs font-medium ${
-                        visit.status === "confirmed"
+                      className={`px-2 py-1 rounded-2xl !h-6 text-xs font-medium ${visit.status === "confirmed"
                           ? "bg-green-100 text-green-800"
                           : visit.status === "pending"
-                          ? "bg-yellow-100 text-yellow-800"
-                          : "bg-red-100 text-red-800"
-                      }`}
+                            ? "bg-yellow-100 text-yellow-800"
+                            : "bg-red-100 text-red-800"
+                        }`}
                     >
                       {visit.status.charAt(0).toUpperCase() +
                         visit.status.slice(1)}
@@ -768,13 +769,12 @@ export default function VisitPlanningPage() {
                   <div className="flex justify-between">
                     <CardTitle>{booking.visitorName}</CardTitle>
                     <div
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        booking.paymentStatus === "Paid"
+                      className={`px-2 py-1 rounded-full text-xs font-medium ${booking.paymentStatus === "Paid"
                           ? "bg-green-100 text-green-800"
                           : booking.paymentStatus === "Pending"
-                          ? "bg-yellow-100 text-yellow-800"
-                          : "bg-red-100 text-red-800"
-                      }`}
+                            ? "bg-yellow-100 text-yellow-800"
+                            : "bg-red-100 text-red-800"
+                        }`}
                     >
                       {booking.paymentStatus}
                     </div>

@@ -15,6 +15,12 @@ const nextConfig = {
         pathname: "/**", // This allows all image paths
       },
       {
+        protocol: "http",
+        hostname: "localhost",
+        port: "3000",
+        pathname: "/**", // This allows all image paths
+      },
+      {
         protocol: "https",
         hostname: "kapraywagera.com",
         pathname: "/**",
@@ -22,6 +28,11 @@ const nextConfig = {
       {
         protocol: "https",
         hostname: "th.bing.com",
+        pathname: "/**",
+      },
+            {
+        protocol: "https",
+        hostname: "zameenblog.s3.amazonaws.com",
         pathname: "/**",
       },
     ],
