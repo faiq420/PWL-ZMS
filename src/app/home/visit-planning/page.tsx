@@ -28,9 +28,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { EventModal } from "@/components/visit-planning/event-modal";
-import { GroupVisitModal } from "@/components/visit-planning/group-visit-modal";
-import { BookingModal } from "@/components/visit-planning/booking-modal";
 import { useToast } from "@/components/ui/use-toast";
 import RouteModal from "@/components/visit-planning/route-modal";
 import { DeleteConfirmationDialog } from "@/components/visit-planning/delete-confirmation";
@@ -41,10 +38,7 @@ export default function VisitPlanningPage() {
   const navigation = useRouter()
   const BASE_URL = "/home/visit-planning/"
   const [date, setDate] = useState<Date | undefined>(new Date());
-  const [eventModalOpen, setEventModalOpen] = useState(false);
-  const [groupVisitModalOpen, setGroupVisitModalOpen] = useState(false);
   const [routeModalOpen, setRouteModalOpen] = useState(false);
-  const [bookingModalOpen, setBookingModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [deleteType, setDeleteType] = useState<
@@ -252,31 +246,31 @@ export default function VisitPlanningPage() {
     },
   ]);
 
-  // CRUD operations for events
-  const handleAddEvent = (event: any) => {
-    const newEvent = {
-      id: events.length + 1,
-      ...event,
-      status: "pending",
-    };
-    setEvents([...events, newEvent]);
-    toast({
-      title: "Event Created",
-      description: `Event "${event.title}" has been created successfully.`,
-    });
-  };
+  // // CRUD operations for events
+  // const handleAddEvent = (event: any) => {
+  //   const newEvent = {
+  //     id: events.length + 1,
+  //     ...event,
+  //     status: "pending",
+  //   };
+  //   setEvents([...events, newEvent]);
+  //   toast({
+  //     title: "Event Created",
+  //     description: `Event "${event.title}" has been created successfully.`,
+  //   });
+  // };
 
-  const handleEditEvent = (updatedEvent: any) => {
-    setEvents(
-      events.map((event) =>
-        event.id === updatedEvent.id ? updatedEvent : event
-      )
-    );
-    toast({
-      title: "Event Updated",
-      description: `Event "${updatedEvent.title}" has been updated successfully.`,
-    });
-  };
+  // const handleEditEvent = (updatedEvent: any) => {
+  //   setEvents(
+  //     events.map((event) =>
+  //       event.id === updatedEvent.id ? updatedEvent : event
+  //     )
+  //   );
+  //   toast({
+  //     title: "Event Updated",
+  //     description: `Event "${updatedEvent.title}" has been updated successfully.`,
+  //   });
+  // };
 
   const handleDeleteEvent = () => {
     if (selectedItem) {
@@ -291,30 +285,30 @@ export default function VisitPlanningPage() {
   };
 
   // CRUD operations for group visits
-  const handleAddGroupVisit = (groupVisit: any) => {
-    const newGroupVisit = {
-      id: groupVisits.length + 1,
-      ...groupVisit,
-      status: "pending",
-    };
-    setGroupVisits([...groupVisits, newGroupVisit]);
-    toast({
-      title: "Group Visit Created",
-      description: `Group visit for "${groupVisit.name}" has been created successfully.`,
-    });
-  };
+  // const handleAddGroupVisit = (groupVisit: any) => {
+  //   const newGroupVisit = {
+  //     id: groupVisits.length + 1,
+  //     ...groupVisit,
+  //     status: "pending",
+  //   };
+  //   setGroupVisits([...groupVisits, newGroupVisit]);
+  //   toast({
+  //     title: "Group Visit Created",
+  //     description: `Group visit for "${groupVisit.name}" has been created successfully.`,
+  //   });
+  // };
 
-  const handleEditGroupVisit = (updatedGroupVisit: any) => {
-    setGroupVisits(
-      groupVisits.map((visit) =>
-        visit.id === updatedGroupVisit.id ? updatedGroupVisit : visit
-      )
-    );
-    toast({
-      title: "Group Visit Updated",
-      description: `Group visit for "${updatedGroupVisit.name}" has been updated successfully.`,
-    });
-  };
+  // const handleEditGroupVisit = (updatedGroupVisit: any) => {
+  //   setGroupVisits(
+  //     groupVisits.map((visit) =>
+  //       visit.id === updatedGroupVisit.id ? updatedGroupVisit : visit
+  //     )
+  //   );
+  //   toast({
+  //     title: "Group Visit Updated",
+  //     description: `Group visit for "${updatedGroupVisit.name}" has been updated successfully.`,
+  //   });
+  // };
 
   const handleDeleteGroupVisit = () => {
     if (selectedItem) {
@@ -368,29 +362,29 @@ export default function VisitPlanningPage() {
   };
 
   // CRUD operations for bookings
-  const handleAddBooking = (booking: any) => {
-    const newBooking = {
-      id: bookings.length + 1,
-      ...booking,
-    };
-    setBookings([...bookings, newBooking]);
-    toast({
-      title: "Booking Created",
-      description: `Booking for "${booking.visitorName}" has been created successfully.`,
-    });
-  };
+  // const handleAddBooking = (booking: any) => {
+  //   const newBooking = {
+  //     id: bookings.length + 1,
+  //     ...booking,
+  //   };
+  //   setBookings([...bookings, newBooking]);
+  //   toast({
+  //     title: "Booking Created",
+  //     description: `Booking for "${booking.visitorName}" has been created successfully.`,
+  //   });
+  // };
 
-  const handleEditBooking = (updatedBooking: any) => {
-    setBookings(
-      bookings.map((booking) =>
-        booking.id === updatedBooking.id ? updatedBooking : booking
-      )
-    );
-    toast({
-      title: "Booking Updated",
-      description: `Booking for "${updatedBooking.visitorName}" has been updated successfully.`,
-    });
-  };
+  // const handleEditBooking = (updatedBooking: any) => {
+  //   setBookings(
+  //     bookings.map((booking) =>
+  //       booking.id === updatedBooking.id ? updatedBooking : booking
+  //     )
+  //   );
+  //   toast({
+  //     title: "Booking Updated",
+  //     description: `Booking for "${updatedBooking.visitorName}" has been updated successfully.`,
+  //   });
+  // };
 
   const handleDeleteBooking = () => {
     if (selectedItem) {
@@ -838,37 +832,12 @@ export default function VisitPlanningPage() {
       </Tabs>
 
       {/* Modals */}
-      <EventModal
-        isOpen={eventModalOpen}
-        onClose={() => setEventModalOpen(false)}
-        onSave={selectedItem ? handleEditEvent : handleAddEvent}
-        event={selectedItem}
-        availableZoos={availableZoos}
-      />
-
-      <GroupVisitModal
-        isOpen={groupVisitModalOpen}
-        onClose={() => setGroupVisitModalOpen(false)}
-        onSave={selectedItem ? handleEditGroupVisit : handleAddGroupVisit}
-        groupVisit={selectedItem}
-        availableZoos={availableZoos}
-      />
-
       <RouteModal
         isOpen={routeModalOpen}
         onClose={() => setRouteModalOpen(false)}
         onSave={selectedItem ? handleEditRoute : handleAddRoute}
         route={selectedItem}
         availableZoos={availableZoos}
-      />
-
-      <BookingModal
-        isOpen={bookingModalOpen}
-        onClose={() => setBookingModalOpen(false)}
-        onSave={selectedItem ? handleEditBooking : handleAddBooking}
-        booking={selectedItem}
-        availableZoos={availableZoos}
-        viewMode={false}
       />
 
       <DeleteConfirmationDialog

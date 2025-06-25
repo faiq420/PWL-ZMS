@@ -225,6 +225,11 @@ export default function VisitingSlug() {
         "Family Pass",
     ]
 
+    const handleTicketType = (type: any) => {
+        console.log(type)
+        setBookingInfo(prev => ({ ...prev, ticketType: type}))
+    }
+
     const handleSave = (e: any) => {
         switch (tab) {
             case "event":
@@ -237,15 +242,15 @@ export default function VisitingSlug() {
                 setGroupVisitInfo((prev: any) => ({ ...prev, id: prev.id + 1, groupVisitInfo }))
                 console.log(groupVisitInfo)
                 break;
-            case "bookings":
+            case "booking":
                 e.preventDefault()
-                setGroupVisitInfo((prev: any) => ({ ...prev, id: prev.id + 1, groupVisitInfo }))
-                console.log(groupVisitInfo)
+                setBookingInfo((prev: any) => ({ ...prev, id: prev.id + 1, bookingInfo }))
+                console.log(bookingInfo)
                 break;
             default:
                 console.log("Fuck You")
         }
-        router.back()
+        // router.back()
     }
 
     return (
@@ -503,9 +508,9 @@ export default function VisitingSlug() {
                                 </div>
                                 <div className="flex flex-col h-full w-full gap-2">
                                     <label>Ticket Type</label>
-                                    <Select value={bookingInfo.ticketType} onValueChange={(value) => setBookingInfo(prev => ({ ...prev, ticketType: value }))} >
+                                    <Select value={bookingInfo.ticketType} onValueChange={(e) => handleTicketType(e)} >
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Select Status" />
+                                            <SelectValue placeholder="Select Ticket Type" />
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectGroup>
@@ -534,7 +539,7 @@ export default function VisitingSlug() {
                                     <label>Payment Status</label>
                                     <Select value={bookingInfo.paymentStatus} onValueChange={(value) => setBookingInfo(prev => ({ ...prev, paymentStatus: value }))} >
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Select Status" />
+                                            <SelectValue placeholder="Select Payment Status" />
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectGroup>
