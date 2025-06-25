@@ -863,7 +863,7 @@ export default function VisitPlanningPage() {
       />
 
       <BookingModal
-        isOpen={true}
+        isOpen={bookingModalOpen}
         onClose={() => setBookingModalOpen(false)}
         onSave={selectedItem ? handleEditBooking : handleAddBooking}
         booking={selectedItem}
