@@ -11,7 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CalendarIcon, Plus } from "lucide-react";
+import { CalendarIcon, Plus, Router } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
@@ -39,6 +39,7 @@ import { useRouter } from "next/navigation";
 export default function VisitPlanningPage() {
   const { toast } = useToast();
   const navigation = useRouter()
+  const BASE_URL = "/home/visit-planning/"
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [eventModalOpen, setEventModalOpen] = useState(false);
   const [groupVisitModalOpen, setGroupVisitModalOpen] = useState(false);
@@ -220,7 +221,7 @@ export default function VisitPlanningPage() {
       id: 2,
       visitorName: "Emily Johnson",
       visitDate: "2023-05-16",
-      ticketType: "Adult",
+      ticketType: "Couple",
       quantity: 2,
       totalPrice: "50.00",
       paymentStatus: "Paid",
@@ -242,7 +243,7 @@ export default function VisitPlanningPage() {
       id: 4,
       visitorName: "David Wilson",
       visitDate: "2023-05-20",
-      ticketType: "Senior",
+      ticketType: "Solo",
       quantity: 1,
       totalPrice: "20.00",
       paymentStatus: "Paid",
@@ -483,7 +484,7 @@ export default function VisitPlanningPage() {
                 </SelectContent>
               </Select> */}
             </div>
-            <Button onClick={() => setEventModalOpen(true)}>
+            <Button onClick={() => navigation.push(`${BASE_URL}event?tab=event&mode=create`)}>
               <Plus className="mr-2 h-4 w-4" /> Add Event
             </Button>
           </div>
@@ -496,10 +497,10 @@ export default function VisitPlanningPage() {
                     <CardTitle>{event.title}</CardTitle>
                     <div
                       className={`px-2 py-1 rounded-2xl h-6 text-xs font-medium ${event.status === "confirmed"
-                          ? "bg-green-100 text-green-800"
-                          : event.status === "pending"
-                            ? "bg-yellow-100 text-yellow-800"
-                            : "bg-red-100 text-red-800"
+                        ? "bg-green-100 text-green-800"
+                        : event.status === "pending"
+                          ? "bg-yellow-100 text-yellow-800"
+                          : "bg-red-100 text-red-800"
                         }`}
                     >
                       {event.status.charAt(0).toUpperCase() +
@@ -535,7 +536,7 @@ export default function VisitPlanningPage() {
                     size="sm"
                     onClick={() => {
                       setSelectedItem(event);
-                      navigation.push(`/home/visit-planning/${event.title.split(" ").join("-").toLowerCase()}?edit=true`)
+                      navigation.push(`${BASE_URL + event.title.split(" ").join("-").toLowerCase()}?tab=event&mode=edit`)
                       // setEventModalOpen(true);
                     }}
                   >
@@ -573,7 +574,7 @@ export default function VisitPlanningPage() {
                 </SelectContent>
               </Select>
             </div>
-            <Button onClick={() => setGroupVisitModalOpen(true)}>
+            <Button onClick={() => navigation.push(`${BASE_URL}group-visit?tab=group-visit&mode=create`)}>
               <Plus className="mr-2 h-4 w-4" /> Add Group Visit
             </Button>
           </div>
@@ -586,10 +587,10 @@ export default function VisitPlanningPage() {
                     <CardTitle>{visit.name}</CardTitle>
                     <p
                       className={`px-2 py-1 rounded-2xl !h-6 text-xs font-medium ${visit.status === "confirmed"
-                          ? "bg-green-100 text-green-800"
-                          : visit.status === "pending"
-                            ? "bg-yellow-100 text-yellow-800"
-                            : "bg-red-100 text-red-800"
+                        ? "bg-green-100 text-green-800"
+                        : visit.status === "pending"
+                          ? "bg-yellow-100 text-yellow-800"
+                          : "bg-red-100 text-red-800"
                         }`}
                     >
                       {visit.status.charAt(0).toUpperCase() +
@@ -632,7 +633,8 @@ export default function VisitPlanningPage() {
                     size="sm"
                     onClick={() => {
                       setSelectedItem(visit);
-                      setGroupVisitModalOpen(true);
+                      navigation.push(`${BASE_URL + visit.name.split(" ").join("-").toLowerCase()}?tab=group-visit&mode=edit`)
+                      // setGroupVisitModalOpen(true);
                     }}
                   >
                     Edit
@@ -745,7 +747,7 @@ export default function VisitPlanningPage() {
                 placeholder="Search bookings..."
                 className="h-8 w-[150px] lg:w-[250px]"
               />
-              {/* <Select defaultValue="all">
+              <Select defaultValue="all">
                 <SelectTrigger className="h-8 w-[150px]">
                   <SelectValue placeholder="Filter by payment" />
                 </SelectTrigger>
@@ -755,11 +757,11 @@ export default function VisitPlanningPage() {
                   <SelectItem value="pending">Pending</SelectItem>
                   <SelectItem value="refunded">Refunded</SelectItem>
                 </SelectContent>
-              </Select> */}
+              </Select>
             </div>
-            {/* <Button onClick={() => setBookingModalOpen(true)}>
+            <Button onClick={() => navigation.push(`${BASE_URL}booking?tab=booking&mode=edit`)}>
               <Plus className="mr-2 h-4 w-4" /> Add Booking
-            </Button> */}
+            </Button>
           </div>
 
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -770,10 +772,10 @@ export default function VisitPlanningPage() {
                     <CardTitle>{booking.visitorName}</CardTitle>
                     <div
                       className={`px-2 py-1 rounded-full text-xs font-medium ${booking.paymentStatus === "Paid"
-                          ? "bg-green-100 text-green-800"
-                          : booking.paymentStatus === "Pending"
-                            ? "bg-yellow-100 text-yellow-800"
-                            : "bg-red-100 text-red-800"
+                        ? "bg-green-100 text-green-800"
+                        : booking.paymentStatus === "Pending"
+                          ? "bg-yellow-100 text-yellow-800"
+                          : "bg-red-100 text-red-800"
                         }`}
                     >
                       {booking.paymentStatus}
@@ -815,7 +817,8 @@ export default function VisitPlanningPage() {
                     size="sm"
                     onClick={() => {
                       setSelectedItem(booking);
-                      setBookingModalOpen(true);
+                      navigation.push(`${BASE_URL + booking.visitorName.split(" ").join("-").toLowerCase()}?tab=booking&mode=edit`)
+                      // setBookingModalOpen(true);
                     }}
                   >
                     Edit
@@ -860,7 +863,7 @@ export default function VisitPlanningPage() {
       />
 
       <BookingModal
-        isOpen={bookingModalOpen}
+        isOpen={true}
         onClose={() => setBookingModalOpen(false)}
         onSave={selectedItem ? handleEditBooking : handleAddBooking}
         booking={selectedItem}

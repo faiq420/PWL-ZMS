@@ -55,7 +55,7 @@ export default function ZooProfilesPage() {
             image:
               "https://zameenblog.s3.amazonaws.com/blog/wp-content/uploads/2021/03/Cover-1440x625-2.jpg",
             status: "active",
-            slug: "lahore-zoo",
+            slug: "1",
             description:
               "Established in 1872, Lahore Zoo is one of the oldest zoos in South Asia, featuring a diverse collection of animals and birds.",
           },
@@ -66,7 +66,7 @@ export default function ZooProfilesPage() {
             image:
               "https://th.bing.com/th/id/R.e967112c84d6ab332fc76717b9e719e6?rik=6S3jtZUUfJiEcg&riu=http%3a%2f%2flocallylahore.com%2fwp-content%2fuploads%2fsp12-768x333.jpg&ehk=90kBmeb3p9n97hicdZ0p8Ce4ksUZTRA7lWP7usT%2f8QQ%3d&risl=&pid=ImgRaw&r=0",
             status: "active",
-            slug: "lahore-safari-park",
+            slug: "2",
             description:
               "A large wildlife sanctuary offering safari experiences and conservation efforts for endangered species native to Pakistan.",
           },
@@ -77,7 +77,7 @@ export default function ZooProfilesPage() {
             image:
               "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiPAtR3czeDrdxYuNt34NIhDJ7t68uGAqmgSrEXxDuNByIBeBiha-xvXOwklndvWxgO0f_Hnt1FslVyLKL8ORRtISYOknzzv8x8AtB9kPFHo5lkSM_0fBhtMhUx_ZkTJW0GenRctADnzlNR/s1600/Bahawalpur20Zoo201-76-1516796494.jpg",
             status: "active",
-            slug: "bahawalpur-zoo",
+            slug: "3",
             description:
               "Founded in 1942, Bahawalpur Zoo houses a variety of animals and is known for its historical significance and educational programs.",
           },

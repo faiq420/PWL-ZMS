@@ -49,7 +49,7 @@ import { AchievementModal } from "@/components/modals/achievement-modal";
 
 // Zoo data
 const zooData = {
-  "lahore-zoo": {
+  "1": {
     name: "Lahore Zoo",
     location: "Shahrah-e-Quaid-e-Azam, Lahore, Punjab, Pakistan",
     established: "1872",
@@ -127,7 +127,7 @@ const zooData = {
       { year: "2015", description: "Community engagement initiatives", },
     ],
   },
-  "lahore-safari-park": {
+  "2": {
     name: "Lahore Safari Park",
     location: "Raiwind Road, Lahore, Punjab, Pakistan",
     established: "1982",
@@ -210,7 +210,7 @@ const zooData = {
       { year: "2015", description: "Community engagement initiatives", },
     ],
   },
-  "bahawalpur-zoo": {
+  "3": {
     name: "Bahawalpur Zoo",
     location: "Bahawalpur, Punjab, Pakistan",
     imagePath:
@@ -294,6 +294,7 @@ export default function ZooProfilePage() {
   const router = useRouter();
   const params = useParams();
   const slug = params?.slug;
+  console.log(slug)
   const [zooInfo, setZooInfo] = useState(() => {
     return zooData[slug as keyof typeof zooData] || null;
   });
