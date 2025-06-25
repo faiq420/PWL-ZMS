@@ -315,9 +315,9 @@ export default function VisitingSlug() {
                     <CardContent>
                         {/* Event Tab */}
                         {tab === "event" && (
-                            <div className="grid grid-cols-4 gap-4 items-center">
+                            <div className="grid lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-4 items-center">
                                 <div className="flex flex-col h-full w-full gap-2">
-                                    <label>Title</label>
+                                    <label className="text-sm text-black">Title</label>
                                     <Input
                                         type="text"
                                         placeholder="Event Title"
@@ -326,7 +326,7 @@ export default function VisitingSlug() {
                                     />
                                 </div>
                                 <div className="flex flex-col h-full w-full gap-2">
-                                    <label>Date</label>
+                                    <label className="text-sm text-black">Date</label>
                                     <Input
                                         type="date"
                                         value={eventInfo.date}
@@ -334,7 +334,7 @@ export default function VisitingSlug() {
                                     />
                                 </div>
                                 <div className="flex flex-col h-full w-full gap-2">
-                                    <label>Time</label>
+                                    <label className="text-sm text-black">Time</label>
                                     <Input
                                         type="time"
                                         value={eventInfo.time}
@@ -342,7 +342,7 @@ export default function VisitingSlug() {
                                     />
                                 </div>
                                 <div className="flex flex-col h-full w-full gap-2">
-                                    <label>Attendees</label>
+                                    <label className="text-sm text-black">Attendees</label>
                                     <Input
                                         type="number"
                                         placeholder="No: of Attendees"
@@ -350,7 +350,7 @@ export default function VisitingSlug() {
                                         onChange={(e: any) => setEventInfo(prev => ({ ...prev, attendees: e.target.value }))} />
                                 </div>
                                 <div className="flex flex-col h-full w-full gap-2">
-                                    <label>Status</label>
+                                    <label className="text-sm text-black">Status</label>
                                     <Select value={eventInfo.status} onValueChange={(value) => setEventInfo(prev => ({ ...prev, status: value }))} >
                                         <SelectTrigger>
                                             <SelectValue placeholder="Select Status" />
@@ -363,7 +363,7 @@ export default function VisitingSlug() {
                                     </Select>
                                 </div>
                                 <div className="flex flex-col h-full w-full gap-2">
-                                    <label>Type</label>
+                                    <label className="text-sm text-black">Type</label>
                                     <Select value={eventInfo.type} onValueChange={(value) => setEventInfo(prev => ({ ...prev, type: value }))}>
                                         <SelectTrigger>
                                             <SelectValue placeholder="Select Event Type" />
@@ -376,7 +376,7 @@ export default function VisitingSlug() {
                                     </Select>
                                 </div>
                                 <div className="flex flex-col h-full w-full gap-2">
-                                    <label>Zoo</label>
+                                    <label className="text-sm text-black">Zoo</label>
                                     <Select value={eventInfo.zoo} onValueChange={(value) => setEventInfo(prev => ({ ...prev, zoo: value }))}>
                                         <SelectTrigger>
                                             <SelectValue placeholder="Select Zoo" />
@@ -392,9 +392,9 @@ export default function VisitingSlug() {
                         )}
                         {/* Group Visit Tab */}
                         {tab === "group-visit" && (
-                            <div className="grid grid-cols-4 gap-4 items-center">
+                            <div className="grid lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-4 items-center">
                                 <div className="flex flex-col h-full w-full gap-2">
-                                    <label>Title</label>
+                                    <label className="text-sm text-black">Title</label>
                                     <Input
                                         type="text"
                                         placeholder="Event Title"
@@ -403,7 +403,7 @@ export default function VisitingSlug() {
                                     />
                                 </div>
                                 <div className="flex flex-col h-full w-full gap-2">
-                                    <label>Date</label>
+                                    <label className="text-sm text-black">Date</label>
                                     <Input
                                         type="date"
                                         value={groupVisitInfo.date}
@@ -411,7 +411,7 @@ export default function VisitingSlug() {
                                     />
                                 </div>
                                 <div className="flex flex-col h-full w-full gap-2">
-                                    <label>Time</label>
+                                    <label className="text-sm text-black">Time</label>
                                     <Input
                                         type="time"
                                         value={groupVisitInfo.time}
@@ -419,7 +419,7 @@ export default function VisitingSlug() {
                                     />
                                 </div>
                                 <div className="flex flex-col h-full w-full gap-2">
-                                    <label>Group Size</label>
+                                    <label className="text-sm text-black">Group Size</label>
                                     <Input
                                         type="number"
                                         placeholder="Group Size"
@@ -427,7 +427,7 @@ export default function VisitingSlug() {
                                         onChange={(e: any) => setGroupVisitInfo(prev => ({ ...prev, groupSize: e.target.value }))} />
                                 </div>
                                 <div className="flex flex-col h-full w-full gap-2">
-                                    <label>Contact Person</label>
+                                    <label className="text-sm text-black">Contact Person</label>
                                     <Input
                                         type="text"
                                         placeholder="Contact Person"
@@ -435,7 +435,7 @@ export default function VisitingSlug() {
                                         onChange={(e: any) => setGroupVisitInfo(prev => ({ ...prev, contactPerson: e.target.value }))} />
                                 </div>
                                 <div className="flex flex-col h-full w-full gap-2">
-                                    <label>Contact Email</label>
+                                    <label className="text-sm text-black">Contact Email</label>
                                     <Input
                                         type="email"
                                         placeholder="Contact Email"
@@ -443,7 +443,7 @@ export default function VisitingSlug() {
                                         onChange={(e: any) => setGroupVisitInfo(prev => ({ ...prev, contactEmail: e.target.value }))} />
                                 </div>
                                 <div className="flex flex-col h-full w-full gap-2">
-                                    <label>Contact Phone</label>
+                                    <label className="text-sm text-black">Contact Phone</label>
                                     <Input
                                         type="text"
                                         placeholder="Contact Phone"
@@ -451,7 +451,7 @@ export default function VisitingSlug() {
                                         onChange={(e: any) => setGroupVisitInfo(prev => ({ ...prev, contactPhone: e.target.value }))} />
                                 </div>
                                 <div className="flex flex-col h-full w-full gap-2">
-                                    <label>Requirements</label>
+                                    <label className="text-sm text-black">Requirements</label>
                                     <Input
                                         type="text"
                                         placeholder="Special Requirements"
@@ -459,7 +459,7 @@ export default function VisitingSlug() {
                                         onChange={(e: any) => setGroupVisitInfo(prev => ({ ...prev, specialRequirements: e.target.value }))} />
                                 </div>
                                 <div className="flex flex-col h-full w-full gap-2">
-                                    <label>Status</label>
+                                    <label className="text-sm text-black">Status</label>
                                     <Select value={groupVisitInfo.status} onValueChange={(value) => setGroupVisitInfo(prev => ({ ...prev, status: value }))} >
                                         <SelectTrigger>
                                             <SelectValue placeholder="Select Status" />
@@ -472,7 +472,7 @@ export default function VisitingSlug() {
                                     </Select>
                                 </div>
                                 <div className="flex flex-col h-full w-full gap-2">
-                                    <label>Zoo</label>
+                                    <label className="text-sm text-black">Zoo</label>
                                     <Select value={groupVisitInfo.zoo} onValueChange={(value) => setGroupVisitInfo(prev => ({ ...prev, zoo: value }))}>
                                         <SelectTrigger>
                                             <SelectValue placeholder="Select Zoo" />
@@ -488,9 +488,9 @@ export default function VisitingSlug() {
                         )}
                         {/* Group Visit Tab */}
                         {tab === "booking" && (
-                            <div className="grid grid-cols-3 gap-4 items-center">
+                            <div className="grid md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-4 items-center">
                                 <div className="flex flex-col h-full w-full gap-2">
-                                    <label>Visitor Name</label>
+                                    <label className="text-sm text-black">Visitor Name</label>
                                     <Input
                                         type="text"
                                         placeholder="Visitor Name"
@@ -499,7 +499,7 @@ export default function VisitingSlug() {
                                     />
                                 </div>
                                 <div className="flex flex-col h-full w-full gap-2">
-                                    <label>Visit Date</label>
+                                    <label className="text-sm text-black">Visit Date</label>
                                     <Input
                                         type="date"
                                         value={bookingInfo.visitDate}
@@ -507,7 +507,7 @@ export default function VisitingSlug() {
                                     />
                                 </div>
                                 <div className="flex flex-col h-full w-full gap-2">
-                                    <label>Ticket Type</label>
+                                    <label className="text-sm text-black">Ticket Type</label>
                                     <Select value={bookingInfo.ticketType} onValueChange={(e) => handleTicketType(e)} >
                                         <SelectTrigger>
                                             <SelectValue placeholder="Select Ticket Type" />
@@ -520,7 +520,7 @@ export default function VisitingSlug() {
                                     </Select>
                                 </div>
                                 <div className="flex flex-col h-full w-full gap-2">
-                                    <label>Quantity</label>
+                                    <label className="text-sm text-black">Quantity</label>
                                     <Input
                                         type="number"
                                         placeholder="Group Size"
@@ -528,7 +528,7 @@ export default function VisitingSlug() {
                                         onChange={(e: any) => setBookingInfo(prev => ({ ...prev, quantity: e.target.value }))} />
                                 </div>
                                 <div className="flex flex-col h-full w-full gap-2">
-                                    <label>Total Price</label>
+                                    <label className="text-sm text-black">Total Price</label>
                                     <Input
                                         type="text"
                                         placeholder="Total Price"
@@ -536,7 +536,7 @@ export default function VisitingSlug() {
                                         onChange={(e: any) => setBookingInfo(prev => ({ ...prev, totalPrice: e.target.value }))} />
                                 </div>
                                 <div className="flex flex-col h-full w-full gap-2">
-                                    <label>Payment Status</label>
+                                    <label className="text-sm text-black">Payment Status</label>
                                     <Select value={bookingInfo.paymentStatus} onValueChange={(value) => setBookingInfo(prev => ({ ...prev, paymentStatus: value }))} >
                                         <SelectTrigger>
                                             <SelectValue placeholder="Select Payment Status" />
@@ -549,7 +549,7 @@ export default function VisitingSlug() {
                                     </Select>
                                 </div>
                                 <div className="flex flex-col h-full w-full gap-2">
-                                    <label>Zoo</label>
+                                    <label className="text-sm text-black">Zoo</label>
                                     <Select value={bookingInfo.zoo} onValueChange={(value) => setBookingInfo(prev => ({ ...prev, zoo: value }))}>
                                         <SelectTrigger>
                                             <SelectValue placeholder="Select Zoo" />
