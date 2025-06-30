@@ -44,7 +44,7 @@ const PasswordInputTag = ({
   };
 
   return (
-    <div className={`${styles.inputGroup} space-y-[10px] flex-1`}>
+    <div className={`${styles.inputGroup} space-y-[6px] flex-1`}>
       <div className="flex items-center space-x-2">
         {label && (
           <Label htmlFor={name}>

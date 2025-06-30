@@ -29,7 +29,7 @@ const DateInputTag = ({
   subfield,
 }: Props) => {
   return (
-    <div className={`${styles.inputGroup} space-y-[10px]`}>
+    <div className={`${styles.inputGroup} space-y-[6px]`}>
       {label && (
         <Label htmlFor={name}>
           {label}

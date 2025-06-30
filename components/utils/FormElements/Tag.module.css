@@ -2,6 +2,7 @@
   display: flex;
   flex-direction: column;
   position: relative;
+  gap: 4;
 }
 
 .input {
@@ -10,7 +11,7 @@
   padding: 8px;
   font-size: 12px;
   font-weight: 400;
-  @apply font-tajawal
+  @apply font-tajawal;
 }
 
 .input:disabled {

@@ -169,7 +169,7 @@ export const TextEditor = ({
   }
 
   return (
-    <div className={`space-y-2 flex-1 ${className}`}>
+    <div className={`space-y-[6px] flex-1 ${className}`}>
       {(label || subfield) && (
         <div className="flex items-center gapx-1 py-[2px]p-2">
           {label && (

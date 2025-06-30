@@ -3,6 +3,7 @@ import DatePicker from "react-datepicker";
 import styles from "./Tag.module.css";
 import "react-datepicker/dist/react-datepicker.css";
 import "./DatePickerStyles.css"; // ✅ Import the custom styles
+import { Label } from "@/components/ui/label";
 
 interface Props {
   name: string;
@@ -24,15 +25,12 @@ const DateTimePicker: React.FC<Props> = ({
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
 
   return (
-    <div className={`${styles.inputGroup} flex flex-col space-y-1`}>
+    <div className={`${styles.inputGroup} flex flex-col space-y-[6px]`}>
       {label && (
-        <label
-          className="text-xs text-[#1E1E1E] font-alata font-normal leading-4"
-          htmlFor={name}
-        >
+        <Label htmlFor={name}>
           {label}
-          {isRequired && <span className="text-red-900"> *</span>}
-        </label>
+          {isRequired && <span className="text-red-900">*</span>}
+        </Label>
       )}
 
       <DatePicker

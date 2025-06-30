@@ -43,13 +43,17 @@ const types: { [key: string]: string } = {
     "bg-main-sunshineYellow text-white hover:bg-main-sunshineYellow/80 disabled:bg-main-sunshineYellow/60",
   outlineSunshineYellow:
     "bg-transparent border border-main-sunshineYellow text-main-sunshineYellow hover:bg-main-white/20 disabled:bg-main-white/10",
+  darkGreen:
+    "bg-green-700 border text-white hover:bg-green-800 disabled:bg-green-700/70",
+  dark: "bg-[#171717] border text-white hover:bg-[#181818] disabled:bg-[#3c3c3c]",
+  white: "bg-white border text-black hover:bg-accent",
 };
 const ButtonComp = ({
   text,
   clickEvent,
   disabled,
   isCruding,
-  type = "default",
+  type = "darkGreen",
   beforeIcon,
   afterIcon,
 }: Props) => {
@@ -58,7 +62,7 @@ const ButtonComp = ({
       <button
         onClick={clickEvent}
         disabled={disabled || isCruding}
-        className={`${types[type]} flex gap-2 justify-center disabled:cursor-text text-nowrap flex-1 text-xs font-medium font-faustina w-full py-3 px-4 rounded shadow hover:cursor-pointer focus:outline-none focus:ring-0 
+        className={`${types[type]} flex gap-2 justify-center disabled:cursor-text text-nowrap flex-1 text-sm font-medium font-faustina w-full py-3 px-4 rounded-md shadow hover:cursor-pointer focus:outline-none focus:ring-0 
           }`}
       >
         <span>{beforeIcon}</span>{" "}

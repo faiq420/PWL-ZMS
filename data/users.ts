@@ -1,21 +1,86 @@
-import type { User, Zoo, Permission } from "@/types/user"
+import type { User, Zoo, Permission } from "@/types/user";
 
 export const zoos: Zoo[] = [
-  { id: "1", name: "Lahore Zoo", location: "Lahore", city: "Lahore" },
-  { id: "2", name: "Lahore Safari Park", location: "Lahore", city: "Lahore" },
-  { id: "3", name: "Bahawalpur Zoo", location: "Bahawalpur", city: "Bahawalpur" },
-  { id: "4", name: "Karachi Zoo", location: "Karachi", city: "Karachi" },
-  { id: "5", name: "Islamabad Zoo", location: "Islamabad", city: "Islamabad" },
-]
+  {
+    id: "1",
+    value: 1,
+    label: "Lahore Zoo",
+    name: "Lahore Zoo",
+    location: "Lahore",
+    city: "Lahore",
+  },
+  {
+    id: "2",
+    value: 2,
+    label: "Lahore Safari Park",
+    name: "Lahore Safari Park",
+    location: "Lahore",
+    city: "Lahore",
+  },
+  {
+    id: "3",
+    value: 3,
+    label: "Bahawalpur Zoo",
+    name: "Bahawalpur Zoo",
+    location: "Bahawalpur",
+    city: "Bahawalpur",
+  },
+  {
+    id: "4",
+    value: 4,
+    label: "Karachi Zoo",
+    name: "Karachi Zoo",
+    location: "Karachi",
+    city: "Karachi",
+  },
+  {
+    id: "5",
+    value: 5,
+    label: "Islamabad Zoo",
+    name: "Islamabad Zoo",
+    location: "Islamabad",
+    city: "Islamabad",
+  },
+];
 
 export const permissions: Permission[] = [
-  { id: "1", name: "user_management", description: "Manage users and roles", module: "users" },
-  { id: "2", name: "zoo_management", description: "Manage zoo profiles and data", module: "zoos" },
-  { id: "3", name: "animal_management", description: "Manage animal directory", module: "animals" },
-  { id: "4", name: "veterinary_access", description: "Access veterinary features", module: "veterinary" },
-  { id: "5", name: "visitor_services", description: "Manage visitor services", module: "visitors" },
-  { id: "6", name: "reports_access", description: "Access reports and analytics", module: "reports" },
-]
+  {
+    id: "1",
+    name: "user_management",
+    description: "Manage users and roles",
+    module: "users",
+  },
+  {
+    id: "2",
+    name: "zoo_management",
+    description: "Manage zoo profiles and data",
+    module: "zoos",
+  },
+  {
+    id: "3",
+    name: "animal_management",
+    description: "Manage animal directory",
+    module: "animals",
+  },
+  {
+    id: "4",
+    name: "veterinary_access",
+    description: "Access veterinary features",
+    module: "veterinary",
+  },
+  {
+    id: "5",
+    name: "visitor_services",
+    description: "Manage visitor services",
+    module: "visitors",
+  },
+  {
+    id: "6",
+    name: "reports_access",
+    description: "Access reports and analytics",
+    module: "reports",
+  },
+];
 
 export const mockUsers: User[] = [
   {
@@ -73,4 +138,4 @@ export const mockUsers: User[] = [
     phone: "+92-302-3456789",
     address: "Gulberg III, Lahore",
   },
-]
+];

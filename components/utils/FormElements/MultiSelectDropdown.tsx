@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import makeAnimated from "react-select/animated";
 import { components } from "react-select";
+import { Label } from "@/components/ui/label";
+import styles from "./Tag.module.css";
 
 interface Props {
   options: any;
@@ -216,13 +218,12 @@ const MultiSelectDropdown = ({
   }
 
   return (
-    <div className="flex-1 DMSans-family">
-      <label
-        className="text-xs text-[#1E1E1E] mb-1 font-alata font-normal leading-4"
-        htmlFor={name}
-      >
-        {label}
-      </label>
+    <div className={`${styles.inputGroup} space-y-[6px] flex-1`}>
+      {label && (
+        <Label htmlFor={name}>
+          {label}
+        </Label>
+      )}
       <Select
         closeMenuOnSelect={false}
         isMulti

@@ -54,7 +54,7 @@ const Dropdown = ({
   const customStyles = {
     control: (provided: any) => ({
       ...provided,
-      fontSize: 14,
+      fontSize: 12,
       minHeight: "34px",
       height: "34px",
       maxHeight: "34px",
@@ -148,7 +148,7 @@ const Dropdown = ({
   }
 
   return (
-    <div className={`${styles.inputGroup} space-y-[10px] flex-1`}>
+    <div className={`${styles.inputGroup} space-y-[6px] flex-1`}>
       {label && (
         <Label htmlFor={name}>
           {label}
