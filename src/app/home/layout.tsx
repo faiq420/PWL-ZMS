@@ -2,6 +2,8 @@ import type React from "react";
 import { SideMenu } from "@/components/Menus/SideMenu";
 import Footer from "@/components/Menus/Footer";
 import Header from "@/components/Menus/Header";
+import 'leaflet/dist/leaflet.css';
+
 
 export default function DashboardLayout({
   children,

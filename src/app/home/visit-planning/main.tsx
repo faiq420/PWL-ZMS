@@ -11,7 +11,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CalendarIcon, Edit, Plus, Router, Trash2, TrashIcon } from "lucide-react";
+import {
+  CalendarIcon,
+  Edit,
+  Plus,
+  Router,
+  Trash2,
+  TrashIcon,
+} from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
@@ -78,8 +85,7 @@ export default function VisitPlanningPage() {
     {
       id: 1,
       title: "School Visit",
-      date: "2023-05-15",
-      time: "10:00 AM",
+      date: "2023-05-15T14:00:00.000z",
       attendees: 45,
       status: "confirmed",
       type: "education",
@@ -88,8 +94,7 @@ export default function VisitPlanningPage() {
     {
       id: 2,
       title: "Corporate Team Building",
-      date: "2023-05-16",
-      time: "2:00 PM",
+      date: "2023-05-16T14:00:00.000z",
       attendees: 20,
       status: "pending",
       type: "corporate",
@@ -98,8 +103,7 @@ export default function VisitPlanningPage() {
     {
       id: 3,
       title: "Birthday Party",
-      date: "2023-05-18",
-      time: "1:00 PM",
+      date: "2023-05-18T14:00:00.000z",
       attendees: 15,
       status: "confirmed",
       type: "birthday",
@@ -108,8 +112,7 @@ export default function VisitPlanningPage() {
     {
       id: 4,
       title: "Senior Center Visit",
-      date: "2023-05-20",
-      time: "11:00 AM",
+      date: "2023-05-20T14:00:00.000z",
       attendees: 25,
       status: "confirmed",
       type: "community",
@@ -473,7 +476,7 @@ export default function VisitPlanningPage() {
         </TabsList>
 
         <TabsContent value="events" className="space-y-4">
-          <div className="flex justify-between">
+          <div className="flex justify-between items-end">
             <div className="flex items-center space-x-2">
               <Input
                 placeholder="Search events..."
@@ -491,21 +494,24 @@ export default function VisitPlanningPage() {
                 </SelectContent>
               </Select> */}
             </div>
-            <Button
-              onClick={() =>
-                router.push(`${BASE_URL}event?tab=event&mode=create`)
-              }
-            >
-              <Plus className="mr-2 h-4 w-4" /> Add Event
-            </Button>
+            <div className="w-fit">
+              <ButtonComp
+                type={"dark"}
+                clickEvent={() => {
+                  NavigateToRecord("event", "create");
+                }}
+                text="Add Event"
+                beforeIcon={<Plus className=" h-4 w-4" />}
+              />
+            </div>
           </div>
 
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {events.map((event) => (
               <Card key={event.id} className="flex flex-col">
-                <CardHeader className="pb-2">
-                  <div className="flex justify-between">
-                    <CardTitle>{event.title}</CardTitle>
+                <CardHeader className="pb-2 flex flex-col h-full">
+                  <div className="flex justify-between flex-1 h-full">
+                    <CardTitle className="font-medium font-barlow">{event.title}</CardTitle>
                     <div
                       className={`px-2 py-1 rounded-2xl h-6 text-xs font-medium ${
                         event.status === "confirmed"
@@ -520,7 +526,7 @@ export default function VisitPlanningPage() {
                     </div>
                   </div>
                   <CardDescription>
-                    {event.date} at {event.time}
+                    {changeDateFormatWithTime(event.date)}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="flex-1 flex flex-col justify-end">
@@ -542,29 +548,22 @@ export default function VisitPlanningPage() {
                     </div>
                   </div>
                 </CardContent>
-                <CardFooter className="flex justify-between">
+                <CardFooter className="flex justify-end gap-2">
                   <Button
-                    variant="outline"
+                    variant="default"
                     size="sm"
                     onClick={() => {
-                      setSelectedItem(event);
-                      router.push(
-                        `${
-                          BASE_URL +
-                          event.title.split(" ").join("-").toLowerCase()
-                        }?tab=event&mode=edit`
-                      );
-                      // setEventModalOpen(true);
+                      NavigateToRecord("event", "edit", event.id);
                     }}
                   >
-                    Edit
+                    <Edit size={12} />
                   </Button>
                   <Button
-                    variant="outline"
+                    variant="destructive"
                     size="sm"
                     onClick={() => openDeleteDialog("event", event)}
                   >
-                    Delete
+                    <Trash2 size={12} />
                   </Button>
                 </CardFooter>
               </Card>
@@ -682,7 +681,7 @@ export default function VisitPlanningPage() {
         </TabsContent>
 
         <TabsContent value="suggested-routes" className="space-y-4">
-          <div className="flex justify-between">
+          <div className="flex justify-between items-end">
             <div className="flex items-center space-x-2">
               <Input
                 placeholder="Search routes..."
@@ -803,8 +802,8 @@ export default function VisitPlanningPage() {
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {bookings.map((booking) => (
               <Card key={booking.id} className="flex flex-col">
-                <CardHeader className="pb-2 h-full flex-1">
-                  <div className="flex justify-between">
+                <CardHeader className="pb-2 h-full flex-1 flex flex-col">
+                  <div className="flex justify-between h-full flex-1">
                     <CardTitle className="font-medium font-barlow">
                       {booking.visitorName}
                     </CardTitle>
@@ -821,7 +820,7 @@ export default function VisitPlanningPage() {
                     </div>
                   </div>
                   <CardDescription>
-                    Visit Date: {changeDateFormatWithTime(booking.visitDate)}
+                    {changeDateFormatWithTime(booking.visitDate)}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="flex-1">
@@ -852,7 +851,7 @@ export default function VisitPlanningPage() {
                 </CardContent>
                 <CardFooter className="flex justify-end gap-2">
                   <Button
-                    variant="outline"
+                    variant="default"
                     size="sm"
                     onClick={() => {
                       NavigateToRecord("booking", "edit", booking.id);
@@ -861,7 +860,7 @@ export default function VisitPlanningPage() {
                     <Edit size={12} />
                   </Button>
                   <Button
-                    variant="outline"
+                    variant="destructive"
                     size="sm"
                     onClick={() => openDeleteDialog("booking", booking)}
                   >

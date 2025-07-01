@@ -35,7 +35,7 @@ const TextArea = ({
         <span className="text-gray-400 mb-1 text-[10px] text-center">{`( ${subfield} )`}</span>
       )}
       <Textarea
-        className={`flex-1 max-h-52`}
+        className={`flex-1 max-h-52 ${styles.input}`}
         id={name}
         name={name}
         value={value}

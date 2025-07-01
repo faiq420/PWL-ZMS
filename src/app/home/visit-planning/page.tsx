@@ -26,7 +26,11 @@ const Page = () => {
   }
 
   return activeTab === "event" ? (
-    <Events />
+    <Events
+      mode={crudModes.includes(mode ?? "") ? mode : "create"}
+      tab={activeTab}
+      id={id}
+    />
   ) : activeTab === "group-visit" ? (
     <Group />
   ) : activeTab === "booking" ? (

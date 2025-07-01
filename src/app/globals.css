@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+/* @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap'); */
+
 body {
   font-family: Arial, Helvetica, sans-serif;
 }
@@ -145,6 +147,21 @@ body {
   content: "";
   @apply absolute inset-0 bg-black opacity-30; /* Black overlay with 30% opacity */
   z-index: -1;
+}
+
+.cloudy-text {
+  font-family: "Fredoka One", cursive;
+  font-size: 100px;
+  font-weight: bold;
+  color: white;
+
+  /* Inner stroke (light blue) */
+  -webkit-text-stroke: 3px #00bfff;
+
+  /* Outer stroke using shadows */
+  text-shadow: 0 0 0 #00bfff, /* Fill for fallback */ 3px 3px 0 #0074d9,
+    /* Darker blue outer stroke simulation */ -3px 3px 0 #0074d9,
+    3px -3px 0 #0074d9, -3px -3px 0 #0074d9, 0 4px 8px rgba(0, 0, 0, 0.2); /* Optional soft drop shadow */
 }
 
 /* .apexcharts-bar-series .apexcharts-series path {

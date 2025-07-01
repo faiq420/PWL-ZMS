@@ -37,7 +37,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@radix-ui/react-dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
+import typographyIcon from "@/public/assets/logos/sidemenu_typography.svg";
 
 export function SideMenu() {
   const pathname = usePathname();
@@ -107,7 +107,7 @@ export function SideMenu() {
 
   return (
     <>
-      <div className="md:hidden flex items-center h-16 px-4 z-50 font-roboto bg-main-background">
+      <div className="md:hidden flex items-center h-16 px-4 z-10 font-roboto bg-main-background">
         <Button
           variant="ghost"
           size="icon"
@@ -117,7 +117,7 @@ export function SideMenu() {
           <Menu className="h-6 w-6" />
           <span className="sr-only">Toggle Menu</span>
         </Button>
-        <h1 className="font-semibold">ZMS</h1>
+        <Image src={typographyIcon} className="w-[20%]" alt="Logo" />
       </div>
 
       {/* Mobile Sidebar */}
@@ -245,16 +245,17 @@ export function SideMenu() {
             >
               {isCollapsed && (
                 <Image
-                  src={"/assets/logos/PWL_logo.png"}
+                  src={"/assets/logos/sidemenu_icon.svg"}
                   height={30}
                   width={30}
                   alt="Logo"
                 />
               )}
               {!isCollapsed && (
-                <span className="uppercase text-4xl leading-5 font-montserrat font-semibold">
-                  ZMS
-                </span>
+                // <span className="uppercase text-4xl leading-5 font-montserrat font-semibold">
+                //   ZMS
+                // </span>
+                <Image src={typographyIcon} className="w-[60%]" alt="Logo" />
               )}
             </Link>
           </div>
