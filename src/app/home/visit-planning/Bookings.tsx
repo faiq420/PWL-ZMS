@@ -12,13 +12,14 @@ import DateInputTag from "@/components/utils/FormElements/DateInputTag";
 import DateTimePicker from "@/components/utils/FormElements/DateTimePicker";
 import Dropdown from "@/components/utils/FormElements/Dropdown";
 import InputTag from "@/components/utils/FormElements/InputTag";
+import MultiSelectDropdown from "@/components/utils/FormElements/MultiSelectDropdown";
 import Paragraph from "@/components/utils/Headings/Paragraph";
 import Subheading from "@/components/utils/Headings/Subheading";
 import { zoos } from "@/data/users";
 import { formatISOStringDate } from "@/Helper/DateFormats";
 import { ArrowLeft, Save, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 
 interface Props {
   mode?: string;
@@ -28,15 +29,28 @@ interface Props {
 
 const Bookings = ({ mode = "create", id = "0", tab }: Props) => {
   const router = useRouter();
-  const prices = {
+  const [prices, setPrices] = useState({
     adult: 200,
     child: 100,
     senior: 150,
     familyPack: 500,
-  };
-
+  });
+  const [visitType, setVisitType] = useState([
+    { label: "Zoo Visit", value: "casual" },
+    { label: "Event Visit", value: "event" },
+  ]);
+  const [events, setEvents] = useState([
+    { label: "Event1 (10:00 AM - 12:00 PM)", value: "event1" },
+    { label: "Event2 (10:00 AM - 12:00 PM)", value: "event2" },
+    { label: "Event3 (12:00 PM - 02:00 PM)", value: "event3" },
+    { label: "Event4 (01:00 PM - 03:00 PM)", value: "event4" },
+    { label: "Event5 (04:00 PM - 06:00 PM)", value: "event5" },
+    { label: "Event6 (05:00 PM - 05:30 PM)", value: "event6" },
+  ]);
+  const [selectedType, setSelectedType] = useState("");
+  const [selectedEvents, setSelectedEvents] = useState<number[]>([]);
   const [obj, setObj] = useState({
-    id: 4,
+    id: 0,
     visitorName: "",
     email: "",
     phone: "",
@@ -115,7 +129,7 @@ const Bookings = ({ mode = "create", id = "0", tab }: Props) => {
       </div>
       <Card>
         <CardHeader></CardHeader>
-        <CardContent className="space-y-10">
+        <CardContent className="space-y-4">
           <div className="space-y-2">
             <Paragraph
               text="Visitor's Information"
@@ -158,61 +172,41 @@ const Bookings = ({ mode = "create", id = "0", tab }: Props) => {
                 name="zoo"
                 label="Zoo"
               />
+              <Dropdown
+                activeId={selectedType}
+                options={visitType}
+                handleDropdownChange={(n, v) => {
+                  setSelectedType(String(v));
+                }}
+                name="type"
+                label="Booking For"
+              />
             </div>
+            {selectedType == "event" && (
+              <MultiSelectDropdown
+                selectedIds={selectedEvents}
+                handleDropdownChange={(n, v) => {
+                  setSelectedEvents(v);
+                }}
+                key={"value"}
+                options={events}
+                name=""
+                label="Events"
+              />
+            )}
           </div>
           <div className="space-y-2">
             <Paragraph text="Ticket Types" className="tracking-normal" />
             <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-2">
               <div className="flex items-center justify-between border rounded-md p-3">
                 <div>
-                  <div className="font-medium text-sm">Adult</div>
-                  <div className="text-xs text-muted-foreground">Ages 18+</div>
-                </div>
-                <div className="flex items-center">
-                  <div className="font-medium mr-4 text-sm">{prices.adult}</div>
-                  <div className="flex items-center space-x-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon"
-                      className="h-8 w-8"
-                      onClick={() =>
-                        handleNumberChange(
-                          "adults",
-                          Math.max(0, obj.adults - 1).toString()
-                        )
-                      }
-                      disabled={obj.adults <= 0}
-                    >
-                      -
-                    </Button>
-                    <span className="w-8 text-center text-sm">
-                      {obj.adults.toString().padStart(2, "0")}
-                    </span>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon"
-                      className="h-8 w-8"
-                      onClick={() =>
-                        handleNumberChange(
-                          "adults",
-                          (obj.adults + 1).toString()
-                        )
-                      }
-                    >
-                      +
-                    </Button>
-                  </div>
-                </div>
-              </div>
-              <div className="flex items-center justify-between border rounded-md p-3">
-                <div>
                   <div className="font-medium text-sm">Child</div>
                   <div className="text-xs text-muted-foreground">Ages 3-17</div>
                 </div>
                 <div className="flex items-center">
-                  <div className="font-medium mr-4 text-sm">{prices.child}</div>
+                  <div className="font-medium mr-4 text-sm">
+                    {prices.child} PKR
+                  </div>
                   <div className="flex items-center space-x-2">
                     <Button
                       type="button"
@@ -251,12 +245,57 @@ const Bookings = ({ mode = "create", id = "0", tab }: Props) => {
               </div>
               <div className="flex items-center justify-between border rounded-md p-3">
                 <div>
-                  <div className="font-medium text-sm">Senior</div>
-                  <div className="text-xs text-muted-foreground">Ages 65+</div>
+                  <div className="font-medium text-sm">Adult</div>
+                  <div className="text-xs text-muted-foreground">Ages 18+</div>
                 </div>
                 <div className="flex items-center">
                   <div className="font-medium mr-4 text-sm">
-                    {prices.senior}
+                    {prices.adult} PKR
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={() =>
+                        handleNumberChange(
+                          "adults",
+                          Math.max(0, obj.adults - 1).toString()
+                        )
+                      }
+                      disabled={obj.adults <= 0}
+                    >
+                      -
+                    </Button>
+                    <span className="w-8 text-center text-sm">
+                      {obj.adults.toString().padStart(2, "0")}
+                    </span>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={() =>
+                        handleNumberChange(
+                          "adults",
+                          (obj.adults + 1).toString()
+                        )
+                      }
+                    >
+                      +
+                    </Button>
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center justify-between border rounded-md p-3">
+                <div>
+                  <div className="font-medium text-sm">Senior</div>
+                  <div className="text-xs text-muted-foreground">Ages 50+</div>
+                </div>
+                <div className="flex items-center">
+                  <div className="font-medium mr-4 text-sm">
+                    {prices.senior} PKR
                   </div>
                   <div className="flex items-center space-x-2">
                     <Button
@@ -303,7 +342,7 @@ const Bookings = ({ mode = "create", id = "0", tab }: Props) => {
                 </div>
                 <div className="flex items-center">
                   <div className="font-medium mr-4 text-sm">
-                    {prices.familyPack}
+                    {prices.familyPack} PKR
                   </div>
                   <div className="flex items-center space-x-2">
                     <Button

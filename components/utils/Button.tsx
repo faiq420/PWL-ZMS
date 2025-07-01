@@ -62,7 +62,7 @@ const ButtonComp = ({
       <button
         onClick={clickEvent}
         disabled={disabled || isCruding}
-        className={`${types[type]} flex gap-2 justify-center items-center disabled:cursor-text text-nowrap flex-1 text-sm font-medium font-faustina w-full py-3 px-4 rounded-md shadow hover:cursor-pointer focus:outline-none focus:ring-0 
+        className={`${types[type]} h-9 flex gap-2 justify-center items-center disabled:cursor-text text-nowrap flex-1 text-sm font-medium font-faustina w-full py-3 px-4 rounded-md shadow hover:cursor-pointer focus:outline-none focus:ring-0 
           }`}
       >
         <span>{beforeIcon}</span>{" "}

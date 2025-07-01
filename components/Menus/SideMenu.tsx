@@ -279,61 +279,6 @@ export function SideMenu() {
               ))}
             </nav>
           </div>
-          <div className="mt-auto py-[6px] w-full">
-            <div
-              className={`flex items-center gap-3 rounded-lg px-3 py-2 ${
-                isCollapsed ? "justify-center flex-col" : ""
-              }`}
-            >
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <div className="h-8 w-8 bg-slate-200 rounded-full cursor-pointer">
-                    <Image
-                      src="/assets/menu/userProfile.svg"
-                      height={32}
-                      width={32}
-                      className="rounded-full"
-                      alt="User"
-                    />
-                  </div>
-                </DropdownMenuTrigger>
-                {/* <DropdownMenuContent align="end">
-                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    className="text-red-500 focus:text-red-500"
-                    onClick={() => {
-                      localStorage.clear();
-                      // router.push("/");
-                    }}
-                  >
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent> */}
-              </DropdownMenu>
-              {!isCollapsed && (
-                <div className="text-sm flex-1">
-                  <div className="flex justify-between">
-                    <p className="font-medium">Admin User</p>
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    admin@zoosystem.com
-                  </p>
-                </div>
-              )}
-            </div>
-            <Link
-              href={"/"}
-              className={cn(
-                "flex-1 flex items-end gap-3 rounded-lg px-5 py-2 text-xs transition-all hover:text-gray-900 text-muted-foreground space-x-3",
-                isCollapsed ? "justify-center" : ""
-              )}
-            >
-              <LogOut className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />
-              {!isCollapsed && <span>Logout</span>}
-            </Link>
-          </div>
         </div>
       </div>
     </>

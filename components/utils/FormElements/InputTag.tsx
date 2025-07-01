@@ -49,7 +49,7 @@ const InputTag = ({
         )}
       </div>
       <Input
-        // className={styles.input}
+        className={styles.input}
         id={name}
         name={name}
         value={value}

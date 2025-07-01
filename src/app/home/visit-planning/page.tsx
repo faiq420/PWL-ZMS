@@ -32,7 +32,11 @@ const Page = () => {
       id={id}
     />
   ) : activeTab === "group-visit" ? (
-    <Group />
+    <Group
+      mode={crudModes.includes(mode ?? "") ? mode : "create"}
+      tab={activeTab}
+      id={id}
+    />
   ) : activeTab === "booking" ? (
     <Bookings
       mode={crudModes.includes(mode ?? "") ? mode : "create"}

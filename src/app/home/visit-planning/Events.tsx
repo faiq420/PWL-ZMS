@@ -184,9 +184,10 @@ const Events = ({ mode = "create", id = "0", tab }: Props) => {
   const [obj, setObj] = useState({
     title: "",
     date: "",
-    adults: 0,
-    children: 0,
-    seniors: 0,
+    adultPrice: 0,
+    childrenPrice: 0,
+    seniorPrice: 0,
+    maxCapacity: 0,
     type: 1,
     zoo: 0,
     id: 0,
@@ -303,10 +304,9 @@ const Events = ({ mode = "create", id = "0", tab }: Props) => {
                 />
                 <NumberInputTag
                   name="phone"
-                  value={obj.children + obj.adults + obj.seniors}
+                  value={obj.maxCapacity}
                   setter={handleChange}
-                  label="Total Attendees"
-                  disabled
+                  label="Maximum Capacity"
                   placeHolder="0"
                 />
                 <Dropdown
@@ -458,7 +458,7 @@ const Events = ({ mode = "create", id = "0", tab }: Props) => {
                   <div className="flex items-center w-1/2 md:w-1/3">
                     <NumberInputTag
                       name="children"
-                      value={obj.children}
+                      value={obj.childrenPrice}
                       setter={handleChange}
                     />
                   </div>
@@ -473,7 +473,7 @@ const Events = ({ mode = "create", id = "0", tab }: Props) => {
                   <div className="flex items-center w-1/2 md:w-1/3">
                     <NumberInputTag
                       name="adults"
-                      value={obj.adults}
+                      value={obj.adultPrice}
                       setter={handleChange}
                     />
                   </div>
@@ -489,7 +489,7 @@ const Events = ({ mode = "create", id = "0", tab }: Props) => {
                   <div className="flex items-center w-1/2 md:w-1/3">
                     <NumberInputTag
                       name="seniors"
-                      value={obj.seniors}
+                      value={obj.seniorPrice}
                       setter={handleChange}
                     />
                   </div>
