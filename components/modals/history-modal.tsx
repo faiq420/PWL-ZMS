@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useRef, useState } from "react"
-import { Button } from "@/components/ui/button"
+import { useRef, useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -11,12 +11,12 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
-import { StaticImport } from "next/dist/shared/lib/get-img-props"
-import Image from "next/image"
-import { PlusCircle } from "lucide-react"
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { StaticImport } from "next/dist/shared/lib/get-img-props";
+import Image from "next/image";
+import { Edit, Plus, PlusCircle } from "lucide-react";
 
 interface HistoryModalProps {
   isOpen: boolean;
@@ -27,7 +27,14 @@ interface HistoryModalProps {
   mode: "edit" | "view";
 }
 
-export function HistoryModal({ isOpen, onClose, onSave, history, image, mode }: HistoryModalProps) {
+export function HistoryModal({
+  isOpen,
+  onClose,
+  onSave,
+  history,
+  image,
+  mode,
+}: HistoryModalProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileClick = () => {
@@ -35,21 +42,23 @@ export function HistoryModal({ isOpen, onClose, onSave, history, image, mode }: 
   };
   const [formData, setFormData] = useState<any>({
     history: history,
-    image: image
-  })
+    image: image,
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    onSave(formData)
-  }
+    e.preventDefault();
+    onSave(formData);
+  };
 
-  const isViewOnly = mode === "view"
+  const isViewOnly = mode === "view";
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[700px]">
         <DialogHeader>
-          <DialogTitle>{mode === "edit" ? "Edit Zoo History" : "Zoo History"}</DialogTitle>
+          <DialogTitle>
+            {mode === "edit" ? "Edit Zoo History" : "Zoo History"}
+          </DialogTitle>
           <DialogDescription>
             {mode === "edit"
               ? "Edit the historical information of this zoo."
@@ -66,26 +75,42 @@ export function HistoryModal({ isOpen, onClose, onSave, history, image, mode }: 
                 src={formData.image}
                 alt="ZOO-IMG"
               />
-              {mode === "edit" && (<div onClick={handleFileClick} className="absolute right-4 top-4 flex items-center justify-center p-2 rounded-full bg-white border w-max cursor-pointer">
-                <input onChange={(e) => {
-                  const target: any = e.target as HTMLInputElement;
-                  const objectURL = URL.createObjectURL(target.files[0])
-                  if (target.files && target.files[0]) {
-                    setFormData((prev: any) => ({ ...prev, image: objectURL }))
-                  }
-                }} ref={fileInputRef} className="hidden" type="file" />
-                <PlusCircle />
-              </div>
+              {mode === "edit" && (
+                <div
+                  onClick={handleFileClick}
+                  className="absolute right-4 top-4 flex items-center justify-center p-2 rounded-full bg-white/50 border w-max cursor-pointer"
+                >
+                  <input
+                    onChange={(e) => {
+                      const target: any = e.target as HTMLInputElement;
+                      const objectURL = URL.createObjectURL(target.files[0]);
+                      if (target.files && target.files[0]) {
+                        setFormData((prev: any) => ({
+                          ...prev,
+                          image: objectURL,
+                        }));
+                      }
+                    }}
+                    ref={fileInputRef}
+                    className="hidden"
+                    type="file"
+                  />
+                  <Edit size={12} />
+                </div>
               )}
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="history">Historical Information</Label>
               <Textarea
                 id="history"
                 rows={2}
                 value={formData.history}
-                onChange={(e) => setFormData((prev: any) => ({ ...prev, history: e.target.value }))}
-                className="min-h-[150px]"
+                onChange={(e) =>
+                  setFormData((prev: any) => ({
+                    ...prev,
+                    history: e.target.value,
+                  }))
+                }
+                className="min-h-[150px] outline-none focus:outline-none"
                 disabled={isViewOnly}
                 required
               />
@@ -106,5 +131,5 @@ export function HistoryModal({ isOpen, onClose, onSave, history, image, mode }: 
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

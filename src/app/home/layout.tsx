@@ -12,7 +12,7 @@ export default function DashboardLayout({
 }) {
   return (
     <div className="flex flex-1 flex-col md:flex-row font-faustina bg-main-background overflow-x-hidden">
-      <div className="sticky top-0 md:h-screen md:block p-1 pr-0 z-[1000]">
+      <div className="sticky top-0 md:h-screen md:block p-1 pr-0 z-50">
         <SideMenu />
       </div>
       <main className="flex-1 h-screen flex flex-col pr-4 py-1 pl-0">
