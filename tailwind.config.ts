@@ -23,7 +23,17 @@ const config: Config = {
           ashWhite: "#F5F5F5",
           background: "#F2F3EE",
           secondaryText: "#3D4844",
-          borderColor:'#'
+          borderColor: "#",
+        },
+        accentMain: {
+          jungleGreen: "#00674A",
+          safariBrown: "#58351A",
+          skyBlue: "#195A84",
+          sunshineYellow: "#9E7F02",
+          forestGreen: "#025902",
+          orange: "#925C06",
+          softRed: "#78150A",
+          cream: "#A19D92",
         },
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",

@@ -189,15 +189,15 @@ const HistoryTab = ({ data }: Props) => {
         }}
       />
       <Card>
-        <CardHeader className="flex flex-row items-center justify-end mb-2">
-          {/* <div>
+        <CardHeader className="flex flex-row items-center justify-between mb-2">
+          <div>
             <CardTitle>
               <Paragraph text={`History of ${data.name}`} className="font-semibold tracking-normal" />
             </CardTitle>
             <CardDescription>
               <BodyText text="Historical background and development" />
             </CardDescription>
-          </div> */}
+          </div>
           <div className="flex gap-2">
             <Button
               variant="outline"

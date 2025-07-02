@@ -48,6 +48,7 @@ import BodyText from "@/components/utils/Headings/BodyText";
 import { AchievementModal } from "@/components/modals/achievement-modal";
 import Subheading from "@/components/utils/Headings/Subheading";
 import HistoryTab from "./Tabs/History";
+import Animals from "./Tabs/Animals";
 
 // Zoo data
 const zooData = {
@@ -293,6 +294,12 @@ const zooData = {
     ],
   },
 };
+
+const cardColors = [
+  "bg-gradient-to-r from-[#012E41] to-[#0376A7] text-white",
+  "bg-gradient-to-r from-[#024A59] to-[#049FBF] text-white",
+  "bg-gradient-to-r from-[#3CA6A6] to-[#174040] text-white",
+];
 
 export default function ZooProfilePage() {
   // State for zoo data
@@ -630,7 +637,7 @@ export default function ZooProfilePage() {
   }
 
   return (
-    <div className="flex-1 space-y-6">
+    <div className="flex-1 space-y-3">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <Subheading text={zooInfo.name} />
@@ -649,7 +656,7 @@ export default function ZooProfilePage() {
         </div>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-3">
+      <div className="grid gap-3 md:grid-cols-3">
         {[
           {
             cardTitle: "Established",
@@ -673,7 +680,10 @@ export default function ZooProfilePage() {
             contentData: zooInfo.animals.length + " different species",
           },
         ].map((card, index: number) => (
-          <Card key={index} className="font-poppins">
+          <Card
+            key={index}
+            className={`font-poppins ${cardColors[index % cardColors.length]}`}
+          >
             <CardHeader className="pb-2">
               <CardTitle className="text-base">{card.cardTitle}</CardTitle>
             </CardHeader>
@@ -681,7 +691,7 @@ export default function ZooProfilePage() {
               <div className="text-3xl font-semibold">
                 {card.contentHeading}
               </div>
-              <p className="text-muted-foreground text-xs">
+              <p className="text-xs">
                 {card.contentData}
               </p>
             </CardContent>
@@ -689,8 +699,8 @@ export default function ZooProfilePage() {
         ))}
       </div>
 
-      <Tabs defaultValue="history" className="space-y-4">
-        <TabsList className="grid grid-cols-2 md:grid-cols-6 lg:w-[800px]">
+      <Tabs defaultValue="history" className="space-y-2">
+        <TabsList className="grid grid-cols-2 md:grid-cols-6 w-full">
           <TabsTrigger value="history">
             <History className="h-4 w-4 mr-2" /> History
           </TabsTrigger>
@@ -711,7 +721,7 @@ export default function ZooProfilePage() {
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="history" className="space-y-4">
+        <TabsContent value="history" className="space-y-2">
           <HistoryTab
             data={{
               name: zooInfo.name,
@@ -724,212 +734,11 @@ export default function ZooProfilePage() {
           />
         </TabsContent>
 
-        <TabsContent value="animals" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>Animal Directory</CardTitle>
-                  <CardDescription>
-                    Complete list of animals at {zooInfo.name}
-                  </CardDescription>
-                </div>
-                {/* <Button
-                  className="bg-green-700 hover:bg-green-800"
-                  onClick={() =>
-                    setAnimalModal({ isOpen: true, mode: "create", data: null })
-                  }
-                >
-                  <Paw className="mr-2 h-4 w-4" /> Add Animal
-                </Button> */}
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <h3 className="font-medium">Total Animals</h3>
-                    <div className="text-3xl font-bold">
-                      {zooInfo.animals.reduce(
-                        (sum: number, animal: any) => sum + animal.count,
-                        0
-                      )}
-                    </div>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button variant="outline">
-                      <FileText className="mr-2 h-4 w-4" /> Export List
-                    </Button>
-                  </div>
-                </div>
-                <div className="grid gap-4 md:grid-cols-3">
-                  <Card>
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-sm font-medium">
-                        Mammals
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-2xl font-bold">
-                        {zooInfo.animals
-                          .filter((a: any) => a.category === "Mammals")
-                          .reduce(
-                            (sum: number, animal: any) => sum + animal.count,
-                            0
-                          )}
-                      </div>
-                      <p className="text-xs text-muted-foreground">
-                        {
-                          zooInfo.animals.filter(
-                            (a: any) => a.category === "Mammals"
-                          ).length
-                        }{" "}
-                        species
-                      </p>
-                    </CardContent>
-                  </Card>
-                  <Card>
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-sm font-medium">
-                        Birds
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-2xl font-bold">
-                        {zooInfo.animals
-                          .filter((a: any) => a.category === "Birds")
-                          .reduce(
-                            (sum: number, animal: any) => sum + animal.count,
-                            0
-                          )}
-                      </div>
-                      <p className="text-xs text-muted-foreground">
-                        {
-                          zooInfo.animals.filter(
-                            (a: any) => a.category === "Birds"
-                          ).length
-                        }{" "}
-                        species
-                      </p>
-                    </CardContent>
-                  </Card>
-                  <Card>
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-sm font-medium">
-                        Reptiles
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-2xl font-bold">
-                        {zooInfo.animals
-                          .filter((a: any) => a.category === "Reptiles")
-                          .reduce(
-                            (sum: number, animal: any) => sum + animal.count,
-                            0
-                          )}
-                      </div>
-                      <p className="text-xs text-muted-foreground">
-                        {
-                          zooInfo.animals.filter(
-                            (a: any) => a.category === "Reptiles"
-                          ).length
-                        }{" "}
-                        species
-                      </p>
-                    </CardContent>
-                  </Card>
-                </div>
-                <div className="rounded-md border">
-                  <div className="relative w-full overflow-auto">
-                    <table className="w-full caption-bottom text-sm">
-                      <thead className="[&_tr]:border-b">
-                        <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                          <th className="h-12 px-4 text-left align-middle font-medium">
-                            Animal Name
-                          </th>
-                          <th className="h-12 px-4 text-left align-middle font-medium">
-                            Category
-                          </th>
-                          <th className="h-12 px-4 text-left align-middle font-medium">
-                            Count
-                          </th>
-                          <th className="h-12 px-4 text-right align-middle font-medium">
-                            Actions
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="[&_tr:last-child]:border-0">
-                        {zooInfo.animals.map((animal: any, index: number) => (
-                          <tr
-                            key={index}
-                            className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
-                          >
-                            <td className="p-4 align-middle font-medium">
-                              {animal.name}
-                            </td>
-                            <td className="p-4 align-middle">
-                              {animal.category}
-                            </td>
-                            <td className="p-4 align-middle">{animal.count}</td>
-                            <td className="p-4 align-middle text-right">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() =>
-                                  // setAnimalModal({
-                                  //   isOpen: true,
-                                  //   mode: "view",
-                                  //   data: { animal, index },
-                                  // })
-                                  router.push(
-                                    "/home/animal-directory/bengal-tiger"
-                                  )
-                                }
-                              >
-                                <Eye className="h-4 w-4 mr-2" /> View
-                              </Button>
-                              {/* <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() =>
-                                  setAnimalModal({
-                                    isOpen: true,
-                                    mode: "edit",
-                                    data: { animal, index },
-                                  })
-                                }
-                              >
-                                <Edit className="h-4 w-4 mr-2" /> Edit
-                              </Button> */}
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="text-red-500"
-                                onClick={() =>
-                                  setDeleteConfirmation({
-                                    isOpen: true,
-                                    type: "animal",
-                                    index,
-                                    title: "Delete Animal",
-                                    description: `Are you sure you want to delete ${animal.name} from the animal directory? This action cannot be undone.`,
-                                  })
-                                }
-                              >
-                                <Trash2 className="h-4 w-4 mr-2" /> Delete
-                              </Button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        <TabsContent value="animals" className="space-y-2">
+          <Animals data={{ name: zooInfo.name, animals: zooInfo.animals }} />
         </TabsContent>
 
-        <TabsContent value="cafeteria" className="space-y-4">
+        <TabsContent value="cafeteria" className="space-y-2">
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
@@ -1051,7 +860,7 @@ export default function ZooProfilePage() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="tickets" className="space-y-4">
+        <TabsContent value="tickets" className="space-y-2">
           <Card>
             <CardHeader>
               <CardTitle>Ticket Sales</CardTitle>
@@ -1228,7 +1037,7 @@ export default function ZooProfilePage() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="shows" className="space-y-4">
+        <TabsContent value="shows" className="space-y-2">
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
@@ -1345,7 +1154,7 @@ export default function ZooProfilePage() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="trips" className="space-y-4">
+        <TabsContent value="trips" className="space-y-2">
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
