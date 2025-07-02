@@ -1,3 +1,4 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -9,6 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import ButtonComp from "@/components/utils/Button";
 import BodyText from "@/components/utils/Headings/BodyText";
 import Heading from "@/components/utils/Headings/Heading";
 import Paragraph from "@/components/utils/Headings/Paragraph";
@@ -22,14 +24,15 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import ZooProfileCard from "./_components/ZooProfileCard";
 
 export default function ZooProfilesPage() {
+  const router = useRouter();
   return (
     <div className="flex-1 space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-semibold tracking-tight font-faustina">
-          Zoo Profiles
-        </h2>
+        <Heading text={"Zoo Profiles"} />
         {/* <Button className="bg-green-700 hover:bg-green-800">
           <Plus className="mr-2 h-4 w-4" /> Add New Zoo
         </Button> */}
@@ -82,69 +85,71 @@ export default function ZooProfilesPage() {
               "Founded in 1942, Bahawalpur Zoo houses a variety of animals and is known for its historical significance and educational programs.",
           },
         ].map((zoo) => (
-          <Card key={zoo.name} className="overflow-hidden">
-            <div className="relative h-48">
-              <Image
-                src={zoo.image || "/placeholder.svg"}
-                alt={zoo.name}
-                fill
-                className="object-cover"
-              />
-              {/* <div
-                className={`absolute top-2 right-2 px-2 py-1 rounded-full text-xs font-medium ${
-                  zoo.status === "active"
-                    ? "bg-green-100 text-green-800"
-                    : zoo.status === "seasonal"
-                    ? "bg-blue-100 text-blue-800"
-                    : "bg-amber-100 text-amber-800"
-                }`}
-              >
-                {zoo.status === "active"
-                  ? "Active"
-                  : zoo.status === "seasonal"
-                  ? "Seasonal"
-                  : "Maintenance"}
-              </div> */}
-            </div>
-            <CardHeader>
-              <CardTitle>
-                <Heading text={zoo.name} />
-              </CardTitle>
-              <CardDescription className="flex items-center font-faustina">
-                <MapPin className="h-4 w-4 mr-1" /> {zoo.location}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2 font-syne">
-                <div className="flex items-center text-sm">
-                  <Building className="h-4 w-4 mr-2 text-muted-foreground" />
-                  <span>{zoo.type}</span>
-                </div>
-                <div className="flex items-center text-sm">
-                  <Clock className="h-4 w-4 mr-2 text-muted-foreground" />
-                  <span>9:00 AM - 6:00 PM</span>
-                </div>
-                <div className="flex items-center text-sm">
-                  <ThermometerSun className="h-4 w-4 mr-2 text-muted-foreground" />
-                  <span>32°C / Sunny</span>
-                </div>
-                <BodyText
-                  text={zoo.description}
-                  className="text-muted-foreground mt-2"
-                />
-              </div>
-            </CardContent>
-            <CardFooter className="flex justify-end">
-              <Link href={`/home/zoo-profiles/${zoo.slug}`}>
-                <Button variant="outline" size="sm">
-                  View Details
-                </Button>
-              </Link>
-              {/* <Button variant="outline" size="sm">
-                Edit
-              </Button> */}
-            </CardFooter>
-          </Card>
+          <ZooProfileCard zoo={zoo} key={zoo.name} />
+          // <Card key={zoo.name} className="overflow-hidden">
+          //   <div className="relative h-48">
+          //     <Image
+          //       src={zoo.image || "/placeholder.svg"}
+          //       alt={zoo.name}
+          //       fill
+          //       className="object-cover"
+          //     />
+          //     {/* <div
+          //       className={`absolute top-2 right-2 px-2 py-1 rounded-full text-xs font-medium ${
+          //         zoo.status === "active"
+          //           ? "bg-green-100 text-green-800"
+          //           : zoo.status === "seasonal"
+          //           ? "bg-blue-100 text-blue-800"
+          //           : "bg-amber-100 text-amber-800"
+          //       }`}
+          //     >
+          //       {zoo.status === "active"
+          //         ? "Active"
+          //         : zoo.status === "seasonal"
+          //         ? "Seasonal"
+          //         : "Maintenance"}
+          //     </div> */}
+          //   </div>
+          //   <CardHeader>
+          //     <CardTitle>
+          //       <Paragraph
+          //         className="font-semibold text-sm uppercase font-faustina"
+          //         text={zoo.name}
+          //       />
+          //     </CardTitle>
+          //     <CardDescription className="flex text-xs items-center font-faustina">
+          //       <MapPin className="h-3 w-3 mr-1" />
+          //       <span>{zoo.location}</span>
+          //     </CardDescription>
+          //   </CardHeader>
+          //   {/* <CardContent>
+          //     <div className="space-y-2 font-syne">
+          //       <div className="flex items-center text-sm">
+          //         <Building className="h-4 w-4 mr-2 text-muted-foreground" />
+          //         <span>{zoo.type}</span>
+          //       </div>
+          //       <div className="flex items-center text-sm">
+          //         <Clock className="h-4 w-4 mr-2 text-muted-foreground" />
+          //         <span>9:00 AM - 6:00 PM</span>
+          //       </div>
+          //       <div className="flex items-center text-sm">
+          //         <ThermometerSun className="h-4 w-4 mr-2 text-muted-foreground" />
+          //         <span>32°C / Sunny</span>
+          //       </div>
+          //     </div>
+          //   </CardContent> */}
+          //   <CardFooter className="flex justify-end">
+          //     <ButtonComp />
+          //     <Link href={`/home/zoo-profiles/${zoo.slug}`}>
+          //       <Button variant="outline" size="sm">
+          //         View Details
+          //       </Button>
+          //     </Link>
+          //     {/* <Button variant="outline" size="sm">
+          //       Edit
+          //     </Button> */}
+          //   </CardFooter>
+          // </Card>
         ))}
       </div>
     </div>

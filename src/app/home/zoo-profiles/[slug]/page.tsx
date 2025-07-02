@@ -46,10 +46,13 @@ import { useParams, useRouter } from "next/navigation";
 import { DeleteConfirmation } from "@/components/modals/delete-confirmation";
 import BodyText from "@/components/utils/Headings/BodyText";
 import { AchievementModal } from "@/components/modals/achievement-modal";
+import Subheading from "@/components/utils/Headings/Subheading";
+import HistoryTab from "./Tabs/History";
 
 // Zoo data
 const zooData = {
   "1": {
+    id: 1,
     name: "Lahore Zoo",
     location: "Shahrah-e-Quaid-e-Azam, Lahore, Punjab, Pakistan",
     established: "1872",
@@ -121,13 +124,14 @@ const zooData = {
       { year: "2020", description: "Renovation of visitor facilities" },
     ],
     achievements: [
-      { year: "1960", description: "Conservation of native wildlife species", },
-      { year: "1975", description: "Educational programs for local schools", },
-      { year: "1990", description: "Research on animal behavior", },
-      { year: "2015", description: "Community engagement initiatives", },
+      { year: "1960", description: "Conservation of native wildlife species" },
+      { year: "1975", description: "Educational programs for local schools" },
+      { year: "1990", description: "Research on animal behavior" },
+      { year: "2015", description: "Community engagement initiatives" },
     ],
   },
   "2": {
+    id: 2,
     name: "Lahore Safari Park",
     location: "Raiwind Road, Lahore, Punjab, Pakistan",
     established: "1982",
@@ -204,13 +208,14 @@ const zooData = {
       { year: "2018", description: "Renovation of visitor facilities" },
     ],
     achievements: [
-      { year: "1960", description: "Conservation of native wildlife species", },
-      { year: "1975", description: "Educational programs for local schools", },
-      { year: "1990", description: "Research on animal behavior", },
-      { year: "2015", description: "Community engagement initiatives", },
+      { year: "1960", description: "Conservation of native wildlife species" },
+      { year: "1975", description: "Educational programs for local schools" },
+      { year: "1990", description: "Research on animal behavior" },
+      { year: "2015", description: "Community engagement initiatives" },
     ],
   },
   "3": {
+    id: 3,
     name: "Bahawalpur Zoo",
     location: "Bahawalpur, Punjab, Pakistan",
     imagePath:
@@ -281,10 +286,10 @@ const zooData = {
       { year: "2015", description: "Modernization of animal enclosures" },
     ],
     achievements: [
-      { year: "1960", description: "Conservation of native wildlife species", },
-      { year: "1975", description: "Educational programs for local schools", },
-      { year: "1990", description: "Research on animal behavior", },
-      { year: "2015", description: "Community engagement initiatives", },
+      { year: "1960", description: "Conservation of native wildlife species" },
+      { year: "1975", description: "Educational programs for local schools" },
+      { year: "1990", description: "Research on animal behavior" },
+      { year: "2015", description: "Community engagement initiatives" },
     ],
   },
 };
@@ -294,7 +299,6 @@ export default function ZooProfilePage() {
   const router = useRouter();
   const params = useParams();
   const slug = params?.slug;
-  console.log(slug)
   const [zooInfo, setZooInfo] = useState(() => {
     return zooData[slug as keyof typeof zooData] || null;
   });
@@ -373,15 +377,17 @@ export default function ZooProfilePage() {
     return Array.from({ length: count }, (_, i) => ({
       id: `TRIP-${Math.floor(Math.random() * 10000)}`,
       name: `${types[Math.floor(Math.random() * types.length)]} Trip`,
-      organizer: `${["ABC School", "XYZ College", "Corporate Group", "Family Group"][
-        Math.floor(Math.random() * 4)
-      ]
-        }`,
+      organizer: `${
+        ["ABC School", "XYZ College", "Corporate Group", "Family Group"][
+          Math.floor(Math.random() * 4)
+        ]
+      }`,
       participants: Math.floor(Math.random() * 50) + 10,
       date: new Date(
         2025,
         // Math.floor(Math.random() * 12),
-        5, 20
+        5,
+        20
         // Math.floor(Math.random() * 28) + 1
       ),
       status: statuses[Math.floor(Math.random() * statuses.length)],
@@ -530,7 +536,7 @@ export default function ZooProfilePage() {
     setZooInfo((prev: any) => ({
       ...prev,
       history: data.history,
-      imagePath: data.image
+      imagePath: data.image,
     }));
     setHistoryModal({ isOpen: false, mode: "edit" });
   };
@@ -589,7 +595,9 @@ export default function ZooProfilePage() {
   const handleDeleteAchievement = (index: number) => {
     setZooInfo((prev: any) => ({
       ...prev,
-      achievements: prev.achievements.filter((_: any, i: number) => i !== index),
+      achievements: prev.achievements.filter(
+        (_: any, i: number) => i !== index
+      ),
     }));
     setDeleteConfirmation({
       isOpen: false,
@@ -625,11 +633,10 @@ export default function ZooProfilePage() {
     <div className="flex-1 space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight font-faustina">
-            {zooInfo.name}
-          </h1>
-          <div className="flex items-center text-muted-foreground mt-1 font-syne">
-            <MapPin className="h-4 w-4 mr-1" /> {zooInfo.location}
+          <Subheading text={zooInfo.name} />
+          <div className="flex items-center text-muted-foreground mt-0 font-syne">
+            <MapPin className="h-4 w-4 mr-1" />
+            <p>{zooInfo.location}</p>
           </div>
         </div>
         <div className="flex gap-2">
@@ -643,43 +650,43 @@ export default function ZooProfilePage() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-3">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg">Established</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{zooInfo.established}</div>
-            <p className="text-muted-foreground text-sm">
-              {new Date().getFullYear() - Number.parseInt(zooInfo.established)}{" "}
-              years of operation
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg">Area</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{zooInfo.area}</div>
-            <p className="text-muted-foreground text-sm">Total land area</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg">Animals</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">
-              {zooInfo.animals.reduce(
-                (sum: number, animal: any) => sum + animal.count,
-                0
-              )}
-            </div>
-            <p className="text-muted-foreground text-sm">
-              {zooInfo.animals.length} different species
-            </p>
-          </CardContent>
-        </Card>
+        {[
+          {
+            cardTitle: "Established",
+            contentHeading: zooInfo.established,
+            contentData:
+              new Date().getFullYear() -
+              Number.parseInt(zooInfo.established) +
+              " years of operation",
+          },
+          {
+            cardTitle: "Area",
+            contentHeading: zooInfo.area,
+            contentData: "Total land area",
+          },
+          {
+            cardTitle: "Animal",
+            contentHeading: zooInfo.animals.reduce(
+              (sum: number, animal: any) => sum + animal.count,
+              0
+            ),
+            contentData: zooInfo.animals.length + " different species",
+          },
+        ].map((card, index: number) => (
+          <Card key={index} className="font-poppins">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base">{card.cardTitle}</CardTitle>
+            </CardHeader>
+            <CardContent className="flex space-x-2 items-end justify-between">
+              <div className="text-3xl font-semibold">
+                {card.contentHeading}
+              </div>
+              <p className="text-muted-foreground text-xs">
+                {card.contentData}
+              </p>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
       <Tabs defaultValue="history" className="space-y-4">
@@ -705,193 +712,16 @@ export default function ZooProfilePage() {
         </TabsList>
 
         <TabsContent value="history" className="space-y-4">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <div>
-                <CardTitle>History of {zooInfo.name}</CardTitle>
-                <CardDescription>
-                  <BodyText text="Historical background and development" />
-                </CardDescription>
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() =>
-                    setHistoryModal({ isOpen: true, mode: "view" })
-                  }
-                >
-                  <Eye className="h-4 w-4 mr-2" />
-                  View Full History
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() =>
-                    setHistoryModal({ isOpen: true, mode: "edit" })
-                  }
-                >
-                  <Edit className="h-4 w-4 mr-2" />
-                  Edit History
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="relative h-64 w-full rounded-lg overflow-hidden">
-                <Image
-                  src={zooInfo.imagePath}
-                  alt={`${zooInfo.name} Historical Photo`}
-                  fill
-                  unoptimized
-                  className="object-cover"
-                />
-              </div>
-              <div className="space-y-4">
-                <BodyText text={zooInfo.history} />
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <h3 className="font-medium font-faustina">
-                        Key Milestones
-                      </h3>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                          setMilestoneModal({
-                            isOpen: true,
-                            mode: "create",
-                            data: null,
-                          })
-                        }
-                      >
-                        <Plus className="h-4 w-4 mr-2" /> Add
-                      </Button>
-                    </div>
-                    <ul className="space-y-1 font-syne">
-                      {zooInfo.milestones.map(
-                        (milestone: any, index: number) => (
-                          <li
-                            key={index}
-                            className="flex items-center justify-between text-sm group cursor-default"
-                          >
-                            <div className="flex items-center">
-                              <span className="h-2 w-2 rounded-full bg-green-600 mr-2"></span>
-                              <span>
-                                {milestone.year}: {milestone.description}
-                              </span>
-                            </div>
-                            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-6 w-6"
-                                onClick={() =>
-                                  setMilestoneModal({
-                                    isOpen: true,
-                                    mode: "edit",
-                                    data: { milestone, index },
-                                  })
-                                }
-                              >
-                                <Edit className="h-3 w-3" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-6 w-6 text-red-500"
-                                onClick={() =>
-                                  setDeleteConfirmation({
-                                    isOpen: true,
-                                    type: "milestone",
-                                    index,
-                                    title: "Delete Milestone",
-                                    description:
-                                      "Are you sure you want to delete this milestone? This action cannot be undone.",
-                                  })
-                                }
-                              >
-                                <Trash2 className="h-3 w-3" />
-                              </Button>
-                            </div>
-                          </li>
-                        )
-                      )}
-                    </ul>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <h3 className="font-medium font-faustina">
-                        Notable Achievements
-                      </h3>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                          setAchievementModal({
-                            isOpen: true,
-                            mode: "create",
-                            data: null,
-                          })
-                        }
-                      >
-                        <Plus className="h-4 w-4 mr-2" /> Add
-                      </Button>
-                    </div>
-                    <ul className="space-y-1 font-syne">
-                      {zooInfo.achievements.map(
-                        (achievement: any, index: number) => {
-                          return (
-                            <li key={index} className="flex items-center justify-between text-sm group cursor-default">
-                              <div className="flex items-center">
-                                <span className="h-2 w-2 rounded-full bg-green-600 mr-2"></span>
-                                <span>{achievement.year}: {achievement.description}</span>
-                              </div>
-                              <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-6 w-6"
-                                  onClick={() => {
-                                    // console.log(achievement)
-                                    setAchievementModal({
-                                      isOpen: true,
-                                      mode: "edit",
-                                      data: { achievement, index },
-                                    })
-                                  }
-                                  }
-                                >
-                                  <Edit className="h-3 w-3" />
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-6 w-6 text-red-500"
-                                  onClick={() =>
-                                    setDeleteConfirmation({
-                                      isOpen: true,
-                                      type: "achievement",
-                                      index,
-                                      title: "Delete Achievement",
-                                      description:
-                                        "Are you sure you want to delete this achievement? This action cannot be undone.",
-                                    })
-                                  }
-                                >
-                                  <Trash2 className="h-3 w-3" />
-                                </Button>
-                              </div>
-                            </li>
-                          )
-                        }
-                      )}
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <HistoryTab
+            data={{
+              name: zooInfo.name,
+              history: zooInfo.history,
+              imagePath: zooInfo.imagePath,
+              id: zooInfo.id,
+              milestones: zooInfo.milestones,
+              achievements: zooInfo.achievements,
+            }}
+          />
         </TabsContent>
 
         <TabsContent value="animals" className="space-y-4">
