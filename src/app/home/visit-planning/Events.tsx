@@ -23,8 +23,11 @@ import { ArrowLeft, Save, SaveIcon, Upload, X } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import MapLocationModal from "./components/MapLocationPickerModal";
-import SelectedLocationMap from "./components/SelectedLocationMap";
+import dynamic from "next/dynamic";
+// import SelectedLocationMap from "./components/SelectedLocationMap";
+// import MapLocationModal from "./components/MapLocationPickerModal";
+const MapLocationModal = dynamic(() => import("./components/MapLocationPickerModal"), { ssr: false });
+const SelectedLocationMap = dynamic(() => import("./components/SelectedLocationMap"), { ssr: false });
 
 interface Props {
   mode?: string;

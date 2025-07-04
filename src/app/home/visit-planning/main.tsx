@@ -2,22 +2,9 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   CalendarIcon,
-  Edit,
-  Plus,
-  Router,
-  Trash2,
-  TrashIcon,
 } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -27,7 +14,6 @@ import {
 } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -39,19 +25,13 @@ import { useToast } from "@/components/ui/use-toast";
 import RouteModal from "@/components/visit-planning/route-modal";
 import { DeleteConfirmationDialog } from "@/components/visit-planning/delete-confirmation";
 import { useRouter } from "next/navigation";
-import ButtonComp from "@/components/utils/Button";
 import Heading from "@/components/utils/Headings/Heading";
-import {
-  changeDateFormat,
-  changeDateFormatWithTime,
-} from "@/Helper/DateFormats";
 import EventsTable from "./tabs/EventsTable";
 import BookingsTable from "./tabs/BookingsTable";
 
 export default function VisitPlanningPage() {
   const { toast } = useToast();
   const router = useRouter();
-  const BASE_URL = "/home/visit-planning/";
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [routeModalOpen, setRouteModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
