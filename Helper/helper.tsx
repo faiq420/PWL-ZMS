@@ -6,8 +6,8 @@ const useHelper = () => {
   const router = useRouter();
   const API: string =
     process.env.NODE_ENV === "development"
-      ? "https://localhost:44316"
-      : "https://kapraywagera.com";
+      ? "https://localhost:44383"
+      : "https://zms.com";
   const headers: Headers = new Headers({
     Authorization: "Bearer " + getData("token"),
   });
@@ -160,13 +160,15 @@ const useHelper = () => {
       const response = await fetch(API + endpoint, {
         method: "POST",
         body: formData,
-        headers: new Headers({
-          Authorization: "Bearer " + getData("token"),
-        }),
+        // headers: new Headers({
+        //   Authorization: "Bearer " + getData("token"),
+        // }),
       });
       // console.clear();
       if (response.ok) {
+        console.log(response, 168);
         const data = await response.json();
+        console.log(data);
         return data;
       } else {
         const err = await response.text();

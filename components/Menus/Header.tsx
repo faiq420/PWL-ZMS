@@ -11,9 +11,16 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { LogOut } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 const Header = () => {
+  const router = useRouter();
   const [userName, setUserName] = useState("Admin User");
+
+  const Logout = () => {
+    router.push("/");
+  };
+
   return (
     <div className="flex justify-end items-center min-h-[57px] border-b border-b-[#d7d7d7] px-4 md:px-5">
       <DropdownMenu>
@@ -46,7 +53,10 @@ const Header = () => {
             <span>Orders</span>
           </DropdownMenuItem> */}
           <DropdownMenuSeparator />
-          <DropdownMenuItem className="text-red-500 focus:text-red-500">
+          <DropdownMenuItem
+            className="text-red-500 focus:text-red-500"
+            onClick={Logout}
+          >
             <LogOut className="mr-2 h-4 w-4" />
             <span>Log out</span>
           </DropdownMenuItem>

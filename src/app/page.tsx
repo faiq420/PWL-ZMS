@@ -23,8 +23,10 @@ import { Separator } from "@radix-ui/react-separator";
 import InputTag from "@/components/utils/FormElements/InputTag";
 import PasswordInputTag from "@/components/utils/FormElements/PasswordInputTag";
 import ButtonComp from "@/components/utils/Button";
+import useHelper from "@/Helper/helper";
 
 export default function LoginPage() {
+  const helper = useHelper();
   const router = useRouter();
   const [email, setEmail] = useState(
     process.env.NODE_ENV == "development" ? "admin@zoosystem.com" : ""
@@ -40,16 +42,36 @@ export default function LoginPage() {
     setIsLoading(true);
     setError("");
 
+    helper.xhr
+      .Post(
+        "/Auth/Login",
+        helper.ConvertToFormData({
+          email: email,
+          password: password,
+        })
+      )
+      .then((res) => {
+        console.log(res);
+        console.log("scsubjs");
+      })
+      .catch((e) => {
+        console.log(e);
+        console.log("err");
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+
     // Simulate authentication delay
-    setTimeout(() => {
-      // Simple validation
-      if (email === "admin@zoosystem.com" && password === "password") {
-        router.push("/home");
-      } else {
-        setError("Invalid email or password.");
-      }
-      setIsLoading(false);
-    }, 1500);
+    // setTimeout(() => {
+    //   // Simple validation
+    //   if (email === "admin@zoosystem.com" && password === "password") {
+    //     router.push("/home");
+    //   } else {
+    //     setError("Invalid email or password.");
+    //   }
+    //   setIsLoading(false);
+    // }, 1500);
   };
 
   return (
@@ -70,7 +92,12 @@ export default function LoginPage() {
         </div>
         <div className="font-tajawal flex-1 flex flex-col items-center justify-center bg-gradient-to-b from-white/90 via-white to-white/10 backdrop-blur-md shadow-[inset_1px_1px_4px_rgba(255,255,255,0.1),_4px_4px_12px_rgba(0,0,0,0.2)] rounded-lg m-3 space-y-9">
           <div className="flex gap-2">
-            <Image src={"/assets/logos/PWL_logo.png"} height={100} width={100} alt="logo" />
+            <Image
+              src={"/assets/logos/PWL_logo.png"}
+              height={100}
+              width={100}
+              alt="logo"
+            />
           </div>
           <div className="mt-5 w-full">
             <CardContent className="space-y-4">
