@@ -160,19 +160,18 @@ const useHelper = () => {
       const response = await fetch(API + endpoint, {
         method: "POST",
         body: formData,
-        // headers: new Headers({
-        //   Authorization: "Bearer " + getData("token"),
-        // }),
+        headers: new Headers({
+          Authorization: "Bearer " + getData("token"),
+        }),
       });
       // console.clear();
       if (response.ok) {
-        console.log(response, 168);
         const data = await response.json();
-        console.log(data);
         return data;
       } else {
-        const err = await response.text();
+        const err = await response.json();
         console.error(err);
+        alert(err.Message)
         throw new Error(err);
       }
     },

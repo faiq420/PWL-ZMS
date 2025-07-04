@@ -2,7 +2,7 @@
 
 import type React from "react";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "../../components/ui/button";
@@ -52,27 +52,29 @@ export default function LoginPage() {
       )
       .then((res) => {
         console.log(res);
-        console.log("scsubjs");
+        if (res.Message) {
+          setError(res.Message);
+        } else {
+          helper.storeData("token", res.token);
+          router.push("/home");
+        }
       })
       .catch((e) => {
-        console.log(e);
-        console.log("err");
+        console.log(e.Message, "jiosdjsib");
+        setError(e.Message);
       })
       .finally(() => {
         setIsLoading(false);
       });
-
-    // Simulate authentication delay
-    // setTimeout(() => {
-    //   // Simple validation
-    //   if (email === "admin@zoosystem.com" && password === "password") {
-    //     router.push("/home");
-    //   } else {
-    //     setError("Invalid email or password.");
-    //   }
-    //   setIsLoading(false);
-    // }, 1500);
   };
+
+  useEffect(() => {
+    if (error != "") {
+      setTimeout(() => {
+        setError("");
+      }, 3000);
+    }
+  }, [error]);
 
   return (
     <div className="flex h-full flex-col loginBg">
