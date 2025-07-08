@@ -10,7 +10,7 @@ import InputTag from "@/components/utils/FormElements/InputTag";
 import Checkbox from "@/components/utils/FormElements/Checkbox";
 import { FileUploader } from "@/components/animal/file-uploader";
 import Toggle from "@/components/utils/FormElements/Toggle";
-import { formatCnic } from "@/Helper/CnicFormat";
+import { formatCnic } from "@/Helper/Utility";
 
 interface Props {
   mode?: string;
