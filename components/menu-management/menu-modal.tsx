@@ -1,13 +1,13 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Switch } from "@/components/ui/switch"
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import {
   Dialog,
   DialogContent,
@@ -15,16 +15,22 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import type { MenuItem } from "@/types/menu"
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import type { MenuItem } from "@/types/menu";
 
 interface MenuModalProps {
-  isOpen: boolean
-  onClose: () => void
-  onSave: (menu: Partial<MenuItem>) => void
-  menu?: MenuItem | null
-  existingMenus: MenuItem[]
+  isOpen: boolean;
+  onClose: () => void;
+  onSave: (menu: Partial<MenuItem>) => void;
+  menu?: MenuItem | null;
+  existingMenus: MenuItem[];
 }
 
 const iconOptions = [
@@ -40,9 +46,15 @@ const iconOptions = [
   "FileText",
   "Shield",
   "Bell",
-]
+];
 
-export function MenuModal({ isOpen, onClose, onSave, menu, existingMenus }: MenuModalProps) {
+export function MenuModal({
+  isOpen,
+  onClose,
+  onSave,
+  menu,
+  existingMenus,
+}: MenuModalProps) {
   const [formData, setFormData] = useState({
     name: "",
     path: "",
@@ -50,9 +62,8 @@ export function MenuModal({ isOpen, onClose, onSave, menu, existingMenus }: Menu
     parentId: "none",
     order: 1,
     isActive: true,
-    isVisible: true,
     description: "",
-  })
+  });
 
   useEffect(() => {
     if (menu) {
@@ -63,9 +74,8 @@ export function MenuModal({ isOpen, onClose, onSave, menu, existingMenus }: Menu
         parentId: menu.parentId || "none",
         order: menu.order || 1,
         isActive: menu.isActive ?? true,
-        isVisible: menu.isVisible ?? true,
         description: menu.description || "",
-      })
+      });
     } else {
       setFormData({
         name: "",
@@ -74,46 +84,52 @@ export function MenuModal({ isOpen, onClose, onSave, menu, existingMenus }: Menu
         parentId: "none",
         order: existingMenus.length + 1,
         isActive: true,
-        isVisible: true,
         description: "",
-      })
+      });
     }
-  }, [menu, existingMenus, isOpen])
+  }, [menu, existingMenus, isOpen]);
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     const submitData = {
       ...formData,
       parentId: formData.parentId === "none" ? "" : formData.parentId,
-    }
-    onSave(submitData)
-  }
+    };
+    onSave(submitData);
+  };
 
-  const getParentMenuOptions = (menus: MenuItem[], excludeId?: string): MenuItem[] => {
+  const getParentMenuOptions = (
+    menus: MenuItem[],
+    excludeId?: string
+  ): MenuItem[] => {
     const flattenMenus = (items: MenuItem[]): MenuItem[] => {
-      let result: MenuItem[] = []
+      let result: MenuItem[] = [];
       for (const item of items) {
         if (item.id !== excludeId) {
-          result.push(item)
+          result.push(item);
           if (item.children) {
-            result = result.concat(flattenMenus(item.children))
+            result = result.concat(flattenMenus(item.children));
           }
         }
       }
-      return result
-    }
-    return flattenMenus(menus)
-  }
+      return result;
+    };
+    return flattenMenus(menus);
+  };
 
-  const parentOptions = getParentMenuOptions(existingMenus, menu?.id)
+  const parentOptions = getParentMenuOptions(existingMenus, menu?.id);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>{menu ? "Edit Menu Item" : "Create New Menu Item"}</DialogTitle>
+          <DialogTitle>
+            {menu ? "Edit Menu Item" : "Create New Menu Item"}
+          </DialogTitle>
           <DialogDescription>
-            {menu ? "Update menu item information and settings." : "Add a new menu item to the navigation."}
+            {menu
+              ? "Update menu item information and settings."
+              : "Add a new menu item to the navigation."}
           </DialogDescription>
         </DialogHeader>
 
@@ -124,7 +140,9 @@ export function MenuModal({ isOpen, onClose, onSave, menu, existingMenus }: Menu
               <Input
                 id="name"
                 value={formData.name}
-                onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, name: e.target.value }))
+                }
                 required
               />
             </div>
@@ -133,7 +151,9 @@ export function MenuModal({ isOpen, onClose, onSave, menu, existingMenus }: Menu
               <Input
                 id="path"
                 value={formData.path}
-                onChange={(e) => setFormData((prev) => ({ ...prev, path: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, path: e.target.value }))
+                }
                 placeholder="/home/example"
               />
             </div>
@@ -144,7 +164,9 @@ export function MenuModal({ isOpen, onClose, onSave, menu, existingMenus }: Menu
               <Label htmlFor="icon">Icon</Label>
               <Select
                 value={formData.icon}
-                onValueChange={(value) => setFormData((prev) => ({ ...prev, icon: value }))}
+                onValueChange={(value) =>
+                  setFormData((prev) => ({ ...prev, icon: value }))
+                }
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select an icon" />
@@ -162,7 +184,9 @@ export function MenuModal({ isOpen, onClose, onSave, menu, existingMenus }: Menu
               <Label htmlFor="parentId">Parent Menu</Label>
               <Select
                 value={formData.parentId}
-                onValueChange={(value) => setFormData((prev) => ({ ...prev, parentId: value }))}
+                onValueChange={(value) =>
+                  setFormData((prev) => ({ ...prev, parentId: value }))
+                }
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select parent (optional)" />
@@ -186,7 +210,12 @@ export function MenuModal({ isOpen, onClose, onSave, menu, existingMenus }: Menu
               type="number"
               min="1"
               value={formData.order}
-              onChange={(e) => setFormData((prev) => ({ ...prev, order: Number.parseInt(e.target.value) || 1 }))}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  order: Number.parseInt(e.target.value) || 1,
+                }))
+              }
             />
           </div>
 
@@ -195,7 +224,12 @@ export function MenuModal({ isOpen, onClose, onSave, menu, existingMenus }: Menu
             <Textarea
               id="description"
               value={formData.description}
-              onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  description: e.target.value,
+                }))
+              }
               rows={2}
             />
           </div>
@@ -205,17 +239,11 @@ export function MenuModal({ isOpen, onClose, onSave, menu, existingMenus }: Menu
               <Switch
                 id="isActive"
                 checked={formData.isActive}
-                onCheckedChange={(checked) => setFormData((prev) => ({ ...prev, isActive: checked }))}
+                onCheckedChange={(checked) =>
+                  setFormData((prev) => ({ ...prev, isActive: checked }))
+                }
               />
               <Label htmlFor="isActive">Active</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="isVisible"
-                checked={formData.isVisible}
-                onCheckedChange={(checked) => setFormData((prev) => ({ ...prev, isVisible: checked }))}
-              />
-              <Label htmlFor="isVisible">Visible</Label>
             </div>
           </div>
 
@@ -223,10 +251,12 @@ export function MenuModal({ isOpen, onClose, onSave, menu, existingMenus }: Menu
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <Button type="submit">{menu ? "Update Menu" : "Create Menu"}</Button>
+            <Button type="submit">
+              {menu ? "Update Menu" : "Create Menu"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

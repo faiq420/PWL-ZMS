@@ -42,30 +42,30 @@ export default function LoginPage() {
     setIsLoading(true);
     setError("");
 
-    helper.xhr
-      .Post(
-        "/Auth/Login",
-        helper.ConvertToFormData({
-          email: email,
-          password: password,
-        })
-      )
-      .then((res) => {
-        console.log(res);
-        if (res.Message) {
-          setError(res.Message);
-        } else {
-          helper.storeData("token", res.token);
+    // helper.xhr
+    //   .Post(
+    //     "/Auth/Login",
+    //     helper.ConvertToFormData({
+    //       email: email,
+    //       password: password,
+    //     })
+    //   )
+    //   .then((res) => {
+    //     console.log(res);
+    //     if (res.Message) {
+    //       setError(res.Message);
+    //     } else {
+    //       helper.storeData("token", res.token);
           router.push("/home");
-        }
-      })
-      .catch((e) => {
-        console.log(e.Message, "jiosdjsib");
-        setError(e.Message);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+      //   }
+      // })
+      // .catch((e) => {
+      //   console.log(e.Message, "jiosdjsib");
+      //   setError(e.Message);
+      // })
+      // .finally(() => {
+      //   setIsLoading(false);
+      // });
   };
 
   useEffect(() => {

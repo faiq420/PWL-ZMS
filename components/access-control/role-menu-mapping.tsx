@@ -79,7 +79,6 @@ export function RoleMenuMapping({ roles, menuItems, onUpdateAccess }: RoleMenuMa
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               Permissions for {currentRole.name}
-              <Badge variant="outline">Level {currentRole.level}</Badge>
             </CardTitle>
           </CardHeader>
           <CardContent>
