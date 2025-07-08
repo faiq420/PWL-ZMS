@@ -6,7 +6,7 @@ export interface User {
   role: UserRole;
   status: UserStatus;
   createdAt: string;
-  updatedAt: string;
+  updatedAt?: string;
   lastLogin?: string;
   avatar?: string;
   phone?: string;

@@ -32,17 +32,17 @@ export function UserStats({ users }: UserStatsProps) {
       value: inactiveUsers,
       icon: UserX,
       description: "Inactive or suspended users",
-    },
-    {
-      title: "Pending Users",
-      value: pendingUsers,
-      icon: Clock,
-      description: "Awaiting approval",
-    },
+    }
+    // {
+    //   title: "Pending Users",
+    //   value: pendingUsers,
+    //   icon: Clock,
+    //   description: "Awaiting approval",
+    // },
   ]
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
       {stats.map((stat) => (
         <Card key={stat.title}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

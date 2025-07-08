@@ -1,10 +1,11 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Calendar, Clock, User, Activity } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import useHelper from "@/Helper/helper"
 
 interface ActivityLogEntry {
   id: string
@@ -12,7 +13,7 @@ interface ActivityLogEntry {
   description: string
   timestamp: string
   ipAddress: string
-  userAgent: string
+  userAgent?: string
   type: "login" | "logout" | "create" | "update" | "delete" | "view"
 }
 
@@ -22,6 +23,30 @@ interface UserActivityLogProps {
 
 export function UserActivityLog({ userId }: UserActivityLogProps) {
   const [filter, setFilter] = useState<string>("all")
+  const [allActivity, setAllActivities] = useState<Array<ActivityLogEntry>>();
+  const helper = useHelper();
+
+  function GetActivityLogByUserId(){
+    helper.xhr.Get(
+      '/Logs/GetAllLogsByUserId',
+      helper.GetURLParamString({ UserId: userId }).toString()
+    ).then((response) => {
+      setAllActivities(response.logs.map((item: any) => ({
+        id: item.ActivityId,
+        action: item.Title,
+        description: item.Message,
+        timestamp: item.CreatedAt,
+        ipAddress: item.IpAddress === "::1" ? "127.0.0.1" : item.IpAddress,
+        type: item.Type.toLowerCase()
+      })));
+    }).catch((error) => {
+      console.error(error);
+    })
+  }
+
+  useEffect(() => {
+    GetActivityLogByUserId()
+  }, [])
 
   // Mock activity data - in a real app, this would come from an API
   const activities: ActivityLogEntry[] = [
@@ -128,7 +153,7 @@ export function UserActivityLog({ userId }: UserActivityLogProps) {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {filteredActivities.map((activity) => (
+          {allActivity !== undefined && allActivity.length > 0 && allActivity.map((activity) => (
             <div key={activity.id} className="flex items-start space-x-3 p-3 border rounded-lg">
               <div className="flex-shrink-0 mt-1">
                 <div className="flex items-center justify-center w-8 h-8 rounded-full bg-muted">
@@ -151,6 +176,29 @@ export function UserActivityLog({ userId }: UserActivityLogProps) {
               </div>
             </div>
           ))}
+          {/* {filteredActivities.map((activity) => (
+            <div key={activity.id} className="flex items-start space-x-3 p-3 border rounded-lg">
+              <div className="flex-shrink-0 mt-1">
+                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-muted">
+                  {getActivityIcon(activity.type)}
+                </div>
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-medium">{activity.action}</h4>
+                  <Badge className={getActivityColor(activity.type)}>{activity.type}</Badge>
+                </div>
+                <p className="text-sm text-muted-foreground mt-1">{activity.description}</p>
+                <div className="flex items-center space-x-4 mt-2 text-xs text-muted-foreground">
+                  <span className="flex items-center space-x-1">
+                    <Clock className="h-3 w-3" />
+                    <span>{new Date(activity.timestamp).toLocaleString()}</span>
+                  </span>
+                  <span>IP: {activity.ipAddress}</span>
+                </div>
+              </div>
+            </div>
+          ))} */}
         </div>
       </CardContent>
     </Card>
