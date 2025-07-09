@@ -42,6 +42,7 @@ export default function UserManagementPage() {
     helper.xhr
       .Get("/Users/GetAllUsers")
       .then((response) => {
+        console.log("Fetched users:", response);
         setUsers(
           response.users.map((item: any) => ({
             id: item.UserId,
@@ -53,6 +54,7 @@ export default function UserManagementPage() {
             role: item.RoleName,
             status: item.IsActive === true ? "active" : "inactive",
             lastLogin: item.LastLogin,
+            phone: item.UserPhone,
           }))
         );
       })
@@ -67,10 +69,6 @@ export default function UserManagementPage() {
 
   const handleCreateUser = () => {
     NavigateToRecord("create");
-  };
-
-  const handleEditUser = (user: User) => {
-    NavigateToRecord("edit");
   };
 
   const handleDeleteUser = (userId: string) => {
@@ -187,10 +185,17 @@ export default function UserManagementPage() {
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="all">All Users</TabsTrigger>
-              <TabsTrigger value="admin">Admins</TabsTrigger>
+              {[...new Set(users.flatMap((user) => user.role))].map(
+                (role, index) => (
+                  <TabsTrigger key={index} value={role}>
+                    {roleLabels[role]}
+                  </TabsTrigger>
+                )
+              )}
+              {/* <TabsTrigger value="admin">Admins</TabsTrigger>
               <TabsTrigger value="zoo_incharge">Zoo Incharge</TabsTrigger>
               <TabsTrigger value="veterinary_doctor">Veterinarians</TabsTrigger>
-              <TabsTrigger value="citizen">Citizens</TabsTrigger>
+              <TabsTrigger value="citizen">Citizens</TabsTrigger> */}
             </TabsList>
 
             {[
@@ -210,7 +215,7 @@ export default function UserManagementPage() {
                 </div>
                 <UserTable
                   users={filteredUsers}
-                  onEdit={handleEditUser}
+                  // onEdit={handleEditUser}
                   onDelete={handleDeleteUser}
                 />
               </TabsContent>

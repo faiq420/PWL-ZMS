@@ -17,34 +17,7 @@ interface UserPermissionsProps {
 }
 
 export function UserPermissions({ user }: UserPermissionsProps) {
-  const getRolePermissions = (role: string) => {
-    switch (role) {
-      case "admin":
-        return permissions;
-      case "zoo_incharge":
-        return permissions.filter((p) =>
-          [
-            "zoo_management",
-            "animal_management",
-            "visitor_services",
-            "reports_access",
-          ].includes(p.name)
-        );
-      case "veterinary_doctor":
-        return permissions.filter((p) =>
-          ["animal_management", "veterinary_access", "reports_access"].includes(
-            p.name
-          )
-        );
-      case "citizen":
-        return [];
-      default:
-        return [];
-    }
-  };
-
-  const userPermissions = user.permissions || getRolePermissions(user.role);
-  const allPermissions = permissions;
+  const userPermissions = user.permissions || [];
 
   return (
     <Card>
@@ -57,8 +30,8 @@ export function UserPermissions({ user }: UserPermissionsProps) {
           Permissions granted to this user based on their role
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
+      <CardContent className="mt-4">
+        <div className="space-y-2">
           {userPermissions.map((permission: any, index: number) => (
             <div
               key={index}

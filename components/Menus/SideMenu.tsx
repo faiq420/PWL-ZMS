@@ -255,7 +255,7 @@ export function SideMenu() {
                 // <span className="uppercase text-4xl leading-5 font-montserrat font-semibold">
                 //   ZMS
                 // </span>
-                <Image src={typographyIcon} className="w-[60%]" alt="Logo" />
+                <Image src={typographyIcon} className="w-[60%] xl:w-[40%]" alt="Logo" />
               )}
             </Link>
           </div>

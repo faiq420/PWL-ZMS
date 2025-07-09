@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "../../../../../components/ui/button";
 import {
+  Activity,
   ArrowLeft,
+  Calendar1Icon,
+  CalendarIcon,
   Edit,
   MapPin,
   Phone,
@@ -15,9 +18,18 @@ import {
   CardHeader,
   CardTitle,
 } from "../../../../../components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "../../../../../components/ui/avatar";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "../../../../../components/ui/avatar";
 import { Calendar } from "../../../../../components/ui/calendar";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../../components/ui/tabs";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "../../../../../components/ui/tabs";
 import { Separator } from "../../../../../components/ui/separator";
 import { UserPermissions } from "../../../../../components/user-management/user-permissions";
 import { UserActivityLog } from "../../../../../components/user-management/user-activity-log";
@@ -26,9 +38,13 @@ import { DeleteConfirmationDialog } from "../../../../../components/user-managem
 import { UserModal } from "../../../../../components/user-management/user-modal";
 import useHelper from "@/Helper/helper";
 import { Badge } from "@/components/ui/badge";
+import {
+  changeDateFormat,
+  changeDateFormatWithTime,
+} from "@/Helper/DateFormats";
+import ButtonComp from "@/components/utils/Button";
 
-
-const UserView = ({userId}: {userId: number}) => {
+const UserView = ({ userId }: { userId: number }) => {
   const router = useRouter();
   const helper = useHelper();
   const [user, setUser] = useState<User>({
@@ -38,7 +54,8 @@ const UserView = ({userId}: {userId: number}) => {
     lastName: "",
     role: "admin",
     status: "active",
-    createdAt: ""
+    createdAt: "",
+    ImagePath: "",
   });
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -60,9 +77,12 @@ const UserView = ({userId}: {userId: number}) => {
             : "",
           role: response.user.RoleName,
           status: response.user.IsActive === true ? "active" : "inactive",
-          createdAt: response.user.Date,
-          lastLogin: response.lastLogin,
+          createdAt: response.user.CreatedAt,
+          lastLogin: response.user.LastLogin,
           permissions: response.permissions,
+          phone: response.user.UserPhone,
+          ImagePath: response.user.ImagePath || "",
+          activityLog: response.logs,
         });
       })
       .catch((error) => {
@@ -71,6 +91,7 @@ const UserView = ({userId}: {userId: number}) => {
   }
 
   useEffect(() => {
+    console.log("Fetching user with ID:", userId);
     GetUserById();
     // const foundUser = mockUsers.find((u) => u.id === params.id);
     // setUser(foundUser || null);
@@ -113,11 +134,6 @@ const UserView = ({userId}: {userId: number}) => {
     }
   };
 
-  const handleDeleteUser = () => {
-    // In a real app, this would make an API call
-    router.push("/home/user-management");
-  };
-
   const handleEditUser = (userData: Partial<User>) => {
     setIsEditModalOpen(false);
   };
@@ -130,25 +146,24 @@ const UserView = ({userId}: {userId: number}) => {
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
           </Button>
-          <div>
+          {/* <div>
             <h1 className="text-3xl font-bold tracking-tight">
               {user.firstName} {user.lastName}
             </h1>
             <p className="text-muted-foreground">{user.email}</p>
-          </div>
+          </div> */}
         </div>
         <div className="flex items-center space-x-2">
-          <Button variant="outline" onClick={() => setIsEditModalOpen(true)}>
-            <Edit className="h-4 w-4 mr-2" />
-            Edit
-          </Button>
-          <Button
-            variant="destructive"
-            onClick={() => setIsDeleteDialogOpen(true)}
-          >
-            <Trash2 className="h-4 w-4 mr-2" />
-            Delete
-          </Button>
+          <div className="w-fit">
+            <ButtonComp
+              text="Edit"
+              type={"white"}
+              clickEvent={() => {
+                router.push(`/home/user-management?mode=edit&id=${user.id}`);
+              }}
+              beforeIcon={<Edit className="h-4 w-4 mr-2" />}
+            />
+          </div>
         </div>
       </div>
 
@@ -156,14 +171,14 @@ const UserView = ({userId}: {userId: number}) => {
         <div className="md:col-span-1">
           <Card className="sticky top-0">
             <CardHeader className="text-center">
-              <Avatar className="w-24 h-24 mx-auto mb-4">
-                <AvatarImage src={user.avatar || "/placeholder.svg"} />
+              <Avatar className="w-24 h-24 mx-auto mb-4 border-2 border-2-background">
+                <AvatarImage src={user.ImagePath || "/placeholder.svg"} />
                 <AvatarFallback className="text-lg">
                   {user.firstName.charAt(0)}
                   {user.lastName.charAt(0)}
                 </AvatarFallback>
               </Avatar>
-              <CardTitle>
+              <CardTitle className="text-xl">
                 {user.firstName} {user.lastName}
               </CardTitle>
               <CardDescription>{user.email}</CardDescription>
@@ -176,28 +191,24 @@ const UserView = ({userId}: {userId: number}) => {
                 </Badge>
               </div>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-2 mt-4">
               {user.phone && (
                 <div className="flex items-center space-x-2">
                   <Phone className="h-4 w-4 text-muted-foreground" />
                   <span className="text-sm">{user.phone}</span>
                 </div>
               )}
-              {user.address && (
-                <div className="flex items-center space-x-2">
-                  <MapPin className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm">{user.address}</span>
-                </div>
-              )}
               <div className="flex items-center space-x-2">
+                <CalendarIcon className="h-4 w-4 text-muted-foreground" />
                 <span className="text-sm">
-                  Joined {new Date(user.createdAt).toLocaleDateString()}
+                  Joined {changeDateFormat(user.createdAt)}
                 </span>
               </div>
               {user.lastLogin && (
                 <div className="flex items-center space-x-2">
+                  <Activity className="h-4 w-4 text-muted-foreground" />
                   <span className="text-sm">
-                    Last login {new Date(user.lastLogin).toLocaleDateString()}
+                    Last login {changeDateFormatWithTime(user.lastLogin)}
                   </span>
                 </div>
               )}
@@ -208,7 +219,6 @@ const UserView = ({userId}: {userId: number}) => {
         <div className="md:col-span-2">
           <Tabs defaultValue="permissions" className="space-y-4">
             <TabsList>
-
               <TabsTrigger value="permissions">Permissions</TabsTrigger>
               <TabsTrigger value="activity">Activity Log</TabsTrigger>
             </TabsList>
@@ -218,25 +228,11 @@ const UserView = ({userId}: {userId: number}) => {
             </TabsContent>
 
             <TabsContent value="activity">
-              <UserActivityLog userId={user.id} />
+              <UserActivityLog user={user} />
             </TabsContent>
           </Tabs>
         </div>
       </div>
-
-      <UserModal
-        isOpen={isEditModalOpen}
-        onClose={() => setIsEditModalOpen(false)}
-        onSave={handleEditUser}
-        user={user}
-      />
-
-      <DeleteConfirmationDialog
-        isOpen={isDeleteDialogOpen}
-        onClose={() => setIsDeleteDialogOpen(false)}
-        onConfirm={handleDeleteUser}
-        userName={`${user?.firstName} ${user?.lastName}`}
-      />
     </div>
   );
 };
