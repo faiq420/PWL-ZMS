@@ -1,10 +1,23 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Calendar,
   Check,
@@ -16,16 +29,20 @@ import {
   Search,
   Stethoscope,
   Upload,
-} from "lucide-react"
-import Image from "next/image"
-import Link from "next/link"
-import { Badge } from "@/components/ui/badge"
+} from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { Badge } from "@/components/ui/badge";
+import SectionIntro from "@/components/utils/Headings/SectionIntro";
 
 export default function VeterinaryInspectionPage() {
   return (
     <div className="flex-1 space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold tracking-tight">Veterinary Field Inspection</h2>
+        <SectionIntro
+          title="Veterinary Field Inspection"
+          description="Manage and track veterinary field inspections."
+        />
         <Button className="bg-green-700 hover:bg-green-800" asChild>
           <Link href="/home/veterinary-inspection/new">
             <Plus className="mr-2 h-4 w-4" /> New Inspection
@@ -45,13 +62,19 @@ export default function VeterinaryInspectionPage() {
           <Card>
             <CardHeader>
               <CardTitle>Inspection Management</CardTitle>
-              <CardDescription>Schedule, track, and manage animal health inspections</CardDescription>
+              <CardDescription>
+                Schedule, track, and manage animal health inspections
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex flex-col sm:flex-row gap-2">
                 <div className="relative flex-1">
                   <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <Input type="search" placeholder="Search inspections..." className="w-full pl-8" />
+                  <Input
+                    type="search"
+                    placeholder="Search inspections..."
+                    className="w-full pl-8"
+                  />
                 </div>
                 <div className="flex gap-2">
                   <Select>
@@ -76,13 +99,27 @@ export default function VeterinaryInspectionPage() {
                   <table className="w-full caption-bottom text-sm">
                     <thead className="[&_tr]:border-b">
                       <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                        <th className="h-12 px-4 text-left align-middle font-medium">ID</th>
-                        <th className="h-12 px-4 text-left align-middle font-medium">Animal</th>
-                        <th className="h-12 px-4 text-left align-middle font-medium">Species</th>
-                        <th className="h-12 px-4 text-left align-middle font-medium">Inspector</th>
-                        <th className="h-12 px-4 text-left align-middle font-medium">Date</th>
-                        <th className="h-12 px-4 text-left align-middle font-medium">Status</th>
-                        <th className="h-12 px-4 text-left align-middle font-medium">Actions</th>
+                        <th className="h-12 px-4 text-left align-middle font-medium">
+                          ID
+                        </th>
+                        <th className="h-12 px-4 text-left align-middle font-medium">
+                          Animal
+                        </th>
+                        <th className="h-12 px-4 text-left align-middle font-medium">
+                          Species
+                        </th>
+                        <th className="h-12 px-4 text-left align-middle font-medium">
+                          Inspector
+                        </th>
+                        <th className="h-12 px-4 text-left align-middle font-medium">
+                          Date
+                        </th>
+                        <th className="h-12 px-4 text-left align-middle font-medium">
+                          Status
+                        </th>
+                        <th className="h-12 px-4 text-left align-middle font-medium">
+                          Actions
+                        </th>
                       </tr>
                     </thead>
                     <tbody className="[&_tr:last-child]:border-0">
@@ -165,31 +202,46 @@ export default function VeterinaryInspectionPage() {
                               {inspection.animal}
                             </Link>
                           </td>
-                          <td className="p-4 align-middle">{inspection.species}</td>
-                          <td className="p-4 align-middle">{inspection.inspector}</td>
-                          <td className="p-4 align-middle">{inspection.date}</td>
+                          <td className="p-4 align-middle">
+                            {inspection.species}
+                          </td>
+                          <td className="p-4 align-middle">
+                            {inspection.inspector}
+                          </td>
+                          <td className="p-4 align-middle">
+                            {inspection.date}
+                          </td>
                           <td className="p-4 align-middle">
                             <Badge
                               className={
                                 inspection.status === "completed"
                                   ? "bg-green-100 text-green-800 hover:bg-green-100"
                                   : inspection.status === "scheduled"
-                                    ? "bg-blue-100 text-blue-800 hover:bg-blue-100"
-                                    : inspection.status === "overdue"
-                                      ? "bg-red-100 text-red-800 hover:bg-red-100"
-                                      : "bg-gray-100 text-gray-800 hover:bg-gray-100"
+                                  ? "bg-blue-100 text-blue-800 hover:bg-blue-100"
+                                  : inspection.status === "overdue"
+                                  ? "bg-red-100 text-red-800 hover:bg-red-100"
+                                  : "bg-gray-100 text-gray-800 hover:bg-gray-100"
                               }
                             >
-                              {inspection.status.charAt(0).toUpperCase() + inspection.status.slice(1)}
+                              {inspection.status.charAt(0).toUpperCase() +
+                                inspection.status.slice(1)}
                             </Badge>
                           </td>
                           <td className="p-4 align-middle">
                             <div className="flex gap-2">
                               <Button variant="outline" size="sm" asChild>
-                                <Link href={`/home/veterinary-inspection/${inspection.slug}`}>View</Link>
+                                <Link
+                                  href={`/home/veterinary-inspection/${inspection.slug}`}
+                                >
+                                  View
+                                </Link>
                               </Button>
                               <Button variant="outline" size="sm" asChild>
-                                <Link href={`/home/veterinary-inspection/${inspection.slug}/edit`}>Edit</Link>
+                                <Link
+                                  href={`/home/veterinary-inspection/${inspection.slug}/edit`}
+                                >
+                                  Edit
+                                </Link>
                               </Button>
                             </div>
                           </td>
@@ -206,7 +258,9 @@ export default function VeterinaryInspectionPage() {
             <Card>
               <CardHeader>
                 <CardTitle>Upcoming Inspections</CardTitle>
-                <CardDescription>Scheduled inspections for the next 7 days</CardDescription>
+                <CardDescription>
+                  Scheduled inspections for the next 7 days
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -228,7 +282,10 @@ export default function VeterinaryInspectionPage() {
                       slug: "ins-2023-006-melman-reticulated-giraffe",
                     },
                   ].map((inspection, index) => (
-                    <div key={index} className="flex gap-4 border rounded-lg p-4">
+                    <div
+                      key={index}
+                      className="flex gap-4 border rounded-lg p-4"
+                    >
                       <div className="flex-shrink-0 flex items-center justify-center h-12 w-12 bg-blue-100 text-blue-800 rounded-full">
                         <Calendar className="h-6 w-6" />
                       </div>
@@ -244,7 +301,9 @@ export default function VeterinaryInspectionPage() {
                         <div className="text-sm text-muted-foreground mt-1">
                           {inspection.date} at {inspection.time}
                         </div>
-                        <div className="text-sm mt-1">Inspector: {inspection.inspector}</div>
+                        <div className="text-sm mt-1">
+                          Inspector: {inspection.inspector}
+                        </div>
                       </div>
                       <div className="flex-shrink-0">
                         <Button variant="outline" size="sm">
@@ -265,7 +324,9 @@ export default function VeterinaryInspectionPage() {
             <Card>
               <CardHeader>
                 <CardTitle>Inspection Templates</CardTitle>
-                <CardDescription>Standardized templates for different species</CardDescription>
+                <CardDescription>
+                  Standardized templates for different species
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -291,14 +352,18 @@ export default function VeterinaryInspectionPage() {
                       lastUpdated: "2023-03-15",
                     },
                   ].map((template) => (
-                    <div key={template.name} className="flex gap-4 border rounded-lg p-4">
+                    <div
+                      key={template.name}
+                      className="flex gap-4 border rounded-lg p-4"
+                    >
                       <div className="flex-shrink-0 flex items-center justify-center h-12 w-12 bg-gray-100 rounded-full">
                         <ClipboardList className="h-6 w-6 text-gray-600" />
                       </div>
                       <div className="flex-1">
                         <h3 className="font-medium">{template.name}</h3>
                         <div className="text-sm text-muted-foreground mt-1">
-                          {template.fields} fields • Last updated: {template.lastUpdated}
+                          {template.fields} fields • Last updated:{" "}
+                          {template.lastUpdated}
                         </div>
                       </div>
                       <div className="flex-shrink-0">
@@ -323,13 +388,19 @@ export default function VeterinaryInspectionPage() {
           <Card>
             <CardHeader>
               <CardTitle>Animal Health Records</CardTitle>
-              <CardDescription>Comprehensive health records for all animals</CardDescription>
+              <CardDescription>
+                Comprehensive health records for all animals
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex flex-col sm:flex-row gap-2">
                 <div className="relative flex-1">
                   <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <Input type="search" placeholder="Search animals..." className="w-full pl-8" />
+                  <Input
+                    type="search"
+                    placeholder="Search animals..."
+                    className="w-full pl-8"
+                  />
                 </div>
                 <div className="flex gap-2">
                   <Select>
@@ -415,17 +486,23 @@ export default function VeterinaryInspectionPage() {
                 ].map((animal) => (
                   <Card key={animal.id} className="overflow-hidden">
                     <div className="relative h-40">
-                      <Image src={animal.image || "/placeholder.svg"} alt={animal.name} fill className="object-cover" />
+                      <Image
+                        src={animal.image || "/placeholder.svg"}
+                        alt={animal.name}
+                        fill
+                        className="object-cover"
+                      />
                       <div
                         className={`absolute top-2 right-2 px-2 py-1 rounded-full text-xs font-medium ${
                           animal.status === "healthy"
                             ? "bg-green-100 text-green-800"
                             : animal.status === "monitoring"
-                              ? "bg-amber-100 text-amber-800"
-                              : "bg-red-100 text-red-800"
+                            ? "bg-amber-100 text-amber-800"
+                            : "bg-red-100 text-red-800"
                         }`}
                       >
-                        {animal.status.charAt(0).toUpperCase() + animal.status.slice(1)}
+                        {animal.status.charAt(0).toUpperCase() +
+                          animal.status.slice(1)}
                       </div>
                     </div>
                     <CardHeader className="pb-2">
@@ -434,7 +511,9 @@ export default function VeterinaryInspectionPage() {
                           <CardTitle>{animal.name}</CardTitle>
                           <CardDescription>{animal.species}</CardDescription>
                         </div>
-                        <div className="text-sm font-medium">ID: {animal.id}</div>
+                        <div className="text-sm font-medium">
+                          ID: {animal.id}
+                        </div>
                       </div>
                     </CardHeader>
                     <CardContent className="pb-2">
@@ -444,14 +523,20 @@ export default function VeterinaryInspectionPage() {
                           <span>{animal.age}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-muted-foreground">Last Check:</span>
+                          <span className="text-muted-foreground">
+                            Last Check:
+                          </span>
                           <span>{animal.lastCheck}</span>
                         </div>
                       </div>
                     </CardContent>
                     <CardFooter className="flex justify-between">
                       <Button variant="outline" size="sm" asChild>
-                        <Link href={`/home/veterinary-inspection/health/${animal.slug}`}>View Records</Link>
+                        <Link
+                          href={`/home/veterinary-inspection/health/${animal.slug}`}
+                        >
+                          View Records
+                        </Link>
                       </Button>
                       <Button variant="outline" size="sm">
                         <Stethoscope className="h-4 w-4 mr-2" /> New Check
@@ -468,13 +553,19 @@ export default function VeterinaryInspectionPage() {
           <Card>
             <CardHeader>
               <CardTitle>Enclosure Assessments</CardTitle>
-              <CardDescription>Monitor and manage animal enclosure conditions</CardDescription>
+              <CardDescription>
+                Monitor and manage animal enclosure conditions
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex flex-col sm:flex-row gap-2">
                 <div className="relative flex-1">
                   <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <Input type="search" placeholder="Search enclosures..." className="w-full pl-8" />
+                  <Input
+                    type="search"
+                    placeholder="Search enclosures..."
+                    className="w-full pl-8"
+                  />
                 </div>
                 <div className="flex gap-2">
                   <Select>
@@ -499,13 +590,27 @@ export default function VeterinaryInspectionPage() {
                   <table className="w-full caption-bottom text-sm">
                     <thead className="[&_tr]:border-b">
                       <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                        <th className="h-12 px-4 text-left align-middle font-medium">ID</th>
-                        <th className="h-12 px-4 text-left align-middle font-medium">Enclosure</th>
-                        <th className="h-12 px-4 text-left align-middle font-medium">Zone</th>
-                        <th className="h-12 px-4 text-left align-middle font-medium">Animals</th>
-                        <th className="h-12 px-4 text-left align-middle font-medium">Last Inspection</th>
-                        <th className="h-12 px-4 text-left align-middle font-medium">Status</th>
-                        <th className="h-12 px-4 text-left align-middle font-medium">Actions</th>
+                        <th className="h-12 px-4 text-left align-middle font-medium">
+                          ID
+                        </th>
+                        <th className="h-12 px-4 text-left align-middle font-medium">
+                          Enclosure
+                        </th>
+                        <th className="h-12 px-4 text-left align-middle font-medium">
+                          Zone
+                        </th>
+                        <th className="h-12 px-4 text-left align-middle font-medium">
+                          Animals
+                        </th>
+                        <th className="h-12 px-4 text-left align-middle font-medium">
+                          Last Inspection
+                        </th>
+                        <th className="h-12 px-4 text-left align-middle font-medium">
+                          Status
+                        </th>
+                        <th className="h-12 px-4 text-left align-middle font-medium">
+                          Actions
+                        </th>
                       </tr>
                     </thead>
                     <tbody className="[&_tr:last-child]:border-0">
@@ -588,30 +693,41 @@ export default function VeterinaryInspectionPage() {
                             </Link>
                           </td>
                           <td className="p-4 align-middle">{enclosure.zone}</td>
-                          <td className="p-4 align-middle">{enclosure.animals}</td>
-                          <td className="p-4 align-middle">{enclosure.lastInspection}</td>
+                          <td className="p-4 align-middle">
+                            {enclosure.animals}
+                          </td>
+                          <td className="p-4 align-middle">
+                            {enclosure.lastInspection}
+                          </td>
                           <td className="p-4 align-middle">
                             <Badge
                               className={
                                 enclosure.status === "excellent"
                                   ? "bg-green-100 text-green-800 hover:bg-green-100"
                                   : enclosure.status === "good"
-                                    ? "bg-blue-100 text-blue-800 hover:bg-blue-100"
-                                    : enclosure.status === "fair"
-                                      ? "bg-amber-100 text-amber-800 hover:bg-amber-100"
-                                      : "bg-red-100 text-red-800 hover:bg-red-100"
+                                  ? "bg-blue-100 text-blue-800 hover:bg-blue-100"
+                                  : enclosure.status === "fair"
+                                  ? "bg-amber-100 text-amber-800 hover:bg-amber-100"
+                                  : "bg-red-100 text-red-800 hover:bg-red-100"
                               }
                             >
-                              {enclosure.status.charAt(0).toUpperCase() + enclosure.status.slice(1)}
+                              {enclosure.status.charAt(0).toUpperCase() +
+                                enclosure.status.slice(1)}
                             </Badge>
                           </td>
                           <td className="p-4 align-middle">
                             <div className="flex gap-2">
                               <Button variant="outline" size="sm" asChild>
-                                <Link href={`/home/veterinary-inspection/enclosures/${enclosure.slug}`}>View</Link>
+                                <Link
+                                  href={`/home/veterinary-inspection/enclosures/${enclosure.slug}`}
+                                >
+                                  View
+                                </Link>
                               </Button>
                               <Button variant="outline" size="sm" asChild>
-                                <Link href={`/home/veterinary-inspection/enclosures/${enclosure.slug}/inspect`}>
+                                <Link
+                                  href={`/home/veterinary-inspection/enclosures/${enclosure.slug}/inspect`}
+                                >
                                   Inspect
                                 </Link>
                               </Button>
@@ -630,7 +746,9 @@ export default function VeterinaryInspectionPage() {
             <Card>
               <CardHeader>
                 <CardTitle>Maintenance Requests</CardTitle>
-                <CardDescription>Pending maintenance for enclosures</CardDescription>
+                <CardDescription>
+                  Pending maintenance for enclosures
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -660,17 +778,22 @@ export default function VeterinaryInspectionPage() {
                       requestDate: "2023-04-02",
                     },
                   ].map((request, index) => (
-                    <div key={index} className="flex gap-4 border rounded-lg p-4">
+                    <div
+                      key={index}
+                      className="flex gap-4 border rounded-lg p-4"
+                    >
                       <div
                         className={`flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full ${
                           request.priority === "high"
                             ? "bg-red-100 text-red-800"
                             : request.priority === "medium"
-                              ? "bg-amber-100 text-amber-800"
-                              : "bg-blue-100 text-blue-800"
+                            ? "bg-amber-100 text-amber-800"
+                            : "bg-blue-100 text-blue-800"
                         }`}
                       >
-                        <span className="text-xs font-bold uppercase">{request.priority.charAt(0)}</span>
+                        <span className="text-xs font-bold uppercase">
+                          {request.priority.charAt(0)}
+                        </span>
                       </div>
                       <div className="flex-1">
                         <h3 className="font-medium">
@@ -683,7 +806,8 @@ export default function VeterinaryInspectionPage() {
                         </h3>
                         <p className="text-sm mt-1">{request.issue}</p>
                         <div className="text-xs text-muted-foreground mt-2">
-                          Requested by {request.requestedBy} on {request.requestDate}
+                          Requested by {request.requestedBy} on{" "}
+                          {request.requestDate}
                         </div>
                       </div>
                       <div className="flex-shrink-0">
@@ -705,7 +829,9 @@ export default function VeterinaryInspectionPage() {
             <Card>
               <CardHeader>
                 <CardTitle>Environmental Monitoring</CardTitle>
-                <CardDescription>Real-time environmental conditions</CardDescription>
+                <CardDescription>
+                  Real-time environmental conditions
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -754,21 +880,30 @@ export default function VeterinaryInspectionPage() {
                             env.status === "optimal"
                               ? "bg-green-100 text-green-800"
                               : env.status === "warning"
-                                ? "bg-amber-100 text-amber-800"
-                                : "bg-red-100 text-red-800"
+                              ? "bg-amber-100 text-amber-800"
+                              : "bg-red-100 text-red-800"
                           }`}
                         >
-                          {env.status.charAt(0).toUpperCase() + env.status.slice(1)}
+                          {env.status.charAt(0).toUpperCase() +
+                            env.status.slice(1)}
                         </span>
                       </div>
                       <div className="grid grid-cols-2 gap-4 mt-2">
                         <div>
-                          <div className="text-sm text-muted-foreground">Temperature</div>
-                          <div className="text-lg font-medium">{env.temperature}</div>
+                          <div className="text-sm text-muted-foreground">
+                            Temperature
+                          </div>
+                          <div className="text-lg font-medium">
+                            {env.temperature}
+                          </div>
                         </div>
                         <div>
-                          <div className="text-sm text-muted-foreground">Humidity</div>
-                          <div className="text-lg font-medium">{env.humidity}</div>
+                          <div className="text-sm text-muted-foreground">
+                            Humidity
+                          </div>
+                          <div className="text-lg font-medium">
+                            {env.humidity}
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -777,7 +912,9 @@ export default function VeterinaryInspectionPage() {
               </CardContent>
               <CardFooter>
                 <Button variant="outline" className="w-full" asChild>
-                  <Link href="/home/veterinary-inspection/environments">View All Environments</Link>
+                  <Link href="/home/veterinary-inspection/environments">
+                    View All Environments
+                  </Link>
                 </Button>
               </CardFooter>
             </Card>
@@ -788,14 +925,18 @@ export default function VeterinaryInspectionPage() {
           <Card>
             <CardHeader>
               <CardTitle>Veterinary Reports</CardTitle>
-              <CardDescription>Generate and manage veterinary reports</CardDescription>
+              <CardDescription>
+                Generate and manage veterinary reports
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 <Card>
                   <CardHeader>
                     <CardTitle className="text-lg">Health Summary</CardTitle>
-                    <CardDescription>Overall animal health status</CardDescription>
+                    <CardDescription>
+                      Overall animal health status
+                    </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
@@ -804,7 +945,10 @@ export default function VeterinaryInspectionPage() {
                         <span className="font-medium">78%</span>
                       </div>
                       <div className="h-2 bg-muted rounded-full overflow-hidden">
-                        <div className="h-full bg-green-500 rounded-full" style={{ width: "78%" }} />
+                        <div
+                          className="h-full bg-green-500 rounded-full"
+                          style={{ width: "78%" }}
+                        />
                       </div>
 
                       <div className="flex items-center justify-between">
@@ -812,7 +956,10 @@ export default function VeterinaryInspectionPage() {
                         <span className="font-medium">15%</span>
                       </div>
                       <div className="h-2 bg-muted rounded-full overflow-hidden">
-                        <div className="h-full bg-amber-500 rounded-full" style={{ width: "15%" }} />
+                        <div
+                          className="h-full bg-amber-500 rounded-full"
+                          style={{ width: "15%" }}
+                        />
                       </div>
 
                       <div className="flex items-center justify-between">
@@ -820,7 +967,10 @@ export default function VeterinaryInspectionPage() {
                         <span className="font-medium">7%</span>
                       </div>
                       <div className="h-2 bg-muted rounded-full overflow-hidden">
-                        <div className="h-full bg-red-500 rounded-full" style={{ width: "7%" }} />
+                        <div
+                          className="h-full bg-red-500 rounded-full"
+                          style={{ width: "7%" }}
+                        />
                       </div>
                     </div>
                   </CardContent>
@@ -835,17 +985,29 @@ export default function VeterinaryInspectionPage() {
 
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-lg">Inspection Compliance</CardTitle>
-                    <CardDescription>Scheduled vs. completed inspections</CardDescription>
+                    <CardTitle className="text-lg">
+                      Inspection Compliance
+                    </CardTitle>
+                    <CardDescription>
+                      Scheduled vs. completed inspections
+                    </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="flex flex-col items-center justify-center h-40">
-                      <div className="text-5xl font-bold text-green-600">92%</div>
-                      <div className="text-sm text-muted-foreground mt-2">Compliance Rate</div>
+                      <div className="text-5xl font-bold text-green-600">
+                        92%
+                      </div>
+                      <div className="text-sm text-muted-foreground mt-2">
+                        Compliance Rate
+                      </div>
                       <div className="text-xs mt-4">
-                        <span className="text-muted-foreground">Total Scheduled: </span>
+                        <span className="text-muted-foreground">
+                          Total Scheduled:{" "}
+                        </span>
                         <span className="font-medium">125</span>
-                        <span className="text-muted-foreground ml-2">Completed: </span>
+                        <span className="text-muted-foreground ml-2">
+                          Completed:{" "}
+                        </span>
                         <span className="font-medium">115</span>
                       </div>
                     </div>
@@ -862,7 +1024,9 @@ export default function VeterinaryInspectionPage() {
                 <Card>
                   <CardHeader>
                     <CardTitle className="text-lg">Medication Usage</CardTitle>
-                    <CardDescription>Medication inventory and usage</CardDescription>
+                    <CardDescription>
+                      Medication inventory and usage
+                    </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
@@ -871,7 +1035,10 @@ export default function VeterinaryInspectionPage() {
                         <span className="font-medium">32%</span>
                       </div>
                       <div className="h-2 bg-muted rounded-full overflow-hidden">
-                        <div className="h-full bg-blue-500 rounded-full" style={{ width: "32%" }} />
+                        <div
+                          className="h-full bg-blue-500 rounded-full"
+                          style={{ width: "32%" }}
+                        />
                       </div>
 
                       <div className="flex items-center justify-between">
@@ -879,7 +1046,10 @@ export default function VeterinaryInspectionPage() {
                         <span className="font-medium">28%</span>
                       </div>
                       <div className="h-2 bg-muted rounded-full overflow-hidden">
-                        <div className="h-full bg-purple-500 rounded-full" style={{ width: "28%" }} />
+                        <div
+                          className="h-full bg-purple-500 rounded-full"
+                          style={{ width: "28%" }}
+                        />
                       </div>
 
                       <div className="flex items-center justify-between">
@@ -887,7 +1057,10 @@ export default function VeterinaryInspectionPage() {
                         <span className="font-medium">25%</span>
                       </div>
                       <div className="h-2 bg-muted rounded-full overflow-hidden">
-                        <div className="h-full bg-yellow-500 rounded-full" style={{ width: "25%" }} />
+                        <div
+                          className="h-full bg-yellow-500 rounded-full"
+                          style={{ width: "25%" }}
+                        />
                       </div>
 
                       <div className="flex items-center justify-between">
@@ -895,7 +1068,10 @@ export default function VeterinaryInspectionPage() {
                         <span className="font-medium">15%</span>
                       </div>
                       <div className="h-2 bg-muted rounded-full overflow-hidden">
-                        <div className="h-full bg-gray-500 rounded-full" style={{ width: "15%" }} />
+                        <div
+                          className="h-full bg-gray-500 rounded-full"
+                          style={{ width: "15%" }}
+                        />
                       </div>
                     </div>
                   </CardContent>
@@ -912,7 +1088,9 @@ export default function VeterinaryInspectionPage() {
               <Card>
                 <CardHeader>
                   <CardTitle>Generated Reports</CardTitle>
-                  <CardDescription>Recently generated and saved reports</CardDescription>
+                  <CardDescription>
+                    Recently generated and saved reports
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="rounded-md border">
@@ -920,11 +1098,21 @@ export default function VeterinaryInspectionPage() {
                       <table className="w-full caption-bottom text-sm">
                         <thead className="[&_tr]:border-b">
                           <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                            <th className="h-12 px-4 text-left align-middle font-medium">Report Name</th>
-                            <th className="h-12 px-4 text-left align-middle font-medium">Type</th>
-                            <th className="h-12 px-4 text-left align-middle font-medium">Generated By</th>
-                            <th className="h-12 px-4 text-left align-middle font-medium">Date</th>
-                            <th className="h-12 px-4 text-left align-middle font-medium">Actions</th>
+                            <th className="h-12 px-4 text-left align-middle font-medium">
+                              Report Name
+                            </th>
+                            <th className="h-12 px-4 text-left align-middle font-medium">
+                              Type
+                            </th>
+                            <th className="h-12 px-4 text-left align-middle font-medium">
+                              Generated By
+                            </th>
+                            <th className="h-12 px-4 text-left align-middle font-medium">
+                              Date
+                            </th>
+                            <th className="h-12 px-4 text-left align-middle font-medium">
+                              Actions
+                            </th>
                           </tr>
                         </thead>
                         <tbody className="[&_tr:last-child]:border-0">
@@ -980,13 +1168,23 @@ export default function VeterinaryInspectionPage() {
                                   </Link>
                                 </div>
                               </td>
-                              <td className="p-4 align-middle">{report.type}</td>
-                              <td className="p-4 align-middle">{report.generatedBy}</td>
-                              <td className="p-4 align-middle">{report.date}</td>
+                              <td className="p-4 align-middle">
+                                {report.type}
+                              </td>
+                              <td className="p-4 align-middle">
+                                {report.generatedBy}
+                              </td>
+                              <td className="p-4 align-middle">
+                                {report.date}
+                              </td>
                               <td className="p-4 align-middle">
                                 <div className="flex gap-2">
                                   <Button variant="outline" size="sm" asChild>
-                                    <Link href={`/home/veterinary-inspection/reports/${report.slug}`}>View</Link>
+                                    <Link
+                                      href={`/home/veterinary-inspection/reports/${report.slug}`}
+                                    >
+                                      View
+                                    </Link>
                                   </Button>
                                   <Button variant="outline" size="sm">
                                     <Download className="h-4 w-4" />
@@ -1017,5 +1215,5 @@ export default function VeterinaryInspectionPage() {
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }

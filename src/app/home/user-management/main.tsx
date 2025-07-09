@@ -27,6 +27,7 @@ import type { User } from "@/types/user";
 import useHelper from "@/Helper/helper";
 import { useRouter } from "next/navigation";
 import ButtonComp from "@/components/utils/Button";
+import SectionIntro from "@/components/utils/Headings/SectionIntro";
 
 export default function UserManagementPage() {
   const [users, setUsers] = useState<User[]>(mockUsers);
@@ -126,14 +127,12 @@ export default function UserManagementPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">User Management</h1>
-          <p className="text-muted-foreground">
-            Manage users, roles, and permissions across the system
-          </p>
-        </div>
+        <SectionIntro
+          title="User Management"
+          description="Manage users, roles, and permissions across the system."
+        />
         <div className="fit">
           <ButtonComp
             clickEvent={handleCreateUser}
@@ -188,7 +187,7 @@ export default function UserManagementPage() {
               {[...new Set(users.flatMap((user) => user.role))].map(
                 (role, index) => (
                   <TabsTrigger key={index} value={role}>
-                    {roleLabels[role]}
+                    {roleLabels[role] || role}
                   </TabsTrigger>
                 )
               )}
@@ -198,28 +197,26 @@ export default function UserManagementPage() {
               <TabsTrigger value="citizen">Citizens</TabsTrigger> */}
             </TabsList>
 
-            {[
-              "all",
-              "admin",
-              "zoo_incharge",
-              "veterinary_doctor",
-              "citizen",
-            ].map((role) => (
-              <TabsContent key={role} value={role} className="mt-6">
-                <div className="mb-4">
-                  <h3 className="text-lg font-semibold">{roleLabels[role]}</h3>
-                  <p className="text-sm text-muted-foreground">
-                    {filteredUsers.length} user
-                    {filteredUsers.length !== 1 ? "s" : ""} found
-                  </p>
-                </div>
-                <UserTable
-                  users={filteredUsers}
-                  // onEdit={handleEditUser}
-                  onDelete={handleDeleteUser}
-                />
-              </TabsContent>
-            ))}
+            {["all", ...new Set(users.flatMap((user) => user.role))].map(
+              (role) => (
+                <TabsContent key={role} value={role} className="mt-6">
+                  <div className="mb-4">
+                    <h3 className="text-lg font-semibold ">
+                      {roleLabels[role] || role}
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      {filteredUsers.length} user
+                      {filteredUsers.length !== 1 ? "s" : ""} found
+                    </p>
+                  </div>
+                  <UserTable
+                    users={filteredUsers}
+                    // onEdit={handleEditUser}
+                    onDelete={handleDeleteUser}
+                  />
+                </TabsContent>
+              )
+            )}
           </Tabs>
         </CardContent>
       </Card>

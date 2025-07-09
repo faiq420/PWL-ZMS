@@ -26,6 +26,9 @@ import { AnimalDeleteDialog } from "@/components/animal/animal-delete-dialog";
 import { toast } from "@/components/ui/use-toast";
 import Heading from "@/components/utils/Headings/Heading";
 import Subheading from "@/components/utils/Headings/Subheading";
+import SectionIntro from "@/components/utils/Headings/SectionIntro";
+import ButtonComp from "@/components/utils/Button";
+import SearchTag from "@/components/utils/FormElements/SearchTag";
 
 // Mock data for demonstration
 const animals = [
@@ -127,8 +130,8 @@ export default function AnimalDirectoryPage() {
     const matchesEndangered =
       activeTab === "endangered"
         ? ["Endangered", "Critically Endangered"].includes(
-          animal.conservationStatus
-        )
+            animal.conservationStatus
+          )
         : true;
 
     const matchesLocation =
@@ -152,29 +155,29 @@ export default function AnimalDirectoryPage() {
   return (
     <div className="flex-1 space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold tracking-tight">Animal Directory</h2>
-        <Button
-          className="bg-green-700 hover:bg-green-800"
-          onClick={() => router.push("/home/animal-directory/new")}
-        >
-          <Plus className="mr-2 h-4 w-4" /> Add New Animal
-        </Button>
+        <SectionIntro
+          title="Animal Directory"
+          description="Explore and manage the animal directory."
+        />
+        <div className="w-fit">
+          <ButtonComp
+            type={"dark"}
+            text="Add New Animal"
+            clickEvent={() => router.push("/home/animal-directory/new")}
+            beforeIcon={<Plus className="h-4 w-4" />}
+          />
+        </div>
       </div>
 
       <div className="flex flex-col sm:flex-row gap-2">
-        <div className="relative flex-1">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Search animals..."
-            className="w-full pl-8"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
+        <SearchTag
+          setter={setSearchTerm}
+          value={searchTerm}
+          placeHolder="Search animals..."
+        />
         <div className="flex gap-2">
           <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-[165px]">
               <SelectValue placeholder="All Zoos" />
             </SelectTrigger>
             <SelectContent>
@@ -206,7 +209,10 @@ export default function AnimalDirectoryPage() {
           {filteredAnimals.length > 0 ? (
             <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {filteredAnimals.map((animal) => (
-                <Card key={animal.id} className="overflow-hidden flex flex-col justify-between">
+                <Card
+                  key={animal.id}
+                  className="overflow-hidden flex flex-col justify-between"
+                >
                   <div className="relative h-48">
                     <Image
                       src={animal.image || "/placeholder.svg"}
@@ -254,8 +260,10 @@ export default function AnimalDirectoryPage() {
                       <div className="flex items-center text-sm mt-2">
                         {/* <Clock className="h-4 w-4 mr-2 text-muted-foreground" /> */}
                         <div className="flex gap-2">
-                        <span className="text-muted-foreground">Feeding Time: </span>
-                        <span>2:00 PM</span>
+                          <span className="text-muted-foreground">
+                            Feeding Time:{" "}
+                          </span>
+                          <span>2:00 PM</span>
                         </div>
                       </div>
                     </div>

@@ -36,6 +36,7 @@ import { FeaturedAnimalModal } from "@/components/digital-guide/featured-animal-
 import { ScheduleModal } from "@/components/digital-guide/schedule-modal";
 import { DeleteConfirmationDialog } from "@/components/digital-guide/delete-confirmation";
 import { Slider } from "@/components/ui/slider";
+import SectionIntro from "@/components/utils/Headings/SectionIntro";
 
 export default function DigitalGuidePage() {
   const { toast } = useToast();
@@ -521,7 +522,10 @@ export default function DigitalGuidePage() {
   return (
     <div className="flex-1 space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold tracking-tight">Digital Guide</h2>
+        <SectionIntro
+          title="Digital Guide"
+          description="Explore and manage the digital guide."
+        />
         {/* <div className="flex gap-2">
           <Button variant="outline">
             <QrCode className="mr-2 h-4 w-4" /> Generate QR Code

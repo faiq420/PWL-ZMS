@@ -26,29 +26,16 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import ZooProfileCard from "./_components/ZooProfileCard";
+import SectionIntro from "@/components/utils/Headings/SectionIntro";
 
 export default function ZooProfilesPage() {
   const router = useRouter();
   return (
     <div className="flex-1 space-y-4">
-      <div className="flex items-center justify-between">
-        <Heading text={"Zoo Profiles"} />
-        {/* <Button className="bg-green-700 hover:bg-green-800">
-          <Plus className="mr-2 h-4 w-4" /> Add New Zoo
-        </Button> */}
-      </div>
-
-      {/* <div className="flex items-center space-x-2">
-        <div className="relative flex-1">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Search zoos..."
-            className="w-full pl-8"
-          />
-        </div>
-      </div> */}
-
+      <SectionIntro
+        title="Zoo Profiles"
+        description="Manage and view zoo profiles."
+      />
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {[
           {

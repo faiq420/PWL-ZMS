@@ -59,7 +59,7 @@ const ZooProfileCard = ({ zoo }: Props) => {
       <CardHeader className="space-y-0.5">
         <CardTitle>
           <Paragraph
-            className="font-semibold text-sm uppercase font-faustina"
+            className="font-semibold !text-base uppercase font-poppins"
             text={zoo.name}
           />
         </CardTitle>

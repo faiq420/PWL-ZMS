@@ -26,6 +26,8 @@ import type { Role } from "@/types/menu";
 import Subheading from "@/components/utils/Headings/Subheading";
 import ButtonComp from "@/components/utils/Button";
 import { useRouter } from "next/navigation";
+import SectionIntro from "@/components/utils/Headings/SectionIntro";
+import SearchTag from "@/components/utils/FormElements/SearchTag";
 
 export default function RoleManagementPage() {
   const router = useRouter();
@@ -94,14 +96,12 @@ export default function RoleManagementPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <Subheading text={"Role Management"} />
-          <div className="flex items-center text-muted-foreground mt-0 font-syne">
-            <p>Manage user roles and permissions</p>
-          </div>
-        </div>
+        <SectionIntro
+          title="Role Management"
+          description="Manage user roles."
+        />
         <div className="flex gap-2">
           <ButtonComp
             text="Create Role"
@@ -111,12 +111,6 @@ export default function RoleManagementPage() {
             }}
             beforeIcon={<Plus className="h-4 w-4" />}
           />
-          {/* <Button variant="outline">
-            <FileText className="mr-2 h-4 w-4" /> Generate Report
-          </Button>
-          <Button className="bg-green-700 hover:bg-green-800">
-            <Info className="mr-2 h-4 w-4" /> Update Information
-          </Button> */}
         </div>
       </div>
 
@@ -131,16 +125,12 @@ export default function RoleManagementPage() {
         </CardHeader>
 
         <CardContent>
-          <div className="flex items-center space-x-4 mb-6">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-              <Input
-                placeholder="Search roles..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
+          <div className="flex items-center space-x-2 mt-4 mb-2">
+            <SearchTag
+              setter={setSearchTerm}
+              value={searchTerm}
+              placeHolder="Search roles..."
+            />  
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-[180px]">
                 <Filter className="mr-2 h-4 w-4" />

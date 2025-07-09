@@ -3,9 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  CalendarIcon,
-} from "lucide-react";
+import { CalendarIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
@@ -28,6 +26,7 @@ import { useRouter } from "next/navigation";
 import Heading from "@/components/utils/Headings/Heading";
 import EventsTable from "./tabs/EventsTable";
 import BookingsTable from "./tabs/BookingsTable";
+import SectionIntro from "@/components/utils/Headings/SectionIntro";
 
 export default function VisitPlanningPage() {
   const { toast } = useToast();
@@ -409,7 +408,10 @@ export default function VisitPlanningPage() {
   return (
     <div className="flex-1 space-y-4">
       <div className="flex items-center justify-between">
-        <Heading text="Visit Planning" />
+        <SectionIntro
+          title="Visit Planning"
+          description="Manage and plan visits for the zoo."
+        />
         <div className="flex items-center space-x-2">
           <Popover>
             <PopoverTrigger asChild>

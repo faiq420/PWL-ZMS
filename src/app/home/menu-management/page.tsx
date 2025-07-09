@@ -1,46 +1,62 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Plus, Search, Filter } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { MenuTree } from "@/components/menu-management/menu-tree"
-import { MenuModal } from "@/components/menu-management/menu-modal"
-import { MenuStats } from "@/components/menu-management/menu-stats"
-import { mockMenuItems } from "@/data/menus"
-import type { MenuItem } from "@/types/menu"
+import { useState } from "react";
+import { Plus, Search, Filter } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { MenuTree } from "@/components/menu-management/menu-tree";
+import { MenuModal } from "@/components/menu-management/menu-modal";
+import { MenuStats } from "@/components/menu-management/menu-stats";
+import { mockMenuItems } from "@/data/menus";
+import type { MenuItem } from "@/types/menu";
+import SectionIntro from "@/components/utils/Headings/SectionIntro";
 
 export default function MenuManagementPage() {
-  const [menuItems, setMenuItems] = useState<MenuItem[]>(mockMenuItems)
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [selectedMenu, setSelectedMenu] = useState<MenuItem | null>(null)
-  const [searchTerm, setSearchTerm] = useState("")
-  const [statusFilter, setStatusFilter] = useState<string>("all")
+  const [menuItems, setMenuItems] = useState<MenuItem[]>(mockMenuItems);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedMenu, setSelectedMenu] = useState<MenuItem | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
 
   const handleCreateMenu = () => {
-    setSelectedMenu(null)
-    setIsModalOpen(true)
-  }
+    setSelectedMenu(null);
+    setIsModalOpen(true);
+  };
 
   const handleEditMenu = (menu: MenuItem) => {
-    setSelectedMenu(menu)
-    setIsModalOpen(true)
-  }
+    setSelectedMenu(menu);
+    setIsModalOpen(true);
+  };
 
   const handleDeleteMenu = (menuId: string) => {
-    const deleteMenuAndChildren = (items: MenuItem[], id: string): MenuItem[] => {
+    const deleteMenuAndChildren = (
+      items: MenuItem[],
+      id: string
+    ): MenuItem[] => {
       return items.filter((item) => {
-        if (item.id === id) return false
+        if (item.id === id) return false;
         if (item.children) {
-          item.children = deleteMenuAndChildren(item.children, id)
+          item.children = deleteMenuAndChildren(item.children, id);
         }
-        return true
-      })
-    }
-    setMenuItems(deleteMenuAndChildren(menuItems, menuId))
-  }
+        return true;
+      });
+    };
+    setMenuItems(deleteMenuAndChildren(menuItems, menuId));
+  };
 
   const handleSaveMenu = (menuData: Partial<MenuItem>) => {
     if (selectedMenu) {
@@ -48,15 +64,19 @@ export default function MenuManagementPage() {
       const updateMenu = (items: MenuItem[]): MenuItem[] => {
         return items.map((item) => {
           if (item.id === selectedMenu.id) {
-            return { ...item, ...menuData, updatedAt: new Date().toISOString() }
+            return {
+              ...item,
+              ...menuData,
+              updatedAt: new Date().toISOString(),
+            };
           }
           if (item.children) {
-            item.children = updateMenu(item.children)
+            item.children = updateMenu(item.children);
           }
-          return item
-        })
-      }
-      setMenuItems(updateMenu(menuItems))
+          return item;
+        });
+      };
+      setMenuItems(updateMenu(menuItems));
     } else {
       // Create new menu
       const newMenu: MenuItem = {
@@ -67,7 +87,7 @@ export default function MenuManagementPage() {
         isVisible: true,
         order: menuItems.length + 1,
         ...menuData,
-      } as MenuItem
+      } as MenuItem;
 
       if (menuData.parentId) {
         // Add as child menu
@@ -77,56 +97,62 @@ export default function MenuManagementPage() {
               return {
                 ...item,
                 children: [...(item.children || []), newMenu],
-              }
+              };
             }
             if (item.children) {
-              item.children = addToParent(item.children)
+              item.children = addToParent(item.children);
             }
-            return item
-          })
-        }
-        setMenuItems(addToParent(menuItems))
+            return item;
+          });
+        };
+        setMenuItems(addToParent(menuItems));
       } else {
         // Add as root menu
-        setMenuItems([...menuItems, newMenu])
+        setMenuItems([...menuItems, newMenu]);
       }
     }
-    setIsModalOpen(false)
-  }
+    setIsModalOpen(false);
+  };
 
   const handleToggleVisibility = (menuId: string) => {
     const toggleVisibility = (items: MenuItem[]): MenuItem[] => {
       return items.map((item) => {
         if (item.id === menuId) {
-          return { ...item, isVisible: !item.isVisible, updatedAt: new Date().toISOString() }
+          return {
+            ...item,
+            isVisible: !item.isVisible,
+            updatedAt: new Date().toISOString(),
+          };
         }
         if (item.children) {
-          item.children = toggleVisibility(item.children)
+          item.children = toggleVisibility(item.children);
         }
-        return item
-      })
-    }
-    setMenuItems(toggleVisibility(menuItems))
-  }
+        return item;
+      });
+    };
+    setMenuItems(toggleVisibility(menuItems));
+  };
 
   const filteredMenus = menuItems.filter((menu) => {
-    const matchesSearch = menu.name.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesSearch = menu.name
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
     const matchesStatus =
       statusFilter === "all" ||
       (statusFilter === "active" && menu.isActive) ||
       (statusFilter === "inactive" && !menu.isActive) ||
       (statusFilter === "visible" && menu.isVisible) ||
-      (statusFilter === "hidden" && !menu.isVisible)
-    return matchesSearch && matchesStatus
-  })
+      (statusFilter === "hidden" && !menu.isVisible);
+    return matchesSearch && matchesStatus;
+  });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Menu Management</h1>
-          <p className="text-muted-foreground">Manage system navigation menus and hierarchy</p>
-        </div>
+        <SectionIntro
+          title="Menu Management"
+          description="Manage system navigation menus and hierarchy."
+        />
         <Button onClick={handleCreateMenu}>
           <Plus className="mr-2 h-4 w-4" />
           Add Menu Item
@@ -137,11 +163,10 @@ export default function MenuManagementPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Menu Structure</CardTitle>
-          <CardDescription>Manage menu items, hierarchy, and permissions</CardDescription>
+          <CardTitle className="font-poppins text-xl">Menu Structure</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center space-x-4 mb-6">
+          <div className="flex items-center space-x-4 mb-2 mt-4">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
@@ -183,5 +208,5 @@ export default function MenuManagementPage() {
         existingMenus={menuItems}
       />
     </div>
-  )
+  );
 }
