@@ -17,3 +17,21 @@ export const formatCnic = (string: string) => {
   }
   return result;
 };
+
+export const formatPhoneNumber = (string: string) => {
+  let N = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+  const len = string.length;
+
+  if (!N.includes(string[len - 1])) {
+    return string.substring(0, len - 1);
+  }
+
+  let result = "";
+  if (len === 5) {
+    result = string.substring(0, 4) + "-" + string[4];
+  } else {
+    result = string.substring(0, 12);
+  }
+
+  return result;
+}

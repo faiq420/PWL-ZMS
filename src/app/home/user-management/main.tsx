@@ -74,7 +74,7 @@ export default function UserManagementPage() {
   };
 
   const handleDeleteUser = (userId: string) => {
-    setUsers(users.filter((user) => user.id !== userId));
+    setUsers(users.filter((user) => user.Id !== Number(userId)));
   };
 
   function NavigateToRecord(mode: string, id?: number) {
@@ -89,7 +89,7 @@ export default function UserManagementPage() {
       // Edit existing user
       setUsers(
         users.map((user) =>
-          user.id === selectedUser.id
+          user.Id === selectedUser.Id
             ? { ...user, ...userData, updatedAt: new Date().toISOString() }
             : user
         )

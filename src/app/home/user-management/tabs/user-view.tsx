@@ -32,7 +32,7 @@ const UserView = ({userId}: {userId: number}) => {
   const router = useRouter();
   const helper = useHelper();
   const [user, setUser] = useState<User>({
-    id: "",
+    Id: 0,
     email: "",
     firstName: "",
     lastName: "",
@@ -52,7 +52,7 @@ const UserView = ({userId}: {userId: number}) => {
       .then((response) => {
         console.log(response);
         setUser({
-          id: response.user.UserId,
+          Id: response.user.UserId,
           email: response.user.UserEmail,
           firstName: response.user.UserName.split(" ")[0],
           lastName: response.user.UserName.includes(" ")
@@ -218,7 +218,7 @@ const UserView = ({userId}: {userId: number}) => {
             </TabsContent>
 
             <TabsContent value="activity">
-              <UserActivityLog userId={user.id} />
+              <UserActivityLog userId={String(user.Id)} />
             </TabsContent>
           </Tabs>
         </div>
