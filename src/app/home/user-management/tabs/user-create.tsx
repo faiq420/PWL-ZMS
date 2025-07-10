@@ -173,7 +173,7 @@ const UserCreate = ({ mode = "create", id = "0" }: Props) => {
           <div className="space-y-2">
             <div className="mb-5 space-y-2 w-[80%] md:w-[20%] mx-auto">
               {imgFile != null || obj?.ImagePath != "" ? (
-                <div className="relative aspect-square rounded-md border border-main-gray/30 overflow-hidden">
+                <div className="relative aspect-square rounded-full border border-main-gray/30 overflow-hidden">
                   <Image
                     src={
                       obj?.ImagePath && obj?.ImagePath != ""
@@ -204,7 +204,7 @@ const UserCreate = ({ mode = "create", id = "0" }: Props) => {
                   <Button
                     variant="destructive"
                     size="icon"
-                    className="absolute top-1 right-1 h-6 w-6 rounded-full"
+                    className="absolute top-8 right-5 h-6 w-6 rounded-full"
                     onClick={() => {
                       setObj({ ...obj, ImagePath: "" });
                       setImgFile(null);
@@ -228,14 +228,13 @@ const UserCreate = ({ mode = "create", id = "0" }: Props) => {
                     onClick={() => {
                       document.getElementById("profileImg-upload")?.click();
                     }}
-                    className="flex w-full flex-col items-center justify-center aspect-square rounded-md border border-dashed border-main-gray/50 bg-gray-50 hover:bg-gray-100 transition-colors"
+                    className="flex w-full flex-col items-center justify-center aspect-square rounded-full border border-dashed border-main-gray/50 bg-gray-50 hover:bg-gray-100 transition-colors"
                   >
                     <Upload className="h-6 w-6 text-main-gray mb-1" />
-                    <span className="text-xs text-main-gray">Add Image</span>
+                    <span className="text-xs text-main-gray">Add Profile Image</span>
                   </button>
                 </>
               )}
-              <Label className="text-center block w-full">Profile Image</Label>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-2 gap-y-3 items-center">
               <InputTag
@@ -251,7 +250,7 @@ const UserCreate = ({ mode = "create", id = "0" }: Props) => {
                 setter={(n, v) => {
                   handleChange(n, formatCnic(v));
                 }}
-                placeHolder="xxx-xxxxxxx-x"
+                placeHolder="xxxxx-xxxxxxx-x"
                 label="Cnic"
               />
               <InputTag
