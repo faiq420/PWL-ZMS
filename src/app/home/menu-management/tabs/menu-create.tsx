@@ -5,6 +5,7 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
+import { useToast } from "@/components/ui/use-toast";
 import ButtonComp from "@/components/utils/Button";
 import Dropdown from "@/components/utils/FormElements/Dropdown";
 import InputTag from "@/components/utils/FormElements/InputTag";
@@ -13,7 +14,7 @@ import Toggle from "@/components/utils/FormElements/Toggle";
 import Subheading from "@/components/utils/Headings/Subheading";
 import { mockMenuItems } from "@/data/menus";
 import { iconOptions } from "@/data/zoos";
-import { MenuItem } from "@/Helper/Menus";
+import useHelper from "@/Helper/helper";
 import { OPTION } from "@/types/utils";
 import { ArrowLeft, Save, X } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -24,14 +25,29 @@ interface Props {
   id?: string;
 }
 
+type MenuItemProps = {
+  MenuId: number;
+  MenuName: string;
+  Path: string;
+  IsParent: boolean;
+  ParentId: number | null;
+  SortingOrder: number;
+  IsActive: boolean;
+  Icon: string;
+  Description: string;
+};
+
 const MenuCreate = ({ mode = "create", id = "0" }: Props) => {
   const router = useRouter();
+  const helper = useHelper();
+  const toast = useToast();
   const [menus, setMenus] = useState<OPTION[]>([]);
   const [icons, setIcons] = useState<OPTION[]>([]);
-  const [obj, setObj] = useState<any>({
+  const [isCruding, setIsCruding] = useState<boolean>(false);
+  const [obj, setObj] = useState<MenuItemProps>({
     MenuId: 0,
     MenuName: "",
-    Path: "",
+    Path: "/home/",
     IsParent: false,
     ParentId: null,
     SortingOrder: 0,
@@ -41,17 +57,19 @@ const MenuCreate = ({ mode = "create", id = "0" }: Props) => {
   });
 
   function GetAllMenus() {
-    try {
-      setMenus([
-        { label: "No Parent Menu", value: null },
-        ...mockMenuItems.map((menu: any) => ({
-          label: menu.MenuName,
-          value: menu.MenuId,
-        })),
-      ]);
-    } catch (error: any) {
-      console.error(error);
-    }
+    helper.xhr
+      .Get("/Menu/GetMenus")
+      .then((response) => {
+        setMenus(
+          response.menus.map((menu: any) => ({
+            label: menu.MenuName,
+            value: menu.MenuId,
+          }))
+        );
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   }
 
   function GetAllIcons() {
@@ -74,23 +92,21 @@ const MenuCreate = ({ mode = "create", id = "0" }: Props) => {
 
   useEffect(() => {
     if (id !== "0") {
-      setObj(
-        mockMenuItems
-          .filter((item) => item.MenuId === Number(id))
-          .map((item: any) => ({
-            MenuId: item.MenuId,
-            MenuName: item.MenuName,
-            Path: item.Path,
-            IsParent: item.IsParent,
-            ParentId: item.ParentId,
-            SortingOrder: item.SortingOrder,
-            IsActive: item.IsActive,
-            Icon: item.Icon,
-            Description: item.Description,
-          }))[0]
-      );
+      GetMenuById();
     }
   }, [id]);
+
+  function GetMenuById() {
+    helper.xhr.Get(
+      '/Menu/GetMenuById',
+      helper.GetURLParamString({ MenuId: Number(id) }).toString()
+    ).then((response) => {
+      // console.log(response);
+      setObj(response.menu);
+    }).catch((error) => {
+      console.error(error);
+    })
+  }
 
   const capitalize = (value: string, space = " ") => {
     const words = String(value).split(space);
@@ -110,7 +126,24 @@ const MenuCreate = ({ mode = "create", id = "0" }: Props) => {
     setObj((prev: any) => ({ ...prev, [name]: value }));
   }
 
-  function HandleSubmit() {}
+  function HandleSubmit() {
+    setIsCruding(true);
+    helper.xhr
+      .Post(`/Menu/${mode === "create" ? "CreateMenu" : "UpdateMenu"}`, helper.ConvertToFormData({ obj: obj }))
+      .then((response) => {
+        console.log(response);
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+      .finally(() => {
+        setIsCruding(false);
+        toast.toast({
+          title: "Operation Successful",
+          description: `Menu ${mode === "create" ? "Created" : "Updated"} Successfully`,
+        });
+      });
+  }
 
   return (
     <div className="flex-1 space-y-4">
@@ -193,7 +226,8 @@ const MenuCreate = ({ mode = "create", id = "0" }: Props) => {
               <ButtonComp
                 text={mode == "edit" ? "Save" : "Create"}
                 clickEvent={HandleSubmit}
-                beforeIcon={<Save className="h-4 w-4" />}
+                beforeIcon={!isCruding ? <Save className="h-4 w-4" /> : null}
+                isCruding={isCruding}
               />
             </div>
           </div>

@@ -10,7 +10,7 @@ import type { MenuItem } from "@/types/menu"
 interface MenuTreeProps {
   menuItems: MenuItem[]
   onEdit: (menu: MenuItem) => void
-  onDelete: (menuId: string) => void
+  onDelete: (menuId: number) => void
   onToggleVisibility: (menuId: string) => void
   level?: number
 }
@@ -70,7 +70,7 @@ export function MenuTree({ menuItems, onEdit, onDelete, onToggleVisibility, leve
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => onDelete(String(item.MenuId))}
+                onClick={() => onDelete(item.MenuId)}
                 className="h-8 w-8 p-0 text-destructive hover:text-destructive"
               >
                 <Trash2 className="h-4 w-4" />

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Plus, Search, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,41 +25,36 @@ import { mockMenuItems } from "@/data/menus";
 import type { MenuItem } from "@/types/menu";
 import SectionIntro from "@/components/utils/Headings/SectionIntro";
 import { useRouter } from "next/navigation";
+import useHelper from "@/Helper/helper";
 
 export default function MenuManagementPage() {
-  const [menuItems, setMenuItems] = useState<MenuItem[]>(mockMenuItems);
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedMenu, setSelectedMenu] = useState<MenuItem | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const router = useRouter();
+  const helper = useHelper();
 
   const handleCreateMenu = () => {
     NavigateToRecord("create")
-    // setSelectedMenu(null);
-    // setIsModalOpen(true);
   };
 
   const handleEditMenu = (menu: MenuItem) => {
     NavigateToRecord("edit", menu.MenuId)
-    // setSelectedMenu(menu);
-    // setIsModalOpen(true);
   };
 
-  const handleDeleteMenu = (menuId: string) => {
-    const deleteMenuAndChildren = (
-      items: MenuItem[],
-      id: string
-    ): MenuItem[] => {
-      return items.filter((item) => {
-        if (item.MenuId === Number(id)) return false;
-        if (item.children) {
-          item.children = deleteMenuAndChildren(item.children, id);
-        }
-        return true;
-      });
-    };
-    setMenuItems(deleteMenuAndChildren(menuItems, menuId));
+  const handleDeleteMenu = (menuId: number) => {
+    helper.xhr.Post(
+      '/Menu/DeleteMenu',
+      helper.ConvertToFormData({ MenuId:  menuId})
+    ).then((response) => {
+      console.log(response);
+    }).catch((error) => {
+      console.error(error);
+    }).finally(() => {
+      setMenuItems(menuItems.filter(item => item.MenuId !== menuId));
+    })
   };
 
   const handleSaveMenu = (menuData: Partial<MenuItem>) => {
@@ -153,6 +148,29 @@ export default function MenuManagementPage() {
         (id != undefined ? `&id=${id}` : "")
     );
   }
+
+  function GetAllMenus() {
+    helper.xhr.Get(
+      '/Menu/GetMenus'
+    ).then((response) => {
+      setMenuItems(response.menus.map((menu: any) => ({
+        MenuId: menu.MenuId,
+        MenuName: menu.MenuName,
+        Path: menu.Path,
+        Description: menu.Description,
+        IsActive: menu.IsActive,
+        IsParent: menu.IsParent,
+        ParentId: menu.ParentId,
+        Icon: menu.Icon
+      })));
+    }).catch((error) => {
+      console.log(error);
+    })
+  }
+
+  useEffect(() => {
+    GetAllMenus();
+  }, [])
 
   return (
     <div className="space-y-4">

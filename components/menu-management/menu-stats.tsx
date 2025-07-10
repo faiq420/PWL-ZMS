@@ -20,8 +20,8 @@ export function MenuStats({ menuItems }: MenuStatsProps) {
   };
 
   const allMenus = flattenMenus(menuItems);
-  const visibleMenus = allMenus.filter((menu) => menu.isVisible);
-  const activeMenus = allMenus.filter((menu) => menu.isActive);
+  const visibleMenus = allMenus.filter((menu) => !menu.IsActive);
+  const activeMenus = allMenus.filter((menu) => menu.IsActive);
   const rootMenus = menuItems.length;
 
   return (
@@ -34,16 +34,6 @@ export function MenuStats({ menuItems }: MenuStatsProps) {
           Description: "System menus defined",
         },
         {
-          Title: "Visible Menus",
-          icon: <Eye className="h-4 w-4 text-muted-foreground" />,
-          Count: visibleMenus.length,
-          Description: `${(
-            (visibleMenus.length / allMenus.length) *
-            100
-          ).toFixed(1)}% of
-            total`,
-        },
-        {
           Title: "Active Menus",
           icon: <Activity className="h-4 w-4 text-muted-foreground" />,
           Count: activeMenus.length,
@@ -51,6 +41,16 @@ export function MenuStats({ menuItems }: MenuStatsProps) {
             (activeMenus.length / allMenus.length) *
             100
           ).toFixed(1)}% active`,
+        },
+        {
+          Title: "Inactive Menus",
+          icon: <Eye className="h-4 w-4 text-muted-foreground" />,
+          Count: visibleMenus.length,
+          Description: `${(
+            (visibleMenus.length / allMenus.length) *
+            100
+          ).toFixed(1)}% of
+            total`,
         },
       ].map((card) => (
         <MetricPresentationCard
