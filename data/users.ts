@@ -84,7 +84,7 @@ export const permissions: Permission[] = [
 
 export const mockUsers: User[] = [
   {
-    id: "1",
+    Id: 1,
     email: "admin@zooapp.com",
     firstName: "System",
     lastName: "Administrator",
@@ -97,7 +97,7 @@ export const mockUsers: User[] = [
     permissions: permissions,
   },
   {
-    id: "2",
+    Id: 2,
     email: "john.doe@lahore-zoo.com",
     firstName: "John",
     lastName: "Doe",
@@ -111,7 +111,7 @@ export const mockUsers: User[] = [
     department: "Zoo Operations",
   },
   {
-    id: "3",
+    Id: 3,
     email: "dr.smith@lahore-zoo.com",
     firstName: "Dr. Sarah",
     lastName: "Smith",
@@ -126,7 +126,7 @@ export const mockUsers: User[] = [
     licenseNumber: "VET-2024-001",
   },
   {
-    id: "4",
+    Id: 4,
     email: "citizen@example.com",
     firstName: "Ahmed",
     lastName: "Khan",

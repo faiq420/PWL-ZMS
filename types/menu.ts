@@ -1,17 +1,32 @@
+// export interface MenuItem {
+//   id: string
+//   name: string
+//   path: string
+//   icon?: string
+//   parentId?: string
+//   order: number
+//   isActive: boolean
+//   isVisible: boolean
+//   description?: string
+//   children?: MenuItem[]
+//   permissions?: MenuPermission[]
+//   createdAt: string
+//   updatedAt: string
+// }
+
 export interface MenuItem {
-  id: string
-  name: string
-  path: string
-  icon?: string
-  parentId?: string
-  order: number
-  isActive: boolean
-  isVisible: boolean
-  description?: string
-  children?: MenuItem[]
-  permissions?: MenuPermission[]
-  createdAt: string
-  updatedAt: string
+  MenuId: number;
+  MenuName: string;
+  Path: string;
+  IsParent: boolean;
+  ParentId?: number | null;
+  SortingOrder: number;
+  IsActive: boolean;
+  Icon?: string;
+  Description?: string;
+  CreatedAt: string;
+  UpdatedAt?: string;
+  children?: MenuItem[];
 }
 
 export interface MenuPermission {
