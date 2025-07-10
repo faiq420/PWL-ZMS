@@ -34,12 +34,12 @@ export function RoleTable({ roles, onEdit, onDelete }: RoleTableProps) {
         <TableHeader>
           <TableRow>
             <TableHead>Role Name</TableHead>
-            <TableHead>Description</TableHead>
-            <TableHead>Level</TableHead>
+            {/* <TableHead>Description</TableHead> */}
+            {/* <TableHead>Level</TableHead> */}
             <TableHead>Status</TableHead>
             <TableHead>Permissions</TableHead>
             <TableHead>Menu Access</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
+            <TableHead className="text-center">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -51,12 +51,12 @@ export function RoleTable({ roles, onEdit, onDelete }: RoleTableProps) {
                   {role.name}
                 </div>
               </TableCell>
-              <TableCell className="max-w-xs">
+              {/* <TableCell className="max-w-xs">
                 <p className="text-sm text-muted-foreground truncate">{role.description}</p>
               </TableCell>
               <TableCell>
                 <Badge className={getRoleLevelColor(role.level)}>Level {role.level}</Badge>
-              </TableCell>
+              </TableCell> */}
               <TableCell>
                 <Badge variant={role.isActive ? "default" : "secondary"}>{role.isActive ? "Active" : "Inactive"}</Badge>
               </TableCell>
@@ -72,8 +72,8 @@ export function RoleTable({ roles, onEdit, onDelete }: RoleTableProps) {
                   <span className="text-sm">{role.menuAccess.length}</span>
                 </div>
               </TableCell>
-              <TableCell className="text-right">
-                <div className="flex items-center justify-end gap-2">
+              <TableCell className="text-center">
+                <div className="flex items-center justify-center gap-2">
                   <Button variant="ghost" size="sm" onClick={() => onEdit(role)}>
                     <Edit className="h-4 w-4" />
                   </Button>

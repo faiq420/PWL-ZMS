@@ -28,6 +28,7 @@ import { useToast } from "@/components/ui/use-toast";
 
 const EventsTable = () => {
   const { toast } = useToast();
+  const router = useRouter();
   const [events, setEvents] = useState([
     {
       id: 1,
@@ -105,7 +106,7 @@ const EventsTable = () => {
     }
   });
 
-  const router = useRouter();
+  
   function NavigateToRecord(tab: string, mode: string, id?: number) {
     router.push(
       `/home/visit-planning?tab=${tab}&mode=${mode}` +

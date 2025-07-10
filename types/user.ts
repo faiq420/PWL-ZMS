@@ -10,6 +10,7 @@ export interface User {
   lastLogin?: string;
   avatar?: string;
   phone?: string;
+  ImagePath?: string; // For profile picture
   address?: string;
   // Role-specific fields
   assignedZoos?: string[]; // For zoo incharge and veterinary doctor
@@ -17,6 +18,16 @@ export interface User {
   licenseNumber?: string; // For veterinary doctor
   department?: string; // For admin and zoo incharge
   permissions?: Permission[];
+  activityLog?: ActivityLogEntry[]; // User activity log
+}
+
+export interface ActivityLogEntry {
+  id?: string;
+  Title: string;
+  Message: string;
+  CreatedAt: string;
+  IpAddress: string;
+  Type: "Login" | "CRUD";
 }
 
 export type UserRole =

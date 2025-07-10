@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { MoreHorizontal, Edit, Trash2, Eye, Mail, Phone } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { useState } from "react";
+import { MoreHorizontal, Edit, Trash2, Eye, Mail, Phone } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,63 +12,80 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { DeleteConfirmationDialog } from "./delete-confirmation-dialog"
-import type { User } from "@/types/user"
-import Link from "next/link"
+} from "@/components/ui/dropdown-menu";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { DeleteConfirmationDialog } from "./delete-confirmation-dialog";
+import type { User } from "@/types/user";
+import Link from "next/link";
+import { changeDateFormatWithTime } from "@/Helper/DateFormats";
+import { useRouter } from "next/navigation";
 
 interface UserTableProps {
-  users: User[]
-  onEdit: (user: User) => void
-  onDelete: (userId: string) => void
+  users: User[];
+  // onEdit: (user: User) => void
+  onDelete: (userId: string) => void;
 }
 
-export function UserTable({ users, onEdit, onDelete }: UserTableProps) {
-  const [deleteUser, setDeleteUser] = useState<User | null>(null)
+export function UserTable({ users, onDelete }: UserTableProps) {
+  const router = useRouter();
+  const [deleteUser, setDeleteUser] = useState<User | null>(null);
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case "active":
-        return "bg-green-100 text-green-800"
+        return "bg-green-100 text-green-800";
       case "inactive":
-        return "bg-gray-100 text-gray-800"
+        return "bg-gray-100 text-gray-800";
       case "suspended":
-        return "bg-red-100 text-red-800"
+        return "bg-red-100 text-red-800";
       case "pending":
-        return "bg-yellow-100 text-yellow-800"
+        return "bg-yellow-100 text-yellow-800";
       default:
-        return "bg-gray-100 text-gray-800"
+        return "bg-gray-100 text-gray-800";
     }
-  }
+  };
 
   const getRoleColor = (role: string) => {
     switch (role) {
       case "admin":
-        return "bg-purple-100 text-purple-800"
+        return "bg-purple-100 text-purple-800";
       case "zoo_incharge":
-        return "bg-blue-100 text-blue-800"
+        return "bg-blue-100 text-blue-800";
       case "veterinary_doctor":
-        return "bg-green-100 text-green-800"
+        return "bg-green-100 text-green-800";
       case "citizen":
-        return "bg-orange-100 text-orange-800"
+        return "bg-orange-100 text-orange-800";
       default:
-        return "bg-gray-100 text-gray-800"
+        return "bg-gray-100 text-gray-800";
     }
-  }
+  };
 
   const formatRole = (role: string) => {
     return role
       .split("_")
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(" ")
-  }
+      .join(" ");
+  };
 
   const handleDeleteConfirm = () => {
     if (deleteUser) {
-      onDelete(deleteUser.id)
-      setDeleteUser(null)
+      onDelete(deleteUser.id);
+      setDeleteUser(null);
     }
+  };
+
+  function NavigateToRecord(mode: string, id?: number) {
+    router.push(
+      `/home/user-management?mode=${mode}` +
+        (id != undefined ? `&id=${id}` : "")
+    );
   }
 
   return (
@@ -101,15 +118,21 @@ export function UserTable({ users, onEdit, onDelete }: UserTableProps) {
                       <div className="font-medium">
                         {user.firstName} {user.lastName}
                       </div>
-                      <div className="text-sm text-muted-foreground">{user.email}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {user.email}
+                      </div>
                     </div>
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Badge className={getRoleColor(user.role)}>{formatRole(user.role)}</Badge>
+                  <Badge className={getRoleColor(user.role)}>
+                    {formatRole(user.role)}
+                  </Badge>
                 </TableCell>
                 <TableCell>
-                  <Badge className={getStatusColor(user.status)}>{user.status}</Badge>
+                  <Badge className={getStatusColor(user.status)}>
+                    {user.status}
+                  </Badge>
                 </TableCell>
                 <TableCell>
                   <div className="space-y-1">
@@ -127,7 +150,9 @@ export function UserTable({ users, onEdit, onDelete }: UserTableProps) {
                 </TableCell>
                 <TableCell>
                   {user.lastLogin ? (
-                    <div className="text-sm">{new Date(user.lastLogin).toLocaleDateString()}</div>
+                    <div className="text-sm">
+                      {changeDateFormatWithTime(user.lastLogin)}
+                    </div>
                   ) : (
                     <span className="text-sm text-muted-foreground">Never</span>
                   )}
@@ -142,18 +167,26 @@ export function UserTable({ users, onEdit, onDelete }: UserTableProps) {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                      <DropdownMenuItem asChild>
-                        <Link href={`/home/user-management/${user.id}`}>
-                          <Eye className="mr-2 h-4 w-4" />
-                          View Details
-                        </Link>
+                      <DropdownMenuItem onClick={() => NavigateToRecord("view", user.id ? parseInt(user.id) : undefined)}>
+                        <Eye className="mr-2 h-4 w-4" />
+                        View Details
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => onEdit(user)}>
+                      <DropdownMenuItem
+                        onClick={() =>
+                          NavigateToRecord(
+                            "edit",
+                            user.id ? parseInt(user.id) : undefined
+                          )
+                        }
+                      >
                         <Edit className="mr-2 h-4 w-4" />
                         Edit User
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={() => setDeleteUser(user)} className="text-red-600">
+                      <DropdownMenuItem
+                        onClick={() => setDeleteUser(user)}
+                        className="text-red-600"
+                      >
                         <Trash2 className="mr-2 h-4 w-4" />
                         Delete User
                       </DropdownMenuItem>
@@ -170,8 +203,10 @@ export function UserTable({ users, onEdit, onDelete }: UserTableProps) {
         isOpen={!!deleteUser}
         onClose={() => setDeleteUser(null)}
         onConfirm={handleDeleteConfirm}
-        userName={deleteUser ? `${deleteUser.firstName} ${deleteUser.lastName}` : ""}
+        userName={
+          deleteUser ? `${deleteUser.firstName} ${deleteUser.lastName}` : ""
+        }
       />
     </>
-  )
+  );
 }

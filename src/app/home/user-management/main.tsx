@@ -27,6 +27,7 @@ import type { User } from "@/types/user";
 import useHelper from "@/Helper/helper";
 import { useRouter } from "next/navigation";
 import ButtonComp from "@/components/utils/Button";
+import SectionIntro from "@/components/utils/Headings/SectionIntro";
 
 export default function UserManagementPage() {
   const [users, setUsers] = useState<User[]>(mockUsers);
@@ -42,6 +43,7 @@ export default function UserManagementPage() {
     helper.xhr
       .Get("/Users/GetAllUsers")
       .then((response) => {
+        console.log("Fetched users:", response);
         setUsers(
           response.users.map((item: any) => ({
             id: item.UserId,
@@ -53,6 +55,7 @@ export default function UserManagementPage() {
             role: item.RoleName,
             status: item.IsActive === true ? "active" : "inactive",
             lastLogin: item.LastLogin,
+            phone: item.UserPhone,
           }))
         );
       })
@@ -67,10 +70,6 @@ export default function UserManagementPage() {
 
   const handleCreateUser = () => {
     NavigateToRecord("create");
-  };
-
-  const handleEditUser = (user: User) => {
-    NavigateToRecord("edit");
   };
 
   const handleDeleteUser = (userId: string) => {
@@ -128,14 +127,12 @@ export default function UserManagementPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">User Management</h1>
-          <p className="text-muted-foreground">
-            Manage users, roles, and permissions across the system
-          </p>
-        </div>
+        <SectionIntro
+          title="User Management"
+          description="Manage users, roles, and permissions across the system."
+        />
         <div className="fit">
           <ButtonComp
             clickEvent={handleCreateUser}
@@ -187,34 +184,39 @@ export default function UserManagementPage() {
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="all">All Users</TabsTrigger>
-              <TabsTrigger value="admin">Admins</TabsTrigger>
+              {[...new Set(users.flatMap((user) => user.role))].map(
+                (role, index) => (
+                  <TabsTrigger key={index} value={role}>
+                    {roleLabels[role] || role}
+                  </TabsTrigger>
+                )
+              )}
+              {/* <TabsTrigger value="admin">Admins</TabsTrigger>
               <TabsTrigger value="zoo_incharge">Zoo Incharge</TabsTrigger>
               <TabsTrigger value="veterinary_doctor">Veterinarians</TabsTrigger>
-              <TabsTrigger value="citizen">Citizens</TabsTrigger>
+              <TabsTrigger value="citizen">Citizens</TabsTrigger> */}
             </TabsList>
 
-            {[
-              "all",
-              "admin",
-              "zoo_incharge",
-              "veterinary_doctor",
-              "citizen",
-            ].map((role) => (
-              <TabsContent key={role} value={role} className="mt-6">
-                <div className="mb-4">
-                  <h3 className="text-lg font-semibold">{roleLabels[role]}</h3>
-                  <p className="text-sm text-muted-foreground">
-                    {filteredUsers.length} user
-                    {filteredUsers.length !== 1 ? "s" : ""} found
-                  </p>
-                </div>
-                <UserTable
-                  users={filteredUsers}
-                  onEdit={handleEditUser}
-                  onDelete={handleDeleteUser}
-                />
-              </TabsContent>
-            ))}
+            {["all", ...new Set(users.flatMap((user) => user.role))].map(
+              (role) => (
+                <TabsContent key={role} value={role} className="mt-6">
+                  <div className="mb-4">
+                    <h3 className="text-lg font-semibold ">
+                      {roleLabels[role] || role}
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      {filteredUsers.length} user
+                      {filteredUsers.length !== 1 ? "s" : ""} found
+                    </p>
+                  </div>
+                  <UserTable
+                    users={filteredUsers}
+                    // onEdit={handleEditUser}
+                    onDelete={handleDeleteUser}
+                  />
+                </TabsContent>
+              )
+            )}
           </Tabs>
         </CardContent>
       </Card>

@@ -1,19 +1,27 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
 import Paragraph from "@/components/utils/Headings/Paragraph";
 import Subheading from "@/components/utils/Headings/Subheading";
 import { ArrowLeft, Save, SaveIcon, Upload, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import React, { use, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import type { User } from "@/types/user";
 import InputTag from "@/components/utils/FormElements/InputTag";
 import Checkbox from "@/components/utils/FormElements/Checkbox";
 import { FileUploader } from "@/components/animal/file-uploader";
 import Toggle from "@/components/utils/FormElements/Toggle";
-import { formatCnic, formatPhoneNumber } from "@/Helper/Utility";
-import useHelper from "@/Helper/helper";
+import { formatCnic } from "@/Helper/Utility";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
+import useHelper from "@/Helper/helper";
+import { OPTION } from "@/types/utils";
+import Dropdown from "@/components/utils/FormElements/Dropdown";
+import { zoos } from "@/data/users";
 import ButtonComp from "@/components/utils/Button";
 
 interface Props {
@@ -23,26 +31,47 @@ interface Props {
 
 interface UserProps extends User {
   cnic: string;
-  ProfileImagePath: string;
 }
 
-const UserCreate = ({ mode = "create", id = "0" }: Props) => {
-  const helper = useHelper();
-  const router = useRouter();
-  const [imageFile, setImageFile] = useState<File | null>();
-  const [user, setUser] = useState<UserProps>({
-    Id: 0,
-    email: "",
-    firstName: "",
-    lastName: "",
-    role: "admin",
-    status: "active",
-    createdAt: "",
-    cnic: "",
-    phone: "",
-    ProfileImagePath: "",
-  });
+type UserObject = {
+  UserId: number;
+  RoleId: number;
+  UserEmail: string;
+  UserName: string;
+  UserPhone: string;
+  UserPassword: string;
+  IsActive: boolean;
+  UserCnic: string;
+  ImagePath: string;
+  Specialization?: string;
+  LicenseNumber?: string;
+  AssignedZoo?: number;
+};
 
+const UserCreate = ({ mode = "create", id = "0" }: Props) => {
+  const router = useRouter();
+  const helper = useHelper();
+  const [imgFile, setImgFile] = useState<File | null>(null);
+  const [obj, setObj] = useState<UserObject>({
+    UserId: 0,
+    UserEmail: "",
+    UserName: "",
+    UserPhone: "",
+    UserPassword: "",
+    IsActive: true,
+    UserCnic: "",
+    ImagePath: "",
+    RoleId: 0,
+    Specialization: "",
+    LicenseNumber: "",
+    AssignedZoo: 0,
+  });
+  const [zooList, setZooList] = useState<OPTION[]>(
+    zoos.map((z: any) => {
+      return { label: z.label, value: z.value };
+    })
+  );
+  const [roles, setRoles] = useState<OPTION[]>([]);
   const capitalize = (value: string, space = " ") => {
     const words = String(value).split(space);
     const capitalizedWords = words.map(
@@ -53,36 +82,77 @@ const UserCreate = ({ mode = "create", id = "0" }: Props) => {
 
   function GetHeading() {
     return `${capitalize(mode)} - ${capitalize(String("User"), "-")} ${
-      id != "0" ? `for ${user.firstName} ${user.lastName}` : ""
+      id != "0" ? `for ${obj.UserName}` : ""
     }`;
   }
 
-  function handleChange(name: string, value: string) {
-    setUser((prev) => ({ ...prev, [name]: value }));
+  function handleChange(name: string, value: string | number | boolean) {
+    setObj((prev) => ({ ...prev, [name]: value }));
   }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setImageFile(e.target.files[0]);
+      const selectedFile = e.target.files[0];
+      setImgFile(selectedFile);
     }
   };
+
+  useEffect(() => {
+    // Fetch roles from the server
+    helper.xhr
+      .Get("/Roles/GetAllRoles")
+      .then((response) => {
+        const roleOptions = response.roles.map((role: any) => ({
+          label: role.RoleName,
+          value: role.RoleId,
+        }));
+        setRoles(roleOptions);
+      })
+      .catch((error) => {
+        console.error("Error fetching roles:", error);
+      });
+  }, []);
+
+  useEffect(() => {
+    if (id && id !== "0") {
+      // Fetch user data by ID
+      helper.xhr
+        .Get(
+          "/Users/GetUserById",
+          helper.GetURLParamString({ userId: Number(id) }).toString()
+        )
+        .then((response) => {
+          const user = response.user;
+          setObj({
+            ...response.user,
+            ImagePath: user.ImagePath || "",
+            UserPassword: "",
+          });
+        })
+        .catch((error) => {
+          console.error("Error fetching user data:", error);
+        });
+    }
+  }, [id]);
 
   function UpdateFile(id: number, file: File) {
     const formData = new FormData();
     formData.append("id", String(id));
     formData.append("file.file", file);
+    // helper.xhr
+    //   .Post("/Profile/UploadProfileImage", formData)
+    //   .then((res) => {
+    //     Message("success", `${file.Type} updated.`);
+
+    //     setImgFile(null);
+    //   })
+    //   .catch((e) => {
+    //     console.log(e);
+    //   })
+    //   .finally(() => {});
   }
 
-  function HandleSubmit() {
-    helper.xhr.Post(
-      '/Users/CreateUser',
-      helper.ConvertToFormData({
-        obj: {
-          
-        }
-      })
-    )
-  }
+  function HandleSubmit() {}
 
   return (
     <div className="flex-1 space-y-4">
@@ -101,72 +171,30 @@ const UserCreate = ({ mode = "create", id = "0" }: Props) => {
         <CardHeader></CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-2 gap-y-3 items-center">
-              <InputTag
-                name="firstName"
-                value={user.firstName}
-                setter={handleChange}
-                label="First Name"
-              />
-              <InputTag
-                name="lastName"
-                value={user.lastName}
-                setter={handleChange}
-                label="Last Name"
-              />
-              <InputTag
-                name="email"
-                value={user.email}
-                setter={handleChange}
-                label="Email"
-              />
-              <InputTag
-                name="cnic"
-                value={user.cnic}
-                setter={(n, v) => {
-                  handleChange(n, formatCnic(v));
-                }}
-                label="Cnic"
-              />
-              <InputTag
-                name="phone"
-                value={user.phone}
-                setter={(n, v) => handleChange(n, formatPhoneNumber(v))}
-                label="Contact"
-              />
-              <div className="flex h-full items-end">
-                <Toggle
-                  name="status"
-                  value={user.status}
-                  setter={handleChange}
-                  label="Is Active"
-                />
-              </div>
-            </div>
-            <div className="md:-mt-2 space-y-2 w-full md:w-1/3">
-              <Label>User Image</Label>
-              {imageFile != null || user?.ProfileImagePath != "" ? (
-                <div className="relative aspect-video rounded-md border border-main-gray/30 overflow-hidden w-full">
+            <div className="mb-5 space-y-2 w-[80%] md:w-[20%] mx-auto">
+              {imgFile != null || obj?.ImagePath != "" ? (
+                <div className="relative aspect-square rounded-md border border-main-gray/30 overflow-hidden">
                   <Image
                     src={
-                      user?.ProfileImagePath && user?.ProfileImagePath != ""
-                        ? helper.GetDocument(user.ProfileImagePath)
-                        : imageFile
-                        ? URL.createObjectURL(imageFile)
+                      obj?.ImagePath && obj?.ImagePath != ""
+                        ? // ? helper.GetDocument(obj.ImagePath)
+                          obj.ImagePath
+                        : imgFile
+                        ? URL.createObjectURL(imgFile)
                         : "/placeholder.svg"
                     }
-                    alt="Category image"
+                    alt="Profile image"
                     fill
                     className="object-cover"
                     unoptimized
                   />
-                  {imageFile != null && user.Id != 0 && (
+                  {imgFile != null && (
                     <Button
                       variant="default"
                       size="icon"
                       className="absolute top-1 left-1 h-6 w-6 rounded-full"
                       onClick={() => {
-                        UpdateFile(user.Id, imageFile);
+                        UpdateFile(Number(obj.UserId), imgFile);
                       }}
                     >
                       <SaveIcon className="h-3 w-3" />
@@ -178,8 +206,8 @@ const UserCreate = ({ mode = "create", id = "0" }: Props) => {
                     size="icon"
                     className="absolute top-1 right-1 h-6 w-6 rounded-full"
                     onClick={() => {
-                      setUser({ ...user, ProfileImagePath: "" });
-                      setImageFile(null);
+                      setObj({ ...obj, ImagePath: "" });
+                      setImgFile(null);
                     }}
                   >
                     <X className="h-3 w-3" />
@@ -189,7 +217,7 @@ const UserCreate = ({ mode = "create", id = "0" }: Props) => {
               ) : (
                 <>
                   <input
-                    id="file-upload"
+                    id="profileImg-upload"
                     type="file"
                     className="hidden"
                     accept="image/*"
@@ -198,19 +226,94 @@ const UserCreate = ({ mode = "create", id = "0" }: Props) => {
                   <button
                     type="button"
                     onClick={() => {
-                      document.getElementById("file-upload")?.click();
+                      document.getElementById("profileImg-upload")?.click();
                     }}
-                    className="flex w-full flex-col items-center justify-center aspect-video rounded-md border border-dashed border-main-gray/50 bg-gray-50 hover:bg-gray-100 transition-colors"
+                    className="flex w-full flex-col items-center justify-center aspect-square rounded-md border border-dashed border-main-gray/50 bg-gray-50 hover:bg-gray-100 transition-colors"
                   >
                     <Upload className="h-6 w-6 text-main-gray mb-1" />
                     <span className="text-xs text-main-gray">Add Image</span>
                   </button>
                 </>
               )}
+              <Label className="text-center block w-full">Profile Image</Label>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-2 gap-y-3 items-center">
+              <InputTag
+                name="UserName"
+                value={obj.UserName}
+                setter={handleChange}
+                label="User Name"
+                placeHolder="User Name"
+              />
+              <InputTag
+                name="UserCnic"
+                value={obj.UserCnic}
+                setter={(n, v) => {
+                  handleChange(n, formatCnic(v));
+                }}
+                placeHolder="xxx-xxxxxxx-x"
+                label="Cnic"
+              />
+              <InputTag
+                name="UserEmail"
+                value={obj.UserEmail}
+                setter={handleChange}
+                label="Email"
+                placeHolder="example@org.com"
+              />
+              <InputTag
+                name="UserPhone"
+                value={obj.UserPhone}
+                setter={handleChange}
+                label="Contact"
+                placeHolder="03xx-xxxxxxx"
+              />
+              <Dropdown
+                name="RoleId"
+                options={roles}
+                activeId={obj.RoleId}
+                handleDropdownChange={handleChange}
+                label="Role"
+              />
+              {[2, 3].includes(obj.RoleId) && (
+                <Dropdown
+                  name="AssignedZoo"
+                  options={zooList}
+                  activeId={obj.AssignedZoo || 0}
+                  handleDropdownChange={handleChange}
+                  label="Assigned Zoo"
+                />
+              )}
+              {obj.RoleId == 3 && (
+                <InputTag
+                  name="Specialization"
+                  value={obj.Specialization}
+                  setter={handleChange}
+                  label="Specialization"
+                  placeHolder="Large Animal Vet"
+                />
+              )}
+              {obj.RoleId == 3 && (
+                <InputTag
+                  name="LicenseNumber"
+                  value={obj.LicenseNumber}
+                  setter={handleChange}
+                  label="LicenseNumber"
+                  placeHolder="VET-2024-001"
+                />
+              )}
+              <div className="flex h-full items-end">
+                <Toggle
+                  name="IsActive"
+                  value={obj.IsActive}
+                  setter={handleChange}
+                  label="Is Active"
+                />
+              </div>
             </div>
           </div>
         </CardContent>
-         <CardFooter>
+        <CardFooter>
           <div className="w-full flex justify-end">
             <div className="w-full md:w-fit flex space-x-2">
               <ButtonComp
