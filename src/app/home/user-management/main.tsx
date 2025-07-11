@@ -36,14 +36,54 @@ export default function UserManagementPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [activeTab, setActiveTab] = useState<string>("all");
+  const helper = useHelper();
   const router = useRouter();
+
+  function GetAllUsers() {
+    helper.xhr
+      .Get("/Users/GetAllUsers")
+      .then((response) => {
+        console.log("Fetched users:", response);
+        setUsers(
+          response.users.map((item: any) => ({
+            Id: item.UserId,
+            email: item.UserEmail,
+            firstName: item.UserName.split(" ")[0],
+            lastName: item.UserName.includes(" ")
+              ? item.UserName.split("")[1]
+              : "",
+            role: item.RoleName,
+            status: item.IsActive === true ? "active" : "inactive",
+            lastLogin: item.LastLogin,
+            phone: item.UserPhone,
+          }))
+        );
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
+
+  useEffect(() => {
+    GetAllUsers();
+  }, []);
 
   const handleCreateUser = () => {
     NavigateToRecord("create");
   };
 
-  const handleDeleteUser = (userId: string) => {
-    setUsers(users.filter((user) => user.Id !== Number(userId)));
+  const handleDeleteUser = (userId: number) => {
+    helper.xhr
+      .Post("/Users/DeleteUser", helper.ConvertToFormData({ userId: userId }))
+      .then((response) => {
+        console.log(response);
+      })
+      .catch((error) => {
+        console.error(error);
+      })
+      .finally(() => {
+        setUsers(users.filter((user) => user.Id !== userId));
+      });
   };
 
   function NavigateToRecord(mode: string, id?: number) {
@@ -111,13 +151,8 @@ export default function UserManagementPage() {
             type={"dark"}
           />
         </div>
-        {/* <Plus className="mr-2 h-4 w-4" />
-          Add User
-        </ButtonComp> */}
       </div>
-
       <UserStats users={users} />
-
       <Card>
         <CardHeader>
           <CardTitle>Users</CardTitle>
@@ -145,8 +180,6 @@ export default function UserManagementPage() {
                 <SelectItem value="all">All Status</SelectItem>
                 <SelectItem value="active">Active</SelectItem>
                 <SelectItem value="inactive">Inactive</SelectItem>
-                {/* <SelectItem value="suspended">Suspended</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem> */}
               </SelectContent>
             </Select>
           </div>
@@ -161,10 +194,6 @@ export default function UserManagementPage() {
                   </TabsTrigger>
                 )
               )}
-              {/* <TabsTrigger value="admin">Admins</TabsTrigger>
-              <TabsTrigger value="zoo_incharge">Zoo Incharge</TabsTrigger>
-              <TabsTrigger value="veterinary_doctor">Veterinarians</TabsTrigger>
-              <TabsTrigger value="citizen">Citizens</TabsTrigger> */}
             </TabsList>
 
             {["all", ...new Set(users.flatMap((user) => user.role))].map(
@@ -181,7 +210,6 @@ export default function UserManagementPage() {
                   </div>
                   <UserTable
                     users={filteredUsers}
-                    // onEdit={handleEditUser}
                     onDelete={handleDeleteUser}
                   />
                 </TabsContent>
@@ -190,13 +218,13 @@ export default function UserManagementPage() {
           </Tabs>
         </CardContent>
       </Card>
-
       <UserModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSave={handleSaveUser}
         user={selectedUser}
       />
+         
     </div>
   );
 }

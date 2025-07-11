@@ -166,14 +166,14 @@ export function BulkPermissions({ roles, menuItems, onUpdateRoles }: BulkPermiss
               <Label className="text-sm font-medium mb-2 block">Select Menu Items</Label>
               <div className="grid grid-cols-1 gap-2 max-h-32 overflow-y-auto border rounded-md p-2">
                 {allMenus.map((menu) => (
-                  <div key={menu.id} className="flex items-center space-x-2">
+                  <div key={menu.MenuId} className="flex items-center space-x-2">
                     <Checkbox
-                      id={`bulk-menu-${menu.id}`}
-                      checked={selectedMenus.includes(menu.id)}
-                      onCheckedChange={(checked) => handleMenuToggle(menu.id, checked as boolean)}
+                      id={`bulk-menu-${menu.MenuId}`}
+                      checked={selectedMenus.includes(String(menu.MenuId))}
+                      onCheckedChange={(checked) => handleMenuToggle(String(menu.MenuId), checked as boolean)}
                     />
-                    <Label htmlFor={`bulk-menu-${menu.id}`} className="text-sm">
-                      {menu.name}
+                    <Label htmlFor={`bulk-menu-${menu.MenuId}`} className="text-sm">
+                      {menu.MenuName}
                     </Label>
                   </div>
                 ))}
@@ -263,7 +263,7 @@ export function BulkPermissions({ roles, menuItems, onUpdateRoles }: BulkPermiss
               variant="outline"
               onClick={() => {
                 setSelectedRoles(roles.map((r) => r.id))
-                setSelectedMenus(allMenus.map((m) => m.id))
+                setSelectedMenus(allMenus.map((m) => String(m.MenuId)))
               }}
             >
               Select All
@@ -287,7 +287,7 @@ export function BulkPermissions({ roles, menuItems, onUpdateRoles }: BulkPermiss
             </Button>
             <Button
               variant="outline"
-              onClick={() => setSelectedMenus(allMenus.filter((m) => m.isVisible).map((m) => m.id))}
+              onClick={() => setSelectedMenus(allMenus.filter((m) => m.IsActive).map((m) => String(m.MenuId)))}
             >
               Select Visible Menus
             </Button>

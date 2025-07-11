@@ -21,21 +21,23 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { DeleteConfirmationDialog } from "./delete-confirmation-dialog";
 import type { User } from "@/types/user";
 import Link from "next/link";
 import { changeDateFormatWithTime } from "@/Helper/DateFormats";
 import { useRouter } from "next/navigation";
+import { Modal } from "../menu-management/menu-modal";
+import { OPTION } from "@/types/utils";
 
 interface UserTableProps {
   users: User[];
   // onEdit: (user: User) => void
-  onDelete: (userId: string) => void;
+  onDelete: (userId: number) => void;
 }
 
 export function UserTable({ users, onDelete }: UserTableProps) {
   const router = useRouter();
-  const [deleteUser, setDeleteUser] = useState<User | null>(null);
+  const [selectedUser, setSelectedUser] = useState<OPTION | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -74,12 +76,13 @@ export function UserTable({ users, onDelete }: UserTableProps) {
       .join(" ");
   };
 
-  const handleDeleteConfirm = () => {
-    if (deleteUser) {
-      onDelete(deleteUser.id);
-      setDeleteUser(null);
-    }
-  };
+  function handleOpenModal(user: User) {
+    setSelectedUser({
+      label: `${user.firstName} ${user.lastName}`,
+      value: user.Id,
+    });
+    setIsModalOpen(true);
+  }
 
   function NavigateToRecord(mode: string, id?: number) {
     router.push(
@@ -103,8 +106,8 @@ export function UserTable({ users, onDelete }: UserTableProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {users.map((user) => (
-              <TableRow key={user.id}>
+            {users.map((user, index) => (
+              <TableRow key={index}>
                 <TableCell>
                   <div className="flex items-center space-x-3">
                     <Avatar className="h-8 w-8">
@@ -167,7 +170,14 @@ export function UserTable({ users, onDelete }: UserTableProps) {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                      <DropdownMenuItem onClick={() => NavigateToRecord("view", user.id ? parseInt(user.id) : undefined)}>
+                      <DropdownMenuItem
+                        onClick={() =>
+                          NavigateToRecord(
+                            "view",
+                            user.Id ? user.Id : undefined
+                          )
+                        }
+                      >
                         <Eye className="mr-2 h-4 w-4" />
                         View Details
                       </DropdownMenuItem>
@@ -175,7 +185,7 @@ export function UserTable({ users, onDelete }: UserTableProps) {
                         onClick={() =>
                           NavigateToRecord(
                             "edit",
-                            user.id ? parseInt(user.id) : undefined
+                            user.Id ? parseInt(String(user.Id)) : undefined
                           )
                         }
                       >
@@ -184,7 +194,9 @@ export function UserTable({ users, onDelete }: UserTableProps) {
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem
-                        onClick={() => setDeleteUser(user)}
+                        onClick={() => {
+                          handleOpenModal(user);
+                        }}
                         className="text-red-600"
                       >
                         <Trash2 className="mr-2 h-4 w-4" />
@@ -199,13 +211,15 @@ export function UserTable({ users, onDelete }: UserTableProps) {
         </Table>
       </div>
 
-      <DeleteConfirmationDialog
-        isOpen={!!deleteUser}
-        onClose={() => setDeleteUser(null)}
-        onConfirm={handleDeleteConfirm}
-        userName={
-          deleteUser ? `${deleteUser.firstName} ${deleteUser.lastName}` : ""
-        }
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onDelete={(id: number) => {
+          onDelete(id);
+          setIsModalOpen(false);
+        }}
+        item={selectedUser !== null ? selectedUser : { label: "", value: 0 }}
+        type="User"
       />
     </>
   );

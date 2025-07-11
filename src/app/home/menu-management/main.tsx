@@ -207,8 +207,6 @@ export default function MenuManagementPage() {
                 <SelectItem value="all">All Items</SelectItem>
                 <SelectItem value="active">Active</SelectItem>
                 <SelectItem value="inactive">Inactive</SelectItem>
-                <SelectItem value="visible">Visible</SelectItem>
-                <SelectItem value="hidden">Hidden</SelectItem>
               </SelectContent>
             </Select>
           </div>

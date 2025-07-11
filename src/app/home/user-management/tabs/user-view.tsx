@@ -44,7 +44,12 @@ import {
 } from "@/Helper/DateFormats";
 import ButtonComp from "@/components/utils/Button";
 
-const UserView = ({ userId }: { userId: number }) => {
+interface Props {
+  mode?: string;
+  id?: string;
+}
+
+const UserView = ({ mode = "create", id = "0" }: Props) => {
   const router = useRouter();
   const helper = useHelper();
   const [user, setUser] = useState<User>({
@@ -55,7 +60,7 @@ const UserView = ({ userId }: { userId: number }) => {
     role: "admin",
     status: "active",
     createdAt: "",
-    ImagePath: "",
+    ImagePath: ""
   });
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -64,10 +69,9 @@ const UserView = ({ userId }: { userId: number }) => {
     helper.xhr
       .Get(
         "/Users/GetUserById",
-        helper.GetURLParamString({ userId: userId }).toString()
+        helper.GetURLParamString({ userId: id }).toString()
       )
       .then((response) => {
-        console.log(response);
         setUser({
           Id: response.user.UserId,
           email: response.user.UserEmail,
@@ -81,7 +85,7 @@ const UserView = ({ userId }: { userId: number }) => {
           lastLogin: response.user.LastLogin,
           permissions: response.permissions,
           phone: response.user.UserPhone,
-          ImagePath: response.user.ImagePath || "",
+          ImagePath: `https://localhost:44383/user/${response.user.UserId}${response.user.Extension}` || "",
           activityLog: response.logs,
         });
       })
@@ -91,11 +95,11 @@ const UserView = ({ userId }: { userId: number }) => {
   }
 
   useEffect(() => {
-    console.log("Fetching user with ID:", userId);
+    console.log("Fetching user with ID:", id);
     GetUserById();
     // const foundUser = mockUsers.find((u) => u.id === params.id);
     // setUser(foundUser || null);
-  }, [userId]);
+  }, [id]);
 
   const getRoleColor = (role: string) => {
     switch (role) {

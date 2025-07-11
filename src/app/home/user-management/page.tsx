@@ -30,7 +30,7 @@ const PageContent = () => {
 
   switch (mode) {
     case "view":
-      return <UserView userId={id ? Number(id) : 0} />;
+      return <UserView {...props} />;
     case "create":
       return <UserCreate {...props} />;
     case "edit":

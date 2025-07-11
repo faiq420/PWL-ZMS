@@ -84,15 +84,15 @@ export function RoleMenuMapping({ roles, menuItems, onUpdateAccess }: RoleMenuMa
           <CardContent>
             <div className="space-y-4">
               {allMenus.map((menu) => {
-                const access = getMenuAccess(menu.id)
+                const access = getMenuAccess(String(menu.MenuId))
                 return (
-                  <div key={menu.id} className="border rounded-lg p-4">
+                  <div key={menu.MenuId} className="border rounded-lg p-4">
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-2">
-                        <h4 className="font-medium">{menu.name}</h4>
-                        {menu.path && (
+                        <h4 className="font-medium">{menu.MenuName}</h4>
+                        {menu.Path && (
                           <Badge variant="outline" className="text-xs">
-                            {menu.path}
+                            {menu.Path}
                           </Badge>
                         )}
                       </div>
@@ -100,41 +100,41 @@ export function RoleMenuMapping({ roles, menuItems, onUpdateAccess }: RoleMenuMa
                     <div className="grid grid-cols-4 gap-4">
                       <div className="flex items-center space-x-2">
                         <Checkbox
-                          id={`${menu.id}-view`}
+                          id={`${menu.MenuId}-view`}
                           checked={access.canView}
-                          onCheckedChange={(checked) => updateMenuAccess(menu.id, "canView", checked as boolean)}
+                          onCheckedChange={(checked) => updateMenuAccess(String(menu.MenuId), "canView", checked as boolean)}
                         />
-                        <Label htmlFor={`${menu.id}-view`} className="text-sm">
+                        <Label htmlFor={`${menu.MenuId}-view`} className="text-sm">
                           View
                         </Label>
                       </div>
                       <div className="flex items-center space-x-2">
                         <Checkbox
-                          id={`${menu.id}-edit`}
+                          id={`${menu.MenuId}-edit`}
                           checked={access.canEdit}
-                          onCheckedChange={(checked) => updateMenuAccess(menu.id, "canEdit", checked as boolean)}
+                          onCheckedChange={(checked) => updateMenuAccess(String(menu.MenuId), "canEdit", checked as boolean)}
                         />
-                        <Label htmlFor={`${menu.id}-edit`} className="text-sm">
+                        <Label htmlFor={`${menu.MenuId}-edit`} className="text-sm">
                           Edit
                         </Label>
                       </div>
                       <div className="flex items-center space-x-2">
                         <Checkbox
-                          id={`${menu.id}-create`}
+                          id={`${menu.MenuId}-create`}
                           checked={access.canCreate}
-                          onCheckedChange={(checked) => updateMenuAccess(menu.id, "canCreate", checked as boolean)}
+                          onCheckedChange={(checked) => updateMenuAccess(String(menu.MenuId), "canCreate", checked as boolean)}
                         />
-                        <Label htmlFor={`${menu.id}-create`} className="text-sm">
+                        <Label htmlFor={`${menu.MenuId}-create`} className="text-sm">
                           Create
                         </Label>
                       </div>
                       <div className="flex items-center space-x-2">
                         <Checkbox
-                          id={`${menu.id}-delete`}
+                          id={`${menu.MenuId}-delete`}
                           checked={access.canDelete}
-                          onCheckedChange={(checked) => updateMenuAccess(menu.id, "canDelete", checked as boolean)}
+                          onCheckedChange={(checked) => updateMenuAccess(String(menu.MenuId), "canDelete", checked as boolean)}
                         />
-                        <Label htmlFor={`${menu.id}-delete`} className="text-sm">
+                        <Label htmlFor={`${menu.MenuId}-delete`} className="text-sm">
                           Delete
                         </Label>
                       </div>

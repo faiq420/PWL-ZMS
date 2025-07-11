@@ -23,6 +23,7 @@ import { OPTION } from "@/types/utils";
 import Dropdown from "@/components/utils/FormElements/Dropdown";
 import { zoos } from "@/data/users";
 import ButtonComp from "@/components/utils/Button";
+import { useToast } from "@/components/ui/use-toast";
 
 interface Props {
   mode?: string;
@@ -50,7 +51,10 @@ type UserObject = {
 
 const UserCreate = ({ mode = "create", id = "0" }: Props) => {
   const router = useRouter();
+  const helper = useHelper();
   const [imgFile, setImgFile] = useState<File | null>(null);
+  const [isCruding, setIsCruding] = useState<boolean>(false);
+  const toast = useToast();
   const [obj, setObj] = useState<UserObject>({
     UserId: 0,
     UserEmail: "",
@@ -96,37 +100,101 @@ const UserCreate = ({ mode = "create", id = "0" }: Props) => {
     }
   };
 
+  useEffect(() => {
+    // Fetch roles from the server
+    helper.xhr
+      .Get("/Roles/GetAllRoles")
+      .then((response) => {
+        const roleOptions = response.roles.map((role: any) => ({
+          label: role.RoleName,
+          value: role.RoleId,
+        }));
+        setRoles(roleOptions);
+      })
+      .catch((error) => {
+        console.error("Error fetching roles:", error);
+      });
+  }, []);
+
+  useEffect(() => {
+    if (id && id !== "0") {
+      // Fetch user data by ID
+      helper.xhr
+        .Get(
+          "/Users/GetUserById",
+          helper.GetURLParamString({ userId: Number(id) }).toString()
+        )
+        .then((response) => {
+          const user = response.user;
+          setObj({
+            ...response.user,
+            ImagePath:
+              `https://localhost:44383/user/${response.user.UserId}${response.user.Extension}` ||
+              "",
+            UserPassword: "",
+          });
+        })
+        .catch((error) => {
+          console.error("Error fetching user data:", error);
+        });
+    }
+  }, [id]);
+
   function UpdateFile(id: number, file: File) {
     const formData = new FormData();
     formData.append("id", String(id));
     formData.append("file.file", file);
-    // helper.xhr
-    //   .Post("/Profile/UploadProfileImage", formData)
-    //   .then((res) => {
-    //     Message("success", `${file.Type} updated.`);
-
-    //     setImgFile(null);
-    //   })
-    //   .catch((e) => {
-    //     console.log(e);
-    //   })
-    //   .finally(() => {});
   }
 
-  function HandleSubmit() {}
+  function HandleSubmit() {
+    setIsCruding(true);
+    const data = {
+      UserId: obj.UserId,
+      UserEmail: obj.UserEmail,
+      UserName: obj.UserName,
+      UserPhone: obj.UserPhone,
+      IsActive: obj.IsActive,
+      UserCnic: obj.UserCnic,
+      RoleId: obj.RoleId,
+    };
+    helper.xhr
+      .Post(
+        `/Users/${mode === "create" ? "CreateUser" : "UpdateUser"}`,
+        helper.ConvertToFormData({
+          obj: data,
+          ZooId: obj.AssignedZoo === 0 ? null : obj.AssignedZoo,
+          image: imgFile,
+        })
+      )
+      .then((response) => {
+        console.log(response);
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+      .finally(() => {
+        setIsCruding(false);
+        toast.toast({
+          title: "Operation Successful",
+          description: `User ${
+            mode === "create" ? "Created" : "Updated"
+          } Successfully`,
+        });
+        router.back();
+      });
+  }
 
   return (
     <div className="flex-1 space-y-4">
-      <div className="flex items-center justify-between w-full">
+      <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2">
           <Button variant="outline" size="icon" onClick={() => router.back()}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <div className="flex items-center justify-around">
+          <div>
             <Subheading text={GetHeading()} />
           </div>
         </div>
-        
       </div>
       <Card>
         <CardHeader></CardHeader>
@@ -134,7 +202,7 @@ const UserCreate = ({ mode = "create", id = "0" }: Props) => {
           <div className="space-y-2">
             <div className="mb-5 space-y-2 w-[80%] md:w-[20%] mx-auto">
               {imgFile != null || obj?.ImagePath != "" ? (
-                <div className="relative aspect-square rounded-full border border-main-gray/30 overflow-hidden">
+                <div className="relative aspect-square rounded-md border border-main-gray/30 overflow-hidden">
                   <Image
                     src={
                       obj?.ImagePath && obj?.ImagePath != ""
@@ -165,7 +233,7 @@ const UserCreate = ({ mode = "create", id = "0" }: Props) => {
                   <Button
                     variant="destructive"
                     size="icon"
-                    className="absolute top-8 right-5 h-6 w-6 rounded-full"
+                    className="absolute top-1 right-1 h-6 w-6 rounded-full"
                     onClick={() => {
                       setObj({ ...obj, ImagePath: "" });
                       setImgFile(null);
@@ -189,13 +257,14 @@ const UserCreate = ({ mode = "create", id = "0" }: Props) => {
                     onClick={() => {
                       document.getElementById("profileImg-upload")?.click();
                     }}
-                    className="flex w-full flex-col items-center justify-center aspect-square rounded-full border border-dashed border-main-gray/50 bg-gray-50 hover:bg-gray-100 transition-colors"
+                    className="flex w-full flex-col items-center justify-center aspect-square rounded-md border border-dashed border-main-gray/50 bg-gray-50 hover:bg-gray-100 transition-colors"
                   >
                     <Upload className="h-6 w-6 text-main-gray mb-1" />
-                    <span className="text-xs text-main-gray">Add Profile Image</span>
+                    <span className="text-xs text-main-gray">Add Image</span>
                   </button>
                 </>
               )}
+              <Label className="text-center block w-full">Profile Image</Label>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-2 gap-y-3 items-center">
               <InputTag
@@ -211,7 +280,7 @@ const UserCreate = ({ mode = "create", id = "0" }: Props) => {
                 setter={(n, v) => {
                   handleChange(n, formatCnic(v));
                 }}
-                placeHolder="xxxxx-xxxxxxx-x"
+                placeHolder="xxx-xxxxxxx-x"
                 label="Cnic"
               />
               <InputTag

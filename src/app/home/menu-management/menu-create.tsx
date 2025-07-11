@@ -142,6 +142,7 @@ const MenuCreate = ({ mode = "create", id = "0" }: Props) => {
           title: "Operation Successful",
           description: `Menu ${mode === "create" ? "Created" : "Updated"} Successfully`,
         });
+        router.back();
       });
   }
 

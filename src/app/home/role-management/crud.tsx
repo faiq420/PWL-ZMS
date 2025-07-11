@@ -72,6 +72,7 @@ const RoleCrud = ({ mode = "create", id = "0" }: Props) => {
             mode === "create" ? "Created" : "Updated"
           } Successfully`,
         });
+        router.back();
       });
   }
 

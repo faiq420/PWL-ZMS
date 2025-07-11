@@ -43,15 +43,9 @@ export default function RoleManagementPage() {
   const router = useRouter();
   const helper = useHelper();
   const [roles, setRoles] = useState<RoleProps[]>([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<Role | null>(null);
+  
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
-
-  const handleCreateRole = () => {
-    setSelectedRole(null);
-    setIsModalOpen(true);
-  };
 
   const handleEditRole = (role: RoleProps) => {
     NavigateToRecord("edit", Number(role.RoleId));
@@ -196,13 +190,6 @@ export default function RoleManagementPage() {
           />
         </CardContent>
       </Card>
-
-      <RoleModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSave={handleSaveRole}
-        role={selectedRole}
-      />
     </div>
   );
 }
