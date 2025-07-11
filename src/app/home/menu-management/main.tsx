@@ -19,7 +19,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { MenuTree } from "@/components/menu-management/menu-tree";
-import { MenuModal } from "@/components/menu-management/menu-modal";
 import { MenuStats } from "@/components/menu-management/menu-stats";
 import { mockMenuItems } from "@/data/menus";
 import type { MenuItem } from "@/types/menu";
@@ -29,8 +28,6 @@ import useHelper from "@/Helper/helper";
 
 export default function MenuManagementPage() {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedMenu, setSelectedMenu] = useState<MenuItem | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const router = useRouter();
@@ -57,61 +54,60 @@ export default function MenuManagementPage() {
     })
   };
 
-  const handleSaveMenu = (menuData: Partial<MenuItem>) => {
-    if (selectedMenu) {
-      // Edit existing menu
-      const updateMenu = (items: MenuItem[]): MenuItem[] => {
-        return items.map((item) => {
-          if (item.MenuId === selectedMenu.MenuId) {
-            return {
-              ...item,
-              ...menuData,
-              updatedAt: new Date().toISOString(),
-            };
-          }
-          if (item.children) {
-            item.children = updateMenu(item.children);
-          }
-          return item;
-        });
-      };
-      setMenuItems(updateMenu(menuItems));
-    } else {
-      // Create new menu
-      const newMenu: MenuItem = {
-        id: Date.now().toString(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        isActive: true,
-        isVisible: true,
-        order: menuItems.length + 1,
-        ...menuData,
-      } as MenuItem;
+  // const handleSaveMenu = (menuData: Partial<MenuItem>) => {
+  //   if (selectedMenu) {
+  //     // Edit existing menu
+  //     const updateMenu = (items: MenuItem[]): MenuItem[] => {
+  //       return items.map((item) => {
+  //         if (item.MenuId === selectedMenu.MenuId) {
+  //           return {
+  //             ...item,
+  //             ...menuData,
+  //             updatedAt: new Date().toISOString(),
+  //           };
+  //         }
+  //         if (item.children) {
+  //           item.children = updateMenu(item.children);
+  //         }
+  //         return item;
+  //       });
+  //     };
+  //     setMenuItems(updateMenu(menuItems));
+  //   } else {
+  //     // Create new menu
+  //     const newMenu: MenuItem = {
+  //       id: Date.now().toString(),
+  //       createdAt: new Date().toISOString(),
+  //       updatedAt: new Date().toISOString(),
+  //       isActive: true,
+  //       isVisible: true,
+  //       order: menuItems.length + 1,
+  //       ...menuData,
+  //     } as MenuItem;
 
-      if (menuData.ParentId) {
-        // Add as child menu
-        const addToParent = (items: MenuItem[]): MenuItem[] => {
-          return items.map((item) => {
-            if (item.MenuId === menuData.ParentId) {
-              return {
-                ...item,
-                children: [...(item.children || []), newMenu],
-              };
-            }
-            if (item.children) {
-              item.children = addToParent(item.children);
-            }
-            return item;
-          });
-        };
-        setMenuItems(addToParent(menuItems));
-      } else {
-        // Add as root menu
-        setMenuItems([...menuItems, newMenu]);
-      }
-    }
-    setIsModalOpen(false);
-  };
+  //     if (menuData.ParentId) {
+  //       // Add as child menu
+  //       const addToParent = (items: MenuItem[]): MenuItem[] => {
+  //         return items.map((item) => {
+  //           if (item.MenuId === menuData.ParentId) {
+  //             return {
+  //               ...item,
+  //               children: [...(item.children || []), newMenu],
+  //             };
+  //           }
+  //           if (item.children) {
+  //             item.children = addToParent(item.children);
+  //           }
+  //           return item;
+  //         });
+  //       };
+  //       setMenuItems(addToParent(menuItems));
+  //     } else {
+  //       // Add as root menu
+  //       setMenuItems([...menuItems, newMenu]);
+  //     }
+  //   }
+  // };
 
   const handleToggleVisibility = (menuId: string) => {
     const toggleVisibility = (items: MenuItem[]): MenuItem[] => {
@@ -225,14 +221,6 @@ export default function MenuManagementPage() {
           />
         </CardContent>
       </Card>
-
-      <MenuModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSave={handleSaveMenu}
-        menu={selectedMenu}
-        existingMenus={menuItems}
-      />
     </div>
   );
 }

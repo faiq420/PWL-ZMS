@@ -226,7 +226,7 @@ const MenuCreate = ({ mode = "create", id = "0" }: Props) => {
               <ButtonComp
                 text={mode == "edit" ? "Save" : "Create"}
                 clickEvent={HandleSubmit}
-                beforeIcon={!isCruding ? <Save className="h-4 w-4" /> : null}
+                beforeIcon={<Save className="h-4 w-4" />}
                 isCruding={isCruding}
               />
             </div>

@@ -1,20 +1,19 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Shield, Users, Activity, Lock } from "lucide-react";
-import type { Role } from "@/types/menu";
 import MetricPresentationCard from "../utils/Cards/MetricPresentationCard";
+import { RoleProps } from "@/src/app/home/role-management/main";
 
 interface RoleStatsProps {
-  roles: Role[];
+  roles: RoleProps[];
 }
 
 export function RoleStats({ roles }: RoleStatsProps) {
-  const activeRoles = roles.filter((role) => role.isActive);
+  const activeRoles = roles.filter((role) => role.IsActive);
   const totalPermissions = roles.reduce(
-    (acc, role) => acc + role.permissions.length,
+    (acc, role) => acc + role.Permissions,
     0
   );
   const totalMenuAccess = roles.reduce(
-    (acc, role) => acc + role.menuAccess.length,
+    (acc, role) => acc + role.MenuAccess,
     0
   );
 

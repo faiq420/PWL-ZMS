@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Plus, Search, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,10 +28,21 @@ import ButtonComp from "@/components/utils/Button";
 import { useRouter } from "next/navigation";
 import SectionIntro from "@/components/utils/Headings/SectionIntro";
 import SearchTag from "@/components/utils/FormElements/SearchTag";
+import useHelper from "@/Helper/helper";
+
+export interface RoleProps {
+  RoleId: number;
+  RoleName: string;
+  Description: string;
+  IsActive: boolean;
+  MenuAccess: number;
+  Permissions: number;
+}
 
 export default function RoleManagementPage() {
   const router = useRouter();
-  const [roles, setRoles] = useState<Role[]>(mockRoles);
+  const helper = useHelper();
+  const [roles, setRoles] = useState<RoleProps[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -42,49 +53,59 @@ export default function RoleManagementPage() {
     setIsModalOpen(true);
   };
 
-  const handleEditRole = (role: Role) => {
-    NavigateToRecord("edit", Number(role.id));
+  const handleEditRole = (role: RoleProps) => {
+    NavigateToRecord("edit", Number(role.RoleId));
   };
 
-  const handleDeleteRole = (roleId: string) => {
-    setRoles(roles.filter((role) => role.id !== roleId));
+  const handleDeleteRole = (roleId: number) => {
+    helper.xhr
+      .Post("/Roles/DeleteRole", helper.ConvertToFormData({ RoleId: roleId }))
+      .then((response) => {
+        console.log(response);
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+      .finally(() => {
+        setRoles(roles.filter((role) => role.RoleId !== Number(roleId)));
+      });
   };
 
   const handleSaveRole = (roleData: Partial<Role>) => {
-    if (selectedRole) {
-      // Edit existing role
-      setRoles(
-        roles.map((role) =>
-          role.id === selectedRole.id
-            ? { ...role, ...roleData, updatedAt: new Date().toISOString() }
-            : role
-        )
-      );
-    } else {
-      // Create new role
-      const newRole: Role = {
-        id: Date.now().toString(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        isActive: true,
-        permissions: [],
-        menuAccess: [],
-        level: roles.length + 1,
-        ...roleData,
-      } as Role;
-      setRoles([...roles, newRole]);
-    }
-    setIsModalOpen(false);
+    // if (selectedRole) {
+    //   // Edit existing role
+    //   setRoles(
+    //     roles.map((role) =>
+    //       role.RoleId === Number(selectedRole.id)
+    //         ? { ...role, ...roleData, updatedAt: new Date().toISOString() }
+    //         : role
+    //     )
+    //   );
+    // } else {
+    //   // Create new role
+    //   const newRole: RoleProps = {
+    //     id: Date.now().toString(),
+    //     createdAt: new Date().toISOString(),
+    //     updatedAt: new Date().toISOString(),
+    //     isActive: true,
+    //     permissions: [],
+    //     menuAccess: [],
+    //     level: roles.length + 1,
+    //     ...roleData,
+    //   } as Role;
+    //   setRoles([...roles, newRole]);
+    // }
+    // setIsModalOpen(false);
   };
 
   const filteredRoles = roles.filter((role) => {
     const matchesSearch =
-      role.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      role.description.toLowerCase().includes(searchTerm.toLowerCase());
+      role.RoleName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      role.Description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus =
       statusFilter === "all" ||
-      (statusFilter === "active" && role.isActive) ||
-      (statusFilter === "inactive" && !role.isActive);
+      (statusFilter === "active" && role.IsActive) ||
+      (statusFilter === "inactive" && !role.IsActive);
     return matchesSearch && matchesStatus;
   });
 
@@ -94,6 +115,30 @@ export default function RoleManagementPage() {
         (id != undefined ? `&id=${id}` : "")
     );
   }
+
+  function GetAllRoles() {
+    helper.xhr
+      .Get("/Roles/GetAllRoles")
+      .then((response) => {
+        setRoles(
+          response.roles.map((role: any) => ({
+            RoleId: role.RoleId,
+            RoleName: role.RoleName,
+            Description: role.Description,
+            IsActive: role.IsActive,
+            MenuAccess: role.MenuAccess,
+            Permissions: role.Permissions,
+          }))
+        );
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
+
+  useEffect(() => {
+    GetAllRoles();
+  }, []);
 
   return (
     <div className="space-y-4">
@@ -130,7 +175,7 @@ export default function RoleManagementPage() {
               setter={setSearchTerm}
               value={searchTerm}
               placeHolder="Search roles..."
-            />  
+            />
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-[180px]">
                 <Filter className="mr-2 h-4 w-4" />
@@ -145,7 +190,7 @@ export default function RoleManagementPage() {
           </div>
 
           <RoleTable
-            roles={filteredRoles}
+            roles={roles}
             onEdit={handleEditRole}
             onDelete={handleDeleteRole}
           />

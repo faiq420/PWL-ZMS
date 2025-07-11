@@ -47,6 +47,7 @@ const types: { [key: string]: string } = {
     "bg-green-700 border text-white hover:bg-green-800 disabled:bg-green-700/70",
   dark: "bg-[#171717] border text-white hover:bg-[#181818] disabled:bg-[#3c3c3c]",
   white: "bg-white border text-black hover:bg-accent",
+  danger: "bg-red-600 hover:bg-red-700 disabled:bg-red-500 text-white"
 };
 const ButtonComp = ({
   text,
@@ -65,9 +66,9 @@ const ButtonComp = ({
         className={`${types[type]} h-9 flex gap-2 justify-center items-center disabled:cursor-text text-nowrap flex-1 text-sm font-medium font-faustina w-full py-3 px-4 rounded-md shadow hover:cursor-pointer focus:outline-none focus:ring-0 
           }`}
       >
-        <span>{beforeIcon}</span>{" "}
+        <span>{!isCruding && beforeIcon}</span>{" "}
         <span> {isCruding ? <BladeLoader /> : text}</span>
-        <span>{afterIcon}</span>{" "}
+        <span>{!isCruding && afterIcon}</span>{" "}
       </button>
     </div>
   );

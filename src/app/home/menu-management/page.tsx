@@ -2,7 +2,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { Suspense, useEffect } from "react";
 import MenuManagementPage from "./main";
-import MenuCreate from "./tabs/menu-create";
+import MenuCreate from "./menu-create";
 
 const PageContent = () => {
   const router = useRouter();

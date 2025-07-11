@@ -4,29 +4,15 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Edit, Trash2, Shield, Users } from "lucide-react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import type { Role } from "@/types/menu"
+import { RoleProps } from "@/src/app/home/role-management/main"
 
 interface RoleTableProps {
-  roles: Role[]
-  onEdit: (role: Role) => void
-  onDelete: (roleId: string) => void
+  roles: RoleProps[]
+  onEdit: (role: RoleProps) => void
+  onDelete: (roleId: number) => void
 }
 
 export function RoleTable({ roles, onEdit, onDelete }: RoleTableProps) {
-  const getRoleLevelColor = (level: number) => {
-    switch (level) {
-      case 1:
-        return "bg-red-100 text-red-800"
-      case 2:
-        return "bg-orange-100 text-orange-800"
-      case 3:
-        return "bg-blue-100 text-blue-800"
-      case 4:
-        return "bg-green-100 text-green-800"
-      default:
-        return "bg-gray-100 text-gray-800"
-    }
-  }
 
   return (
     <div className="rounded-md border">
@@ -44,11 +30,11 @@ export function RoleTable({ roles, onEdit, onDelete }: RoleTableProps) {
         </TableHeader>
         <TableBody>
           {roles.map((role) => (
-            <TableRow key={role.id}>
+            <TableRow key={role.RoleId}>
               <TableCell className="font-medium">
                 <div className="flex items-center gap-2">
                   <Shield className="h-4 w-4 text-muted-foreground" />
-                  {role.name}
+                  {role.RoleName}
                 </div>
               </TableCell>
               {/* <TableCell className="max-w-xs">
@@ -58,18 +44,18 @@ export function RoleTable({ roles, onEdit, onDelete }: RoleTableProps) {
                 <Badge className={getRoleLevelColor(role.level)}>Level {role.level}</Badge>
               </TableCell> */}
               <TableCell>
-                <Badge variant={role.isActive ? "default" : "secondary"}>{role.isActive ? "Active" : "Inactive"}</Badge>
+                <Badge variant={role.IsActive ? "default" : "secondary"}>{role.IsActive ? "Active" : "Inactive"}</Badge>
               </TableCell>
               <TableCell>
                 <div className="flex items-center gap-1">
                   <Users className="h-3 w-3" />
-                  <span className="text-sm">{role.permissions.length}</span>
+                  <span className="text-sm">{role.Permissions}</span>
                 </div>
               </TableCell>
               <TableCell>
                 <div className="flex items-center gap-1">
                   <Shield className="h-3 w-3" />
-                  <span className="text-sm">{role.menuAccess.length}</span>
+                  <span className="text-sm">{role.MenuAccess}</span>
                 </div>
               </TableCell>
               <TableCell className="text-center">
@@ -80,7 +66,7 @@ export function RoleTable({ roles, onEdit, onDelete }: RoleTableProps) {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => onDelete(role.id)}
+                    onClick={() => onDelete(role.RoleId)}
                     className="text-destructive hover:text-destructive"
                   >
                     <Trash2 className="h-4 w-4" />
