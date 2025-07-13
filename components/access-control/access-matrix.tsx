@@ -13,11 +13,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import type { Role, MenuItem } from "@/types/menu";
+import { OPTION } from "@/types/utils";
+import { RoleProps } from "@/src/app/home/access-control/page";
 
 interface AccessMatrixProps {
-  roles: Role[];
-  menuItems: MenuItem[];
-  onUpdateAccess: (roleId: string, menuAccess: any[]) => void;
+  roles: RoleProps[];
+  menuItems: OPTION[];
+  onUpdateAccess: (roleId: number, menuAccess: any[]) => void;
 }
 
 export function AccessMatrix({
@@ -38,43 +40,48 @@ export function AccessMatrix({
     return result;
   };
 
-  const allMenus = flattenMenus(menuItems);
+  const allMenus = menuItems;
 
-  const hasAccess = (roleId: string, menuId: string) => {
-    const role = roles.find((r) => r.id === roleId);
+  const hasAccess = (roleId: number, menuId: number) => {
+    const role = roles.find((r) => r.RoleId === roleId);
     return (
-      role?.menuAccess.some(
-        (access) => access.menuId === menuId && access.canView
-      ) || false
+      role?.Menus.some((access) => access.MenuId === menuId && (access.View || access.Create || access.Delete || access.Edit)) ||
+      false
     );
   };
 
-  const toggleAccess = (roleId: string, menuId: string) => {
-    const role = roles.find((r) => r.id === roleId);
+  const toggleAccess = (roleId: number, menuId: number) => {
+    const role = roles.find((r) => r.RoleId === roleId);
     if (!role) return;
 
-    const existingAccess = role.menuAccess.find(
-      (access) => access.menuId === menuId
+    const existingAccess = role.Menus.find(
+      (access) => access.MenuId === menuId
     );
     let newMenuAccess;
 
     if (existingAccess) {
       // Toggle existing access
-      newMenuAccess = role.menuAccess.map((access) =>
-        access.menuId === menuId
-          ? { ...access, canView: !access.canView }
+      newMenuAccess = role.Menus.map((access) =>
+        access.MenuId === menuId
+          ? {
+              ...access,
+              View: !access.View,
+              Create: !access.Create,
+              Edit: !access.Edit,
+              Delete: !access.Delete,
+            }
           : access
       );
     } else {
       // Add new access
       newMenuAccess = [
-        ...role.menuAccess,
+        ...role.Menus,
         {
-          menuId,
-          canView: true,
-          canEdit: false,
-          canDelete: false,
-          canCreate: false,
+          MenuId: menuId,
+          View: true,
+          Edit: true,
+          Delete: true,
+          Create: true,
         },
       ];
     }
@@ -82,14 +89,15 @@ export function AccessMatrix({
     onUpdateAccess(roleId, newMenuAccess);
   };
 
-  const toggleBulkAccess = (roleId: string, grant: boolean) => {
+  const toggleBulkAccess = (roleId: number, grant: boolean) => {
     const newMenuAccess = allMenus.map((menu) => ({
-      menuId: menu.MenuId,
-      canView: grant,
-      canEdit: false,
-      canDelete: false,
-      canCreate: false,
+      MenuId: menu.value,
+      View: grant,
+      Edit: grant,
+      Delete: grant,
+      Create: grant,
     }));
+    console.log(newMenuAccess);
     onUpdateAccess(roleId, newMenuAccess);
   };
 
@@ -101,15 +109,15 @@ export function AccessMatrix({
             <TableRow>
               <TableHead className="w-48">Menu Item</TableHead>
               {roles.map((role) => (
-                <TableHead key={role.id} className="text-center min-w-32">
+                <TableHead key={role.RoleId} className="text-center min-w-32">
                   <div className="space-y-1">
-                    <div className="font-medium">{role.name}</div>
+                    <div className="font-medium">{role.RoleName}</div>
                     <div className="flex gap-1 justify-center">
                       <Button
                         size="sm"
                         variant="outline"
                         className="h-6 text-xs"
-                        onClick={() => toggleBulkAccess(role.id, true)}
+                        onClick={() => toggleBulkAccess(role.RoleId, true)}
                       >
                         Grant All
                       </Button>
@@ -117,7 +125,7 @@ export function AccessMatrix({
                         size="sm"
                         variant="outline"
                         className="h-6 text-xs"
-                        onClick={() => toggleBulkAccess(role.id, false)}
+                        onClick={() => toggleBulkAccess(role.RoleId, false)}
                       >
                         Revoke All
                       </Button>
@@ -129,25 +137,23 @@ export function AccessMatrix({
           </TableHeader>
           <TableBody>
             {allMenus.map((menu) => (
-              <TableRow key={menu.MenuId}>
+              <TableRow key={Number(menu.value)}>
                 <TableCell className="font-medium">
                   <div className="flex items-center gap-2">
-                    <span>{menu.MenuName}</span>
-                    {/* {menu.path && (
-                      <Badge variant="outline" className="text-xs">
-                        {menu.path}
-                      </Badge>
-                    )} */}
+                    <span>{menu.label}</span>
                   </div>
                 </TableCell>
                 {roles.map((role) => (
                   <TableCell
-                    key={`${role.id}-${menu.MenuId}`}
+                    key={`${role.RoleId}-${menu.value}`}
                     className="text-center"
                   >
                     <Checkbox
-                      checked={hasAccess(role.id, String(menu.MenuId))}
-                      onCheckedChange={() => toggleAccess(role.id, String(menu.MenuId))}
+                      // checked={hasAccess(role.RoleId, Number(menu.value))}
+                      checked={hasAccess(role.RoleId, Number(menu.value))}
+                      onCheckedChange={() =>
+                        toggleAccess(role.RoleId, Number(menu.value))
+                      }
                     />
                   </TableCell>
                 ))}

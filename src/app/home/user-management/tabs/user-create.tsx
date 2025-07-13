@@ -280,7 +280,7 @@ const UserCreate = ({ mode = "create", id = "0" }: Props) => {
                 setter={(n, v) => {
                   handleChange(n, formatCnic(v));
                 }}
-                placeHolder="xxx-xxxxxxx-x"
+                placeHolder="xxxxx-xxxxxxx-x"
                 label="Cnic"
               />
               <InputTag

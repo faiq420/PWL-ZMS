@@ -6,16 +6,18 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
-import type { Role, MenuItem, MenuAccess } from "@/types/menu"
+import type { MenuItem, MenuAccess } from "@/types/menu"
+import { MenuProps, RoleProps } from "@/src/app/home/access-control/page"
+import { OPTION } from "@/types/utils"
 
 interface RoleMenuMappingProps {
-  roles: Role[]
-  menuItems: MenuItem[]
-  onUpdateAccess: (roleId: string, menuAccess: MenuAccess[]) => void
+  roles: RoleProps[]
+  menuItems: OPTION[]
+  onUpdateAccess: (roleId: number, menuAccess: MenuProps[]) => void
 }
 
 export function RoleMenuMapping({ roles, menuItems, onUpdateAccess }: RoleMenuMappingProps) {
-  const [selectedRole, setSelectedRole] = useState<string>(roles[0]?.id || "")
+  const [selectedRole, setSelectedRole] = useState<string>(String(roles[0]?.RoleId) || "")
 
   const flattenMenus = (items: MenuItem[]): MenuItem[] => {
     let result: MenuItem[] = []
@@ -28,32 +30,32 @@ export function RoleMenuMapping({ roles, menuItems, onUpdateAccess }: RoleMenuMa
     return result
   }
 
-  const allMenus = flattenMenus(menuItems)
-  const currentRole = roles.find((role) => role.id === selectedRole)
+  const allMenus = menuItems
+  const currentRole = roles.find((role) => role.RoleId === Number(selectedRole))
 
-  const getMenuAccess = (menuId: string): MenuAccess => {
-    const access = currentRole?.menuAccess.find((access) => access.menuId === menuId)
-    return access || { menuId, canView: false, canEdit: false, canDelete: false, canCreate: false }
+  const getMenuAccess = (menuId: number): MenuProps => {
+    const access = currentRole?.Menus.find((access) => access.MenuId === Number(menuId));
+    return access || { MenuId: menuId, View: false, Edit: false, Delete: false, Create: false }
   }
 
-  const updateMenuAccess = (menuId: string, permission: keyof MenuAccess, value: boolean) => {
+  const updateMenuAccess = (menuId: number, permission: keyof MenuProps, value: boolean) => {
     if (!currentRole) return
 
-    const existingAccess = currentRole.menuAccess.find((access) => access.menuId === menuId)
-    let newMenuAccess: MenuAccess[]
+    const existingAccess = currentRole.Menus.find((access) => access.MenuId === menuId)
+    let newMenuAccess: MenuProps[]
 
     if (existingAccess) {
-      newMenuAccess = currentRole.menuAccess.map((access) =>
-        access.menuId === menuId ? { ...access, [permission]: value } : access,
+      newMenuAccess = currentRole.Menus.map((access) =>
+        access.MenuId === menuId ? { ...access, [permission]: value } : access,
       )
     } else {
       newMenuAccess = [
-        ...currentRole.menuAccess,
-        { menuId, canView: false, canEdit: false, canDelete: false, canCreate: false, [permission]: value },
+        ...currentRole.Menus,
+        { MenuId: menuId, View: false, Edit: false, Delete: false, Create: false, [permission]: value },
       ]
     }
 
-    onUpdateAccess(selectedRole, newMenuAccess)
+    onUpdateAccess(Number(selectedRole), newMenuAccess)
   }
 
   return (
@@ -66,8 +68,8 @@ export function RoleMenuMapping({ roles, menuItems, onUpdateAccess }: RoleMenuMa
           </SelectTrigger>
           <SelectContent>
             {roles.map((role) => (
-              <SelectItem key={role.id} value={role.id}>
-                {role.name}
+              <SelectItem key={role.RoleId} value={String(role.RoleId)}>
+                {role.RoleName}
               </SelectItem>
             ))}
           </SelectContent>
@@ -78,63 +80,63 @@ export function RoleMenuMapping({ roles, menuItems, onUpdateAccess }: RoleMenuMa
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              Permissions for {currentRole.name}
+              Permissions for {currentRole.RoleName}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               {allMenus.map((menu) => {
-                const access = getMenuAccess(String(menu.MenuId))
+                const access = getMenuAccess(Number(menu.value))
                 return (
-                  <div key={menu.MenuId} className="border rounded-lg p-4">
+                  <div key={menu.label} className="border rounded-lg p-4">
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-2">
-                        <h4 className="font-medium">{menu.MenuName}</h4>
-                        {menu.Path && (
+                        <h4 className="font-medium">{menu.label}</h4>
+                        {/* {menu.Path && (
                           <Badge variant="outline" className="text-xs">
                             {menu.Path}
                           </Badge>
-                        )}
+                        )} */}
                       </div>
                     </div>
                     <div className="grid grid-cols-4 gap-4">
                       <div className="flex items-center space-x-2">
                         <Checkbox
-                          id={`${menu.MenuId}-view`}
-                          checked={access.canView}
-                          onCheckedChange={(checked) => updateMenuAccess(String(menu.MenuId), "canView", checked as boolean)}
+                          id={`${menu.value}-view`}
+                          checked={access.View}
+                          onCheckedChange={(checked) => updateMenuAccess(Number(menu.value), "View", checked as boolean)}
                         />
-                        <Label htmlFor={`${menu.MenuId}-view`} className="text-sm">
+                        <Label htmlFor={`${menu.value}-view`} className="text-sm">
                           View
                         </Label>
                       </div>
                       <div className="flex items-center space-x-2">
                         <Checkbox
-                          id={`${menu.MenuId}-edit`}
-                          checked={access.canEdit}
-                          onCheckedChange={(checked) => updateMenuAccess(String(menu.MenuId), "canEdit", checked as boolean)}
+                          id={`${menu.value}-edit`}
+                          checked={access.Edit}
+                          onCheckedChange={(checked) => updateMenuAccess(Number(menu.value), "Edit", checked as boolean)}
                         />
-                        <Label htmlFor={`${menu.MenuId}-edit`} className="text-sm">
+                        <Label htmlFor={`${menu.value}-edit`} className="text-sm">
                           Edit
                         </Label>
                       </div>
                       <div className="flex items-center space-x-2">
                         <Checkbox
-                          id={`${menu.MenuId}-create`}
-                          checked={access.canCreate}
-                          onCheckedChange={(checked) => updateMenuAccess(String(menu.MenuId), "canCreate", checked as boolean)}
+                          id={`${menu.value}-create`}
+                          checked={access.Create}
+                          onCheckedChange={(checked) => updateMenuAccess(Number(menu.value), "Create", checked as boolean)}
                         />
-                        <Label htmlFor={`${menu.MenuId}-create`} className="text-sm">
+                        <Label htmlFor={`${menu.value}-create`} className="text-sm">
                           Create
                         </Label>
                       </div>
                       <div className="flex items-center space-x-2">
                         <Checkbox
-                          id={`${menu.MenuId}-delete`}
-                          checked={access.canDelete}
-                          onCheckedChange={(checked) => updateMenuAccess(String(menu.MenuId), "canDelete", checked as boolean)}
+                          id={`${menu.value}-delete`}
+                          checked={access.Delete}
+                          onCheckedChange={(checked) => updateMenuAccess(Number(menu.value), "Delete", checked as boolean)}
                         />
-                        <Label htmlFor={`${menu.MenuId}-delete`} className="text-sm">
+                        <Label htmlFor={`${menu.value}-delete`} className="text-sm">
                           Delete
                         </Label>
                       </div>

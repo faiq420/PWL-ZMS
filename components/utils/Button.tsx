@@ -46,6 +46,7 @@ const types: { [key: string]: string } = {
   darkGreen:
     "bg-green-700 border text-white hover:bg-green-800 disabled:bg-green-700/70",
   dark: "bg-[#171717] border text-white hover:bg-[#181818] disabled:bg-[#3c3c3c]",
+  dark_custom: "bg-[#171717] border text-white hover:bg-[#181818] disabled:bg-[#8b8b8b]",
   white: "bg-white border text-black hover:bg-accent",
   danger: "bg-red-600 hover:bg-red-700 disabled:bg-red-500 text-white"
 };

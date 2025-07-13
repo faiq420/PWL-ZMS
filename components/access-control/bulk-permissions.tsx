@@ -1,137 +1,170 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Label } from "@/components/ui/label"
-import { Shield, Copy } from "lucide-react"
-import type { Role, MenuItem } from "@/types/menu"
-import { useToast } from "@/hooks/use-toast"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Shield, Copy } from "lucide-react";
+import type { MenuItem } from "@/types/menu";
+import { MenuProps, RoleProps } from "@/src/app/home/access-control/page";
+import { OPTION } from "@/types/utils";
+import { useToast } from "../ui/use-toast";
+import useHelper from "@/Helper/helper";
+import ButtonComp from "../utils/Button";
 
 interface BulkPermissionsProps {
-  roles: Role[]
-  menuItems: MenuItem[]
-  onUpdateRoles: (roles: Role[]) => void
+  roles: RoleProps[];
+  menuItems: OPTION[];
+  onUpdateRoles: (roles: RoleProps[]) => void;
+  onCopyRoles: (roleId: number, menuAccess: MenuProps[]) => void;
 }
 
-export function BulkPermissions({ roles, menuItems, onUpdateRoles }: BulkPermissionsProps) {
-  const [selectedRoles, setSelectedRoles] = useState<string[]>([])
-  const [selectedMenus, setSelectedMenus] = useState<string[]>([])
-  const [sourceRole, setSourceRole] = useState<string>("")
-  const [targetRoles, setTargetRoles] = useState<string[]>([])
-  const { toast } = useToast()
+export function BulkPermissions({
+  roles,
+  menuItems,
+  onUpdateRoles,
+  onCopyRoles,
+}: BulkPermissionsProps) {
+  const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
+  const [selectedMenus, setSelectedMenus] = useState<string[]>([]);
+  const [sourceRole, setSourceRole] = useState<string>("");
+  const [targetRoles, setTargetRoles] = useState<number[]>([]);
+  const { toast } = useToast();
+  const helper = useHelper();
+  const [isCruding, setIsCruding] = useState<boolean>(false);
 
   const flattenMenus = (items: MenuItem[]): MenuItem[] => {
-    let result: MenuItem[] = []
+    let result: MenuItem[] = [];
     for (const item of items) {
-      result.push(item)
+      result.push(item);
       if (item.children) {
-        result = result.concat(flattenMenus(item.children))
+        result = result.concat(flattenMenus(item.children));
       }
     }
-    return result
-  }
+    return result;
+  };
 
-  const allMenus = flattenMenus(menuItems)
+  const allMenus = menuItems;
 
   const handleRoleToggle = (roleId: string, checked: boolean) => {
     if (checked) {
-      setSelectedRoles([...selectedRoles, roleId])
+      setSelectedRoles([...selectedRoles, roleId]);
     } else {
-      setSelectedRoles(selectedRoles.filter((id) => id !== roleId))
+      setSelectedRoles(selectedRoles.filter((id) => id !== roleId));
     }
-  }
+  };
 
   const handleMenuToggle = (menuId: string, checked: boolean) => {
     if (checked) {
-      setSelectedMenus([...selectedMenus, menuId])
+      setSelectedMenus([...selectedMenus, menuId]);
     } else {
-      setSelectedMenus(selectedMenus.filter((id) => id !== menuId))
+      setSelectedMenus(selectedMenus.filter((id) => id !== menuId));
     }
-  }
+  };
 
-  const handleTargetRoleToggle = (roleId: string, checked: boolean) => {
+  const handleTargetRoleToggle = (roleId: number, checked: boolean) => {
     if (checked) {
-      setTargetRoles([...targetRoles, roleId])
+      setTargetRoles([...targetRoles, roleId]);
     } else {
-      setTargetRoles(targetRoles.filter((id) => id !== roleId))
+      setTargetRoles(targetRoles.filter((id) => id !== roleId));
     }
-  }
+  };
 
-  const grantBulkAccess = () => {
-    const updatedRoles = roles.map((role) => {
-      if (selectedRoles.includes(role.id)) {
-        const newMenuAccess = [...role.menuAccess]
+  // const grantBulkAccess = () => {
+  //   const updatedRoles = roles.map((role) => {
+  //     if (selectedRoles.includes(String(role.RoleId))) {
+  //       const newMenuAccess = [...role.Menus]
 
-        selectedMenus.forEach((menuId) => {
-          const existingIndex = newMenuAccess.findIndex((access) => access.menuId === menuId)
-          if (existingIndex >= 0) {
-            newMenuAccess[existingIndex] = {
-              ...newMenuAccess[existingIndex],
-              canView: true,
-            }
-          } else {
-            newMenuAccess.push({
-              menuId,
-              canView: true,
-              canEdit: false,
-              canDelete: false,
-              canCreate: false,
-            })
-          }
-        })
+  //       selectedMenus.forEach((menuId) => {
+  //         const existingIndex = newMenuAccess.findIndex((access) => access.MenuId === menuId)
+  //         if (existingIndex >= 0) {
+  //           newMenuAccess[existingIndex] = {
+  //             ...newMenuAccess[existingIndex],
+  //             canView: true,
+  //           }
+  //         } else {
+  //           newMenuAccess.push({
+  //             menuId,
+  //             canView: true,
+  //             canEdit: false,
+  //             canDelete: false,
+  //             canCreate: false,
+  //           })
+  //         }
+  //       })
 
-        return { ...role, menuAccess: newMenuAccess, updatedAt: new Date().toISOString() }
-      }
-      return role
-    })
+  //       return { ...role, menuAccess: newMenuAccess, updatedAt: new Date().toISOString() }
+  //     }
+  //     return role
+  //   })
 
-    onUpdateRoles(updatedRoles)
-    toast({
-      title: "Permissions Granted",
-      description: `Access granted to ${selectedRoles.length} roles for ${selectedMenus.length} menu items.`,
-    })
-  }
+  //   onUpdateRoles(updatedRoles)
+  //   toast({
+  //     title: "Permissions Granted",
+  //     description: `Access granted to ${selectedRoles.length} roles for ${selectedMenus.length} menu items.`,
+  //   })
+  // }
 
-  const revokeBulkAccess = () => {
-    const updatedRoles = roles.map((role) => {
-      if (selectedRoles.includes(role.id)) {
-        const newMenuAccess = role.menuAccess.filter((access) => !selectedMenus.includes(access.menuId))
-        return { ...role, menuAccess: newMenuAccess, updatedAt: new Date().toISOString() }
-      }
-      return role
-    })
+  // const revokeBulkAccess = () => {
+  //   const updatedRoles = roles.map((role) => {
+  //     if (selectedRoles.includes(role.id)) {
+  //       const newMenuAccess = role.menuAccess.filter((access) => !selectedMenus.includes(access.menuId))
+  //       return { ...role, menuAccess: newMenuAccess, updatedAt: new Date().toISOString() }
+  //     }
+  //     return role
+  //   })
 
-    onUpdateRoles(updatedRoles)
-    toast({
-      title: "Permissions Revoked",
-      description: `Access revoked from ${selectedRoles.length} roles for ${selectedMenus.length} menu items.`,
-    })
+  //   onUpdateRoles(updatedRoles)
+  //   toast({
+  //     title: "Permissions Revoked",
+  //     description: `Access revoked from ${selectedRoles.length} roles for ${selectedMenus.length} menu items.`,
+  //   })
+  // }
+
+  function GetMenusOfRole(roleId: number): MenuProps[] | [] {
+    const role = roles.find((item) => item.RoleId === roleId);
+    return role?.Menus ? role.Menus : [];
   }
 
   const copyPermissions = () => {
-    const sourceRoleData = roles.find((role) => role.id === sourceRole)
-    if (!sourceRoleData) return
-
-    const updatedRoles = roles.map((role) => {
-      if (targetRoles.includes(role.id)) {
-        return {
-          ...role,
-          menuAccess: [...sourceRoleData.menuAccess],
-          updatedAt: new Date().toISOString(),
-        }
-      }
-      return role
-    })
-
-    onUpdateRoles(updatedRoles)
-    toast({
-      title: "Permissions Copied",
-      description: `Permissions copied from ${sourceRoleData.name} to ${targetRoles.length} roles.`,
-    })
-  }
+    setIsCruding(true);
+    Promise.allSettled(
+      targetRoles.map((role) => {
+        return helper.xhr.Post(
+          "/Mapping/CopyPermissions",
+          helper.ConvertToFormData({
+            SRoleId: Number(sourceRole),
+            DRoleId: role,
+          })
+        );
+      })
+    )
+      .then((response) => {
+        console.log(response);
+        toast({
+          title: "Permissions Updated",
+          description:
+            "Role-based menu access permissions have been saved successfully.",
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+      .finally(() => {
+        targetRoles.map((role) => {
+          onCopyRoles(role, GetMenusOfRole(Number(sourceRole)));
+        });
+        setIsCruding(false);
+      });
+  };
 
   return (
     <div className="space-y-6">
@@ -145,17 +178,25 @@ export function BulkPermissions({ roles, menuItems, onUpdateRoles }: BulkPermiss
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label className="text-sm font-medium mb-2 block">Select Roles</Label>
+              <Label className="text-sm font-medium mb-2 block">
+                Select Roles
+              </Label>
               <div className="grid grid-cols-1 gap-2 max-h-32 overflow-y-auto border rounded-md p-2">
                 {roles.map((role) => (
-                  <div key={role.id} className="flex items-center space-x-2">
+                  <div
+                    key={role.RoleId}
+                    className="flex items-center space-x-2"
+                  >
                     <Checkbox
-                      id={`bulk-role-${role.id}`}
-                      checked={selectedRoles.includes(role.id)}
-                      onCheckedChange={(checked) => handleRoleToggle(role.id, checked as boolean)}
+                      id={`bulk-role-${role.RoleId}`}
+                      checked={selectedRoles.includes(String(role.RoleId))}
+                      // onCheckedChange={(checked) => handleRoleToggle(role.id, checked as boolean)}
                     />
-                    <Label htmlFor={`bulk-role-${role.id}`} className="text-sm">
-                      {role.name}
+                    <Label
+                      htmlFor={`bulk-role-${role.RoleId}`}
+                      className="text-sm"
+                    >
+                      {role.RoleName}
                     </Label>
                   </div>
                 ))}
@@ -163,17 +204,24 @@ export function BulkPermissions({ roles, menuItems, onUpdateRoles }: BulkPermiss
             </div>
 
             <div>
-              <Label className="text-sm font-medium mb-2 block">Select Menu Items</Label>
+              <Label className="text-sm font-medium mb-2 block">
+                Select Menu Items
+              </Label>
               <div className="grid grid-cols-1 gap-2 max-h-32 overflow-y-auto border rounded-md p-2">
                 {allMenus.map((menu) => (
-                  <div key={menu.MenuId} className="flex items-center space-x-2">
+                  <div key={menu.label} className="flex items-center space-x-2">
                     <Checkbox
-                      id={`bulk-menu-${menu.MenuId}`}
-                      checked={selectedMenus.includes(String(menu.MenuId))}
-                      onCheckedChange={(checked) => handleMenuToggle(String(menu.MenuId), checked as boolean)}
+                      id={`bulk-menu-${menu.value}`}
+                      checked={selectedMenus.includes(String(menu.value))}
+                      onCheckedChange={(checked) =>
+                        handleMenuToggle(String(menu.value), checked as boolean)
+                      }
                     />
-                    <Label htmlFor={`bulk-menu-${menu.MenuId}`} className="text-sm">
-                      {menu.MenuName}
+                    <Label
+                      htmlFor={`bulk-menu-${menu.value}`}
+                      className="text-sm"
+                    >
+                      {menu.label}
                     </Label>
                   </div>
                 ))}
@@ -182,16 +230,20 @@ export function BulkPermissions({ roles, menuItems, onUpdateRoles }: BulkPermiss
 
             <div className="flex gap-2">
               <Button
-                onClick={grantBulkAccess}
-                disabled={selectedRoles.length === 0 || selectedMenus.length === 0}
+                // onClick={grantBulkAccess}
+                disabled={
+                  selectedRoles.length === 0 || selectedMenus.length === 0
+                }
                 className="flex-1"
               >
                 Grant Access
               </Button>
               <Button
                 variant="destructive"
-                onClick={revokeBulkAccess}
-                disabled={selectedRoles.length === 0 || selectedMenus.length === 0}
+                // onClick={revokeBulkAccess}
+                disabled={
+                  selectedRoles.length === 0 || selectedMenus.length === 0
+                }
                 className="flex-1"
               >
                 Revoke Access
@@ -209,7 +261,10 @@ export function BulkPermissions({ roles, menuItems, onUpdateRoles }: BulkPermiss
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label htmlFor="source-role" className="text-sm font-medium mb-2 block">
+              <Label
+                htmlFor="source-role"
+                className="text-sm font-medium mb-2 block"
+              >
                 Source Role
               </Label>
               <Select value={sourceRole} onValueChange={setSourceRole}>
@@ -218,8 +273,8 @@ export function BulkPermissions({ roles, menuItems, onUpdateRoles }: BulkPermiss
                 </SelectTrigger>
                 <SelectContent>
                   {roles.map((role) => (
-                    <SelectItem key={role.id} value={role.id}>
-                      {role.name}
+                    <SelectItem key={role.RoleId} value={String(role.RoleId)}>
+                      {role.RoleName}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -227,28 +282,45 @@ export function BulkPermissions({ roles, menuItems, onUpdateRoles }: BulkPermiss
             </div>
 
             <div>
-              <Label className="text-sm font-medium mb-2 block">Target Roles</Label>
+              <Label className="text-sm font-medium mb-2 block">
+                Target Roles
+              </Label>
               <div className="grid grid-cols-1 gap-2 max-h-32 overflow-y-auto border rounded-md p-2">
                 {roles
-                  .filter((role) => role.id !== sourceRole)
+                  .filter((role) => role.RoleId !== Number(sourceRole))
                   .map((role) => (
-                    <div key={role.id} className="flex items-center space-x-2">
+                    <div
+                      key={role.RoleId}
+                      className="flex items-center space-x-2"
+                    >
                       <Checkbox
-                        id={`target-role-${role.id}`}
-                        checked={targetRoles.includes(role.id)}
-                        onCheckedChange={(checked) => handleTargetRoleToggle(role.id, checked as boolean)}
+                        id={`target-role-${role.RoleId}`}
+                        checked={targetRoles.includes(role.RoleId)}
+                        onCheckedChange={(checked) =>
+                          handleTargetRoleToggle(
+                            role.RoleId,
+                            checked as boolean
+                          )
+                        }
                       />
-                      <Label htmlFor={`target-role-${role.id}`} className="text-sm">
-                        {role.name}
+                      <Label
+                        htmlFor={`target-role-${role.RoleId}`}
+                        className="text-sm"
+                      >
+                        {role.RoleName}
                       </Label>
                     </div>
                   ))}
               </div>
             </div>
 
-            <Button onClick={copyPermissions} disabled={!sourceRole || targetRoles.length === 0} className="w-full">
-              Copy Permissions
-            </Button>
+            <ButtonComp
+              clickEvent={copyPermissions}
+              isCruding={isCruding}
+              text="Copy Permissions"
+              type={"dark_custom"}
+              disabled={targetRoles.length <= 0}
+            />
           </CardContent>
         </Card>
       </div>
@@ -261,33 +333,33 @@ export function BulkPermissions({ roles, menuItems, onUpdateRoles }: BulkPermiss
           <div className="grid gap-2 md:grid-cols-4">
             <Button
               variant="outline"
-              onClick={() => {
-                setSelectedRoles(roles.map((r) => r.id))
-                setSelectedMenus(allMenus.map((m) => String(m.MenuId)))
-              }}
+              // onClick={() => {
+              //   setSelectedRoles(roles.map((r) => r.id))
+              //   setSelectedMenus(allMenus.map((m) => String(m.MenuId)))
+              // }}
             >
               Select All
             </Button>
             <Button
               variant="outline"
               onClick={() => {
-                setSelectedRoles([])
-                setSelectedMenus([])
-                setTargetRoles([])
-                setSourceRole("")
+                setSelectedRoles([]);
+                setSelectedMenus([]);
+                setTargetRoles([]);
+                setSourceRole("");
               }}
             >
               Clear Selection
             </Button>
             <Button
               variant="outline"
-              onClick={() => setSelectedRoles(roles.filter((r) => r.isActive).map((r) => r.id))}
+              // onClick={() => setSelectedRoles(roles.filter((r) => r.isActive).map((r) => r.id))}
             >
               Select Active Roles
             </Button>
             <Button
               variant="outline"
-              onClick={() => setSelectedMenus(allMenus.filter((m) => m.IsActive).map((m) => String(m.MenuId)))}
+              // onClick={() => setSelectedMenus(allMenus.filter((m) => m.IsActive).map((m) => String(m.MenuId)))}
             >
               Select Visible Menus
             </Button>
@@ -295,5 +367,5 @@ export function BulkPermissions({ roles, menuItems, onUpdateRoles }: BulkPermiss
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

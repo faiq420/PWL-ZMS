@@ -89,6 +89,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${poppins.variable} ${barlow.variable} ${montserrat.variable} ${roboto.variable} ${DMSans.variable} ${syne.variable} ${faustina.variable} ${tajawal.variable} min-h-screen`}
     >
       <body className="flex-1 flex flex-col min-h-screen">

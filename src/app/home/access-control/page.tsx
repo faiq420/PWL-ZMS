@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Shield, Users, Menu, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,36 +12,94 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AccessMatrix } from "@/components/access-control/access-matrix";
-import { RoleMenuMapping } from "@/components/access-control/role-menu-mapping";
-import { BulkPermissions } from "@/components/access-control/bulk-permissions";
-import { mockRoles, mockMenuItems } from "@/data/menus";
-import type { Role, MenuItem } from "@/types/menu";
-import { useToast } from "@/hooks/use-toast";
 import SectionIntro from "@/components/utils/Headings/SectionIntro";
 import MetricPresentationCard from "@/components/utils/Cards/MetricPresentationCard";
+import useHelper from "@/Helper/helper";
+import { OPTION } from "@/types/utils";
+import ButtonComp from "@/components/utils/Button";
+import { useToast } from "@/components/ui/use-toast";
+import { RoleMenuMapping } from "@/components/access-control/role-menu-mapping";
+import { BulkPermissions } from "@/components/access-control/bulk-permissions";
+
+export interface MenuProps {
+  MenuId?: number;
+  View?: boolean;
+  Create?: boolean;
+  Edit?: boolean;
+  Delete?: boolean;
+}
+
+export interface RoleProps {
+  RoleId: number;
+  RoleName: string;
+  Menus: Array<MenuProps>;
+}
 
 export default function AccessControlPage() {
-  const [roles, setRoles] = useState<Role[]>(mockRoles);
-  const [menuItems, setMenuItems] = useState<MenuItem[]>(mockMenuItems);
+  const [roles, setRoles] = useState<RoleProps[]>([]);
+  const [menuItems, setMenuItems] = useState<OPTION[]>([]);
+  const [isCruding, setIsCruding] = useState<boolean>(false);
   const { toast } = useToast();
+  const helper = useHelper();
 
   const handleSavePermissions = () => {
-    toast({
-      title: "Permissions Updated",
-      description:
-        "Role-based menu access permissions have been saved successfully.",
-    });
+    setIsCruding(true);
+    Promise.allSettled(
+      roles.map((role: RoleProps) => {
+        return helper.xhr.Post(
+          "/Mapping/CreateMapping",
+          helper.ConvertToFormData({
+            MenuId: role.Menus,
+            RoleId: role.RoleId,
+          })
+        );
+      })
+    )
+      .then((response) => {
+        console.log(response);
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+      .finally(() => {
+        setIsCruding(false);
+        toast({
+          title: "Permissions Updated",
+          description:
+            "Role-based menu access permissions have been saved successfully.",
+        });
+      });
   };
 
-  const handleUpdateRoleAccess = (roleId: string, menuAccess: any[]) => {
+  const handleUpdateRoleAccess = (roleId: number, menuAccess: MenuProps[] | []) => {
     setRoles(
       roles.map((role) =>
-        role.id === roleId
-          ? { ...role, menuAccess, updatedAt: new Date().toISOString() }
-          : role
+        role.RoleId === roleId ? { ...role, Menus: menuAccess } : role
       )
     );
+    console.log(roles);
   };
+
+  function GetRoleMenuMapping() {
+    helper.xhr
+      .Get("/Mapping/GetAllMenus")
+      .then((response) => {
+        setMenuItems(
+          response.allMenus.map((menu: any) => ({
+            label: menu.MenuName,
+            value: menu.MenuId,
+          }))
+        );
+        setRoles(response.mapping);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
+  useEffect(() => {
+    GetRoleMenuMapping();
+  }, []);
 
   return (
     <div className="flex-1 space-y-4">
@@ -50,10 +108,19 @@ export default function AccessControlPage() {
           title="Access Control"
           description="Manage role-based menu access and permissions."
         />
-        <Button onClick={handleSavePermissions}>
+        <div className="grid place-content-center">
+          <ButtonComp
+            clickEvent={handleSavePermissions}
+            text="Save Changes"
+            beforeIcon={<Save className="mr-2 h-4 w-4" />}
+            type={"dark"}
+            isCruding={isCruding}
+          />
+        </div>
+        {/* <Button onClick={handleSavePermissions}>
           <Save className="mr-2 h-4 w-4" />
           Save Changes
-        </Button>
+        </Button> */}
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
@@ -73,7 +140,7 @@ export default function AccessControlPage() {
           {
             Title: "Permissions",
             icon: <Shield className="h-4 w-4 text-muted-foreground" />,
-            Count: roles.reduce((acc, role) => acc + role.menuAccess.length, 0),
+            Count: roles.reduce((acc, role) => acc + role.Menus.length, 0),
             Description: "Total access rules",
           },
         ].map((card) => (
@@ -89,9 +156,15 @@ export default function AccessControlPage() {
 
       <Tabs defaultValue="matrix" className="space-y-4 w-full flex flex-col">
         <TabsList className="w-full flex-1">
-          <TabsTrigger className="flex-1" value="matrix">Access Matrix</TabsTrigger>
-          <TabsTrigger className="flex-1" value="mapping">Role Mapping</TabsTrigger>
-          <TabsTrigger className="flex-1" value="bulk">Bulk Operations</TabsTrigger>
+          <TabsTrigger className="flex-1" value="matrix">
+            Access Matrix
+          </TabsTrigger>
+          <TabsTrigger className="flex-1" value="mapping">
+            Role Mapping
+          </TabsTrigger>
+          <TabsTrigger className="flex-1" value="bulk">
+            Bulk Operations
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="matrix" className="space-y-4">
@@ -144,6 +217,7 @@ export default function AccessControlPage() {
                 roles={roles}
                 menuItems={menuItems}
                 onUpdateRoles={setRoles}
+                onCopyRoles={handleUpdateRoleAccess}
               />
             </CardContent>
           </Card>
