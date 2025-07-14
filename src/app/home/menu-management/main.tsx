@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus, Search, Filter } from "lucide-react";
+import { Plus, Search, Filter, ArrowUpDown, Save, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -25,33 +25,39 @@ import type { MenuItem } from "@/types/menu";
 import SectionIntro from "@/components/utils/Headings/SectionIntro";
 import { useRouter } from "next/navigation";
 import useHelper from "@/Helper/helper";
+import ButtonComp from "@/components/utils/Button";
+import { useToast } from "@/components/ui/use-toast";
 
 export default function MenuManagementPage() {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [isReordering, setIsReordering] = useState<boolean>(false);
+  const [isCruding, setIsCruding] = useState<boolean>(false);
   const router = useRouter();
   const helper = useHelper();
+  const { toast } = useToast();
 
   const handleCreateMenu = () => {
-    NavigateToRecord("create")
+    NavigateToRecord("create");
   };
 
   const handleEditMenu = (menu: MenuItem) => {
-    NavigateToRecord("edit", menu.MenuId)
+    NavigateToRecord("edit", menu.MenuId);
   };
 
   const handleDeleteMenu = (menuId: number) => {
-    helper.xhr.Post(
-      '/Menu/DeleteMenu',
-      helper.ConvertToFormData({ MenuId:  menuId})
-    ).then((response) => {
-      console.log(response);
-    }).catch((error) => {
-      console.error(error);
-    }).finally(() => {
-      setMenuItems(menuItems.filter(item => item.MenuId !== menuId));
-    })
+    helper.xhr
+      .Post("/Menu/DeleteMenu", helper.ConvertToFormData({ MenuId: menuId }))
+      .then((response) => {
+        console.log(response);
+      })
+      .catch((error) => {
+        console.error(error);
+      })
+      .finally(() => {
+        setMenuItems(menuItems.filter((item) => item.MenuId !== menuId));
+      });
   };
 
   // const handleSaveMenu = (menuData: Partial<MenuItem>) => {
@@ -128,9 +134,9 @@ export default function MenuManagementPage() {
   };
 
   const filteredMenus = menuItems.filter((menu) => {
-    const matchesSearch = menu.MenuName
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
+    const matchesSearch = menu.MenuName.toLowerCase().includes(
+      searchTerm.toLowerCase()
+    );
     const matchesStatus =
       statusFilter === "all" ||
       (statusFilter === "active" && menu.IsActive) ||
@@ -146,27 +152,58 @@ export default function MenuManagementPage() {
   }
 
   function GetAllMenus() {
-    helper.xhr.Get(
-      '/Menu/GetMenus'
-    ).then((response) => {
-      setMenuItems(response.menus.map((menu: any) => ({
-        MenuId: menu.MenuId,
-        MenuName: menu.MenuName,
-        Path: menu.Path,
-        Description: menu.Description,
-        IsActive: menu.IsActive,
-        IsParent: menu.IsParent,
-        ParentId: menu.ParentId,
-        Icon: menu.Icon
-      })));
-    }).catch((error) => {
-      console.log(error);
-    })
+    helper.xhr
+      .Get("/Menu/GetMenus")
+      .then((response) => {
+        setMenuItems(
+          response.menus.map((menu: any) => ({
+            MenuId: menu.MenuId,
+            MenuName: menu.MenuName,
+            Path: menu.Path,
+            Description: menu.Description,
+            IsActive: menu.IsActive,
+            IsParent: menu.IsParent,
+            ParentId: menu.ParentId,
+            Icon: menu.Icon,
+          }))
+        );
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   }
 
   useEffect(() => {
     GetAllMenus();
-  }, [])
+  }, []);
+
+  function handleSaveReOrdering() {
+    setIsCruding(true);
+    helper.xhr
+      .Post(
+        "/Menu/MenuReordering",
+        helper.ConvertToFormData({
+          Menus: menuItems.map((menu, index) => ({
+            MenuId: menu.MenuId,
+            SortingOrder: index,
+          })),
+        })
+      )
+      .then((response) => {
+        console.log(response);
+        toast({
+          title: "Reordering Successful",
+          description: 'Menu Reordered Successfully',
+        });
+      })
+      .catch((error) => {
+        console.error(error);
+      })
+      .finally(() => {
+        setIsReordering(false);
+        setIsCruding(false);
+      });
+  }
 
   return (
     <div className="space-y-4">
@@ -184,8 +221,33 @@ export default function MenuManagementPage() {
       <MenuStats menuItems={menuItems} />
 
       <Card>
-        <CardHeader>
+        <CardHeader className="flex-row items-center justify-between ">
           <CardTitle className="font-poppins text-xl">Menu Structure</CardTitle>
+          <div className="flex space-x-2">
+            {isReordering && (
+              <ButtonComp
+                text={"Cancel"}
+                clickEvent={() => setIsReordering(false)}
+                beforeIcon={<X className="h-4 w-4" />}
+                type={"white"}
+              />
+            )}
+            <ButtonComp
+              text={!isReordering ? "Re-Order" : "Save"}
+              clickEvent={() => {
+                !isReordering ? setIsReordering(true) : handleSaveReOrdering();
+              }}
+              beforeIcon={
+                !isReordering ? (
+                  <ArrowUpDown className="mr-2 h-4 w-4" />
+                ) : (
+                  <Save className="h-4 w-4" />
+                )
+              }
+              type={!isReordering ? "white" : "default"}
+              isCruding={isCruding}
+            />
+          </div>
         </CardHeader>
         <CardContent>
           <div className="flex items-center space-x-4 mb-2 mt-4">
@@ -216,6 +278,8 @@ export default function MenuManagementPage() {
             onEdit={handleEditMenu}
             onDelete={handleDeleteMenu}
             onToggleVisibility={handleToggleVisibility}
+            isReOrdering={isReordering}
+            setMenuItems={setMenuItems}
           />
         </CardContent>
       </Card>

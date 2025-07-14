@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import {
   ChevronDown,
   ChevronRight,
@@ -23,6 +23,8 @@ interface MenuTreeProps {
   onDelete: (menuId: number) => void;
   onToggleVisibility: (menuId: string) => void;
   level?: number;
+  isReOrdering: boolean;
+  setMenuItems: (menuItem: MenuItem[]) => void;
 }
 
 export function MenuTree({
@@ -31,10 +33,13 @@ export function MenuTree({
   onDelete,
   onToggleVisibility,
   level = 0,
+  isReOrdering,
+  setMenuItems,
 }: MenuTreeProps) {
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedMenu, setSelectedMenu] = useState<OPTION | null>(null);
+  const [isDragging, setIsDragging] = useState<boolean>(false);
 
   const toggleExpanded = (itemId: string) => {
     const newExpanded = new Set(expandedItems);
@@ -51,31 +56,52 @@ export function MenuTree({
     setIsModalOpen(true);
   }
 
+  function handleDraggingStart(
+    event: React.DragEvent<HTMLDivElement>,
+    item: MenuItem
+  ) {
+    event.dataTransfer.setData("DraggedMenuId", String(item.MenuId));
+    setIsDragging(true);
+  }
+
+  function handleDrop(
+    event: React.DragEvent<HTMLDivElement>,
+    dropIndex: number
+  ) {
+    event.preventDefault();
+    const draggedMenuItemId = event.dataTransfer.getData("DraggedMenuId");
+
+    const draggedMenuItemIndex = menuItems.findIndex(
+      (item) => item.MenuId === Number(draggedMenuItemId)
+    );
+    const draggedMenuItem = menuItems[draggedMenuItemIndex];
+    const updatedMenuItems = [...menuItems];
+    updatedMenuItems.splice(draggedMenuItemIndex, 1);
+    updatedMenuItems.splice(dropIndex, 0, draggedMenuItem);
+
+    setMenuItems(updatedMenuItems);
+  }
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) =>
+    e.preventDefault();
+
   return (
     <div className="space-y-1">
-      {menuItems.map((item) => (
+      {menuItems.map((item, index) => (
         <div key={item.MenuId} className="space-y-1">
           <div
+            draggable={isReOrdering}
+            onDragStart={(e) => handleDraggingStart(e, item)}
+            onDrop={(e) => handleDrop(e, index)}
+            onDragOver={handleDragOver}
             className={cn(
               "flex items-center gap-2 p-2 rounded-lg border hover:bg-muted/50 transition-colors",
               level > 0 && "ml-6 border-l-2 border-l-muted"
             )}
           >
             <div className="flex items-center gap-1">
-              <GripVertical className="h-4 w-4 text-muted-foreground cursor-grab" />
-              {item.children && item.children.length > 0 && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-6 w-6 p-0"
-                  onClick={() => toggleExpanded(String(item.MenuId))}
-                >
-                  {expandedItems.has(String(item.MenuId)) ? (
-                    <ChevronDown className="h-3 w-3" />
-                  ) : (
-                    <ChevronRight className="h-3 w-3" />
-                  )}
-                </Button>
+              {isReOrdering && (
+                <GripVertical className="h-4 w-4 text-muted-foreground cursor-grab" />
               )}
             </div>
 
@@ -120,6 +146,8 @@ export function MenuTree({
                 onDelete={onDelete}
                 onToggleVisibility={onToggleVisibility}
                 level={level + 1}
+                isReOrdering={isReOrdering}
+                setMenuItems={setMenuItems}
               />
             )}
         </div>
