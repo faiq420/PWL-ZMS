@@ -36,44 +36,14 @@ export default function UserManagementPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [activeTab, setActiveTab] = useState<string>("all");
-  const helper = useHelper();
   const router = useRouter();
-
-  function GetAllUsers() {
-    helper.xhr
-      .Get("/Users/GetAllUsers")
-      .then((response) => {
-        console.log("Fetched users:", response);
-        setUsers(
-          response.users.map((item: any) => ({
-            id: item.UserId,
-            email: item.UserEmail,
-            firstName: item.UserName.split(" ")[0],
-            lastName: item.UserName.includes(" ")
-              ? item.UserName.split("")[1]
-              : "",
-            role: item.RoleName,
-            status: item.IsActive === true ? "active" : "inactive",
-            lastLogin: item.LastLogin,
-            phone: item.UserPhone,
-          }))
-        );
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  }
-
-  useEffect(() => {
-    GetAllUsers();
-  }, []);
 
   const handleCreateUser = () => {
     NavigateToRecord("create");
   };
 
   const handleDeleteUser = (userId: string) => {
-    setUsers(users.filter((user) => user.id !== userId));
+    setUsers(users.filter((user) => user.Id !== Number(userId)));
   };
 
   function NavigateToRecord(mode: string, id?: number) {
@@ -88,7 +58,7 @@ export default function UserManagementPage() {
       // Edit existing user
       setUsers(
         users.map((user) =>
-          user.id === selectedUser.id
+          user.Id === selectedUser.Id
             ? { ...user, ...userData, updatedAt: new Date().toISOString() }
             : user
         )

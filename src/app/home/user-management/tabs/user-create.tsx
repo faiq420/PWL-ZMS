@@ -50,7 +50,6 @@ type UserObject = {
 
 const UserCreate = ({ mode = "create", id = "0" }: Props) => {
   const router = useRouter();
-  const helper = useHelper();
   const [imgFile, setImgFile] = useState<File | null>(null);
   const [obj, setObj] = useState<UserObject>({
     UserId: 0,
@@ -97,44 +96,6 @@ const UserCreate = ({ mode = "create", id = "0" }: Props) => {
     }
   };
 
-  useEffect(() => {
-    // Fetch roles from the server
-    helper.xhr
-      .Get("/Roles/GetAllRoles")
-      .then((response) => {
-        const roleOptions = response.roles.map((role: any) => ({
-          label: role.RoleName,
-          value: role.RoleId,
-        }));
-        setRoles(roleOptions);
-      })
-      .catch((error) => {
-        console.error("Error fetching roles:", error);
-      });
-  }, []);
-
-  useEffect(() => {
-    if (id && id !== "0") {
-      // Fetch user data by ID
-      helper.xhr
-        .Get(
-          "/Users/GetUserById",
-          helper.GetURLParamString({ userId: Number(id) }).toString()
-        )
-        .then((response) => {
-          const user = response.user;
-          setObj({
-            ...response.user,
-            ImagePath: user.ImagePath || "",
-            UserPassword: "",
-          });
-        })
-        .catch((error) => {
-          console.error("Error fetching user data:", error);
-        });
-    }
-  }, [id]);
-
   function UpdateFile(id: number, file: File) {
     const formData = new FormData();
     formData.append("id", String(id));
@@ -156,15 +117,16 @@ const UserCreate = ({ mode = "create", id = "0" }: Props) => {
 
   return (
     <div className="flex-1 space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between w-full">
         <div className="flex items-center space-x-2">
           <Button variant="outline" size="icon" onClick={() => router.back()}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <div>
+          <div className="flex items-center justify-around">
             <Subheading text={GetHeading()} />
           </div>
         </div>
+        
       </div>
       <Card>
         <CardHeader></CardHeader>

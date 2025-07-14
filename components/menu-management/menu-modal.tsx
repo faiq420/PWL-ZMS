@@ -68,13 +68,13 @@ export function MenuModal({
   useEffect(() => {
     if (menu) {
       setFormData({
-        name: menu.name || "",
-        path: menu.path || "",
-        icon: menu.icon || "LayoutDashboard", // Updated default value to be a non-empty string
-        parentId: menu.parentId || "none",
-        order: menu.order || 1,
-        isActive: menu.isActive ?? true,
-        description: menu.description || "",
+        name: menu.MenuName || "",
+        path: menu.Path || "",
+        icon: menu.Icon || "LayoutDashboard", // Updated default value to be a non-empty string
+        parentId: String(menu.ParentId) || "none",
+        order: menu.SortingOrder || 1,
+        isActive: menu.IsActive ?? true,
+        description: menu.Description || "",
       });
     } else {
       setFormData({
@@ -95,7 +95,7 @@ export function MenuModal({
       ...formData,
       parentId: formData.parentId === "none" ? "" : formData.parentId,
     };
-    onSave(submitData);
+    // onSave(submitData);
   };
 
   const getParentMenuOptions = (
@@ -105,7 +105,7 @@ export function MenuModal({
     const flattenMenus = (items: MenuItem[]): MenuItem[] => {
       let result: MenuItem[] = [];
       for (const item of items) {
-        if (item.id !== excludeId) {
+        if (String(item.MenuId) !== excludeId) {
           result.push(item);
           if (item.children) {
             result = result.concat(flattenMenus(item.children));
@@ -117,7 +117,7 @@ export function MenuModal({
     return flattenMenus(menus);
   };
 
-  const parentOptions = getParentMenuOptions(existingMenus, menu?.id);
+  const parentOptions = getParentMenuOptions(existingMenus, String(menu?.MenuId));
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -194,8 +194,8 @@ export function MenuModal({
                 <SelectContent>
                   <SelectItem value="none">No Parent (Root Level)</SelectItem>
                   {parentOptions.map((parent) => (
-                    <SelectItem key={parent.id} value={parent.id}>
-                      {parent.name}
+                    <SelectItem key={parent.MenuId} value={String(parent.MenuId)}>
+                      {parent.MenuName}
                     </SelectItem>
                   ))}
                 </SelectContent>
