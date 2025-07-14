@@ -413,7 +413,7 @@ export default function VisitPlanningPage() {
           description="Manage and plan visits for the zoo."
         />
         <div className="flex items-center space-x-2">
-          <Popover>
+          {/* <Popover>
             <PopoverTrigger asChild>
               <Button
                 variant={"outline"}
@@ -434,7 +434,7 @@ export default function VisitPlanningPage() {
                 initialFocus
               />
             </PopoverContent>
-          </Popover>
+          </Popover> */}
           <Select defaultValue="all">
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Select Zoo" />
@@ -451,8 +451,8 @@ export default function VisitPlanningPage() {
         </div>
       </div>
 
-      <Tabs defaultValue="events" className="space-y-1">
-        <TabsList className="absolute">
+      <Tabs defaultValue="events" className="space-y-4">
+        <TabsList className="">
           <TabsTrigger value="events">Events</TabsTrigger>
           <TabsTrigger value="bookings">Bookings</TabsTrigger>
         </TabsList>

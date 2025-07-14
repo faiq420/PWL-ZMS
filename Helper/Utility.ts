@@ -17,3 +17,39 @@ export const formatCnic = (string: string) => {
   }
   return result;
 };
+
+type ScreenKey =
+  | ""
+  | "user"
+  | "zoo"
+  | "guide"
+  | "animal"
+  | "visits"
+  | "inspection"
+  | "role"
+  | "menu"
+  | "access";
+
+export const NavigateToRecord = (
+  screen: ScreenKey,
+  tab: string = "",
+  mode: string,
+  id?: number
+) => {
+  const screens: Record<ScreenKey, string> = {
+    user: "user-management",
+    zoo: "zoo-profile",
+    guide: "digital-guide",
+    animal: "animal-management",
+    visits: "visit-planning",
+    inspection: "veterinary-inspection",
+    role: "role-management",
+    menu: "menu-management",
+    access: "access-management",
+    "": "",
+  };
+  return (
+    `/home/${screens[screen]}?${tab ? `tab=${tab}&` : ""}mode=${mode}` +
+    (id != undefined ? `&id=${id}` : "")
+  );
+};

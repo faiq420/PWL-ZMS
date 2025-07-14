@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -25,6 +25,9 @@ import { ArrowUpDown, Edit, Plus, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import CardIntro from "@/components/utils/Headings/CardIntro";
+import SearchTag from "@/components/utils/FormElements/SearchTag";
 
 const BookingsTable = () => {
   const { toast } = useToast();
@@ -171,165 +174,188 @@ const BookingsTable = () => {
         type={deleteType}
         item={selectedItem}
       />
-      <div className="flex justify-end items-end space-x-2">
-        <div className="flex items-center space-x-2">
-          <Input
-            placeholder="Search booking..."
-            className="h-9 w-[150px] lg:w-[235px]"
-          />
-        </div>
-        <div className="w-fit">
-          <ButtonComp
-            type={"dark"}
-            clickEvent={() => {
-              NavigateToRecord("booking", "create");
-            }}
-            text="Add Booking"
-            beforeIcon={<Plus className=" h-4 w-4" />}
-          />
-        </div>
-      </div>
-      {selectedBookings.length > 0 && (
-        <div className="flex items-center gap-2 mb-4 p-2 bg-main-frostyBlue/10 rounded-md">
-          <span className="text-sm text-main-darkFadedBlue">
-            {selectedBookings.length} booking
-            {selectedBookings.length > 1 ? "s" : ""} selected
-          </span>
-          <div className="flex-1"></div>
-          <Button
-            variant="outline"
-            size="sm"
-            className="border-red-500 text-red-500 hover:bg-red-50"
-          >
-            <Trash2 className="mr-2 h-4 w-4" />
-            Delete
-          </Button>
-        </div>
-      )}
-      <Table>
-        <TableHeader>
-          <TableRow className="bg-main-frostyBlue/5">
-            <TableHead className="w-12">
-              <Checkbox
-                value={
-                  selectedBookings.length === filteredBookings.length &&
-                  filteredBookings.length > 0
-                }
-                setter={toggleSelectAll}
-                name=""
-              />
-            </TableHead>
-            <TableHead>
-              <div
-                className="flex items-center gap-1 cursor-pointer"
-                onClick={() =>
-                  setSortOrder(
-                    sortOrder === "name-asc" ? "name-desc" : "name-asc"
-                  )
-                }
-              >
-                Name
-                <ArrowUpDown className="h-4 w-4" />
+      <Card>
+        <CardHeader>
+          <div className="md:flex gap-3 justify-between items-end mb-2 w-full">
+            <CardIntro
+              title="Booking Management"
+              description="Manage all bookings throughout the zoos."
+            />
+            <div className="flex space-x-2">
+              <div className="w-full md:w-[300px]">
+                <SearchTag
+                  value={searchQuery}
+                  setter={(value) => setSearchQuery(value)}
+                  placeHolder="Select bookings..."
+                />
               </div>
-            </TableHead>
-            <TableHead>Booking Method</TableHead>
-            <TableHead>Date</TableHead>
-            <TableHead>Quantity</TableHead>
-            <TableHead>Total Price</TableHead>
-            <TableHead>Zoo</TableHead>
-            <TableHead className="text-center text-main-darkFadedBlue">
-              Actions
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody className="!text-sm">
-          {currentPosts.length > 0 ? (
-            currentPosts.map((booking: any, index: number) => (
-              <TableRow key={index}>
-                <TableCell>
-                  <Checkbox
-                    value={selectedBookings.includes(booking.id)}
-                    setter={(n, v) => toggleSelectbooking(booking.id)}
-                    name="id"
-                  />
-                </TableCell>
-                <TableCell>{booking.visitorName}</TableCell>
-                <TableCell>{booking.bookingMethod}</TableCell>
-                <TableCell>
-                  {changeDateFormatWithTime(booking.visitDate)}
-                </TableCell>
-                <TableCell>{booking.quantity}</TableCell>
-                <TableCell>{booking.totalPrice}</TableCell>
-                <TableCell>{booking.zoo}</TableCell>
-                <TableCell className="flex justify-center items-center space-x-2">
-                  <Edit
-                    className="text-black h-4 w-4 cursor-pointer"
-                    onClick={() => {
-                      NavigateToRecord("booking", "edit", booking.id);
-                    }}
-                  />
-
-                  <Trash2
-                    className="text-red-500 h-4 w-4 cursor-pointer"
-                    onClick={() => openDeleteDialog("booking", booking)}
-                  />
-                </TableCell>
-              </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell
-                colSpan={6}
-                className="h-24 text-center text-main-gray"
-              >
-                No products found.
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-      <div className="mt-4">
-        <Pagination>
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious
-                onClick={() => {
-                  if (currentPage != 1) {
-                    setCurrentPage(currentPage - 1);
-                  }
-                }}
-                aria-disabled={currentPage == 1}
-                className="text-main-darkFadedBlue cursor-pointer"
-              />
-            </PaginationItem>
-            {paginationLabels.map((label: number) => (
-              <PaginationItem key={label}>
-                <PaginationLink
-                  onClick={() => {
-                    setCurrentPage(label);
+              <div className="w-fit">
+                <ButtonComp
+                  type={"dark"}
+                  clickEvent={() => {
+                    NavigateToRecord("booking", "create");
                   }}
-                  className={`${
-                    currentPage == label && "bg-main-gray"
-                  }  text-main-navyBlue cursor-pointer`}
-                >
-                  {label}
-                </PaginationLink>
-              </PaginationItem>
-            ))}
-            <PaginationItem>
-              <PaginationNext
-                onClick={() => {
-                  if (currentPage != totalPages) {
-                    setCurrentPage(currentPage + 1);
-                  }
-                }}
-                aria-disabled={currentPage == totalPages}
-                className="text-main-darkFadedBlue cursor-pointer"
-              />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
-      </div>
+                  text="Add Booking"
+                  beforeIcon={<Plus className=" h-4 w-4" />}
+                />
+              </div>
+            </div>
+          </div>
+        </CardHeader>
+
+        <CardContent>
+          {selectedBookings.length > 0 && (
+            <div className="flex items-center gap-2 mb-4 p-2 bg-main-frostyBlue/10 rounded-md">
+              <span className="text-sm text-main-darkFadedBlue">
+                {selectedBookings.length} booking
+                {selectedBookings.length > 1 ? "s" : ""} selected
+              </span>
+              <div className="flex-1"></div>
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-red-500 text-red-500 hover:bg-red-50"
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Delete
+              </Button>
+            </div>
+          )}
+          <div className="border rounded-md">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-main-frostyBlue/5">
+                  <TableHead className="w-12">
+                    <Checkbox
+                      value={
+                        selectedBookings.length === filteredBookings.length &&
+                        filteredBookings.length > 0
+                      }
+                      setter={toggleSelectAll}
+                      name=""
+                    />
+                  </TableHead>
+                  <TableHead>
+                    <div
+                      className="flex items-center gap-1 cursor-pointer"
+                      onClick={() =>
+                        setSortOrder(
+                          sortOrder === "name-asc" ? "name-desc" : "name-asc"
+                        )
+                      }
+                    >
+                      Name
+                      <ArrowUpDown className="h-4 w-4" />
+                    </div>
+                  </TableHead>
+                  <TableHead>Booking Method</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Quantity</TableHead>
+                  <TableHead>Total Price</TableHead>
+                  <TableHead>Zoo</TableHead>
+                  <TableHead className="text-center text-main-darkFadedBlue">
+                    Actions
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody className="!text-sm">
+                {currentPosts.length > 0 ? (
+                  currentPosts.map((booking: any, index: number) => (
+                    <TableRow key={index}>
+                      <TableCell>
+                        <Checkbox
+                          value={selectedBookings.includes(booking.id)}
+                          setter={(n, v) => toggleSelectbooking(booking.id)}
+                          name="id"
+                        />
+                      </TableCell>
+                      <TableCell>{booking.visitorName}</TableCell>
+                      <TableCell>{booking.bookingMethod}</TableCell>
+                      <TableCell>
+                        {changeDateFormatWithTime(booking.visitDate)}
+                      </TableCell>
+                      <TableCell>{booking.quantity}</TableCell>
+                      <TableCell>{booking.totalPrice}</TableCell>
+                      <TableCell>{booking.zoo}</TableCell>
+                      <TableCell className="flex justify-center items-center space-x-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            NavigateToRecord("booking", "edit", booking.id);
+                          }}
+                        >
+                          <Edit className="text-black h-4 w-4 cursor-pointer" />
+                        </Button>
+
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => openDeleteDialog("booking", booking)}
+                          className="text-destructive hover:text-destructive"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell
+                      colSpan={6}
+                      className="h-24 text-center text-main-gray"
+                    >
+                      No products found.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+          <div className="mt-4">
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious
+                    onClick={() => {
+                      if (currentPage != 1) {
+                        setCurrentPage(currentPage - 1);
+                      }
+                    }}
+                    aria-disabled={currentPage == 1}
+                    className="text-main-darkFadedBlue cursor-pointer"
+                  />
+                </PaginationItem>
+                {paginationLabels.map((label: number) => (
+                  <PaginationItem key={label}>
+                    <PaginationLink
+                      onClick={() => {
+                        setCurrentPage(label);
+                      }}
+                      className={`${
+                        currentPage == label && "bg-main-gray"
+                      }  text-main-navyBlue cursor-pointer`}
+                    >
+                      {label}
+                    </PaginationLink>
+                  </PaginationItem>
+                ))}
+                <PaginationItem>
+                  <PaginationNext
+                    onClick={() => {
+                      if (currentPage != totalPages) {
+                        setCurrentPage(currentPage + 1);
+                      }
+                    }}
+                    aria-disabled={currentPage == totalPages}
+                    className="text-main-darkFadedBlue cursor-pointer"
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+        </CardContent>
+      </Card>
     </>
   );
 };

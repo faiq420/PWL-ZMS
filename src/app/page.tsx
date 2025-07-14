@@ -42,30 +42,30 @@ export default function LoginPage() {
     setIsLoading(true);
     setError("");
 
-    helper.xhr
-      .Post(
-        "/Auth/Login",
-        helper.ConvertToFormData({
-          email: email,
-          password: password,
-        })
-      )
-      .then((res) => {
-        console.log(res);
-        if (res.Message) {
-          setError(res.Message);
-        } else {
-          helper.storeData("token", res.token);
+    // helper.xhr
+    //   .Post(
+    //     "/Auth/Login",
+    //     helper.ConvertToFormData({
+    //       email: email,
+    //       password: password,
+    //     })
+    //   )
+    //   .then((res) => {
+    //     console.log(res);
+    //     if (res.Message) {
+    //       setError(res.Message);
+    //     } else {
+    //       helper.storeData("token", res.token);
           router.push("/home");
-        }
-      })
-      .catch((e) => {
-        console.log(e.Message, "jiosdjsib");
-        setError(e.Message);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+      //   }
+      // })
+      // .catch((e) => {
+      //   console.log(e.Message, "jiosdjsib");
+      //   setError(e.Message);
+      // })
+      // .finally(() => {
+      //   setIsLoading(false);
+      // });
   };
 
   useEffect(() => {
@@ -80,7 +80,7 @@ export default function LoginPage() {
     <div className="flex h-full flex-col loginBg">
       <div className="absolute inset-0 bg-black opacity-50 z-0"></div>
       <div className="relative flex-1 h-full grid grid-cols-1 md:grid-cols-[65%_35%]">
-        <div className="flex flex-col justify-center text-white p-5 space-y-4">
+        <div className="hidden md:flex flex-col justify-center text-white p-5 space-y-4">
           <h1 className="font-semibold tracking-tighter text-7xl leading-[80px] font-faustina">
             Punjab Wildlife & <br /> Parks
           </h1>
