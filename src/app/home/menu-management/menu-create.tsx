@@ -16,7 +16,7 @@ import { mockMenuItems } from "@/data/menus";
 import { iconOptions } from "@/data/zoos";
 import useHelper from "@/Helper/helper";
 import { OPTION } from "@/types/utils";
-import { ArrowLeft, Save, X } from "lucide-react";
+import { ArrowLeft, CodeSquare, Save, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
@@ -123,6 +123,8 @@ const MenuCreate = ({ mode = "create", id = "0" }: Props) => {
   }
 
   function handleChange(name: string, value: string | number) {
+    console.log(value);
+    if(name==="SortingOrder" && (String(value).includes("-") || Number(value) < 0)) return;
     setObj((prev: any) => ({ ...prev, [name]: value }));
   }
 

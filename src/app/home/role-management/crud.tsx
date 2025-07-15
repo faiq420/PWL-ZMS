@@ -1,3 +1,4 @@
+import PermissionsComp from "@/components/role-management/permissions";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -5,21 +6,31 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import ButtonComp from "@/components/utils/Button";
+import Dropdown from "@/components/utils/FormElements/Dropdown";
 import InputTag from "@/components/utils/FormElements/InputTag";
+import RadioButton from "@/components/utils/FormElements/RadioButton";
 import TextArea from "@/components/utils/FormElements/TextArea";
 import Toggle from "@/components/utils/FormElements/Toggle";
 import Subheading from "@/components/utils/Headings/Subheading";
 import useHelper from "@/Helper/helper";
-import { ArrowLeft, Save, X } from "lucide-react";
+import { OPTION } from "@/types/utils";
+import { ArrowLeft, Delete, Edit, Save, View, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
+import { MenuProps } from "../access-control/page";
 
 interface Props {
   mode?: string;
   id?: string;
   tab?: string;
+}
+
+export interface MenuExtendedProps extends MenuProps {
+  MenuName: string;
 }
 
 const RoleCrud = ({ mode = "create", id = "0" }: Props) => {
@@ -33,6 +44,16 @@ const RoleCrud = ({ mode = "create", id = "0" }: Props) => {
     Description: "",
     IsActive: true,
   });
+  const [isReplictionChecked, setIsReplicationChecked] =
+    useState<boolean>(true);
+  const [roles, setRoles] = useState<OPTION[]>([]);
+  const data = [
+    { label: "Manual Configuration", value: "manual" },
+    { label: "Replication", value: "replication" },
+  ];
+  const [selectedRole, setSelectedRole] = useState<number>(0);
+  const [allMenus, setAllMenus] = useState<MenuExtendedProps[]>([]);
+
   const capitalize = (value: string, space = " ") => {
     const words = String(value).split(space);
     const capitalizedWords = words.map(
@@ -56,22 +77,34 @@ const RoleCrud = ({ mode = "create", id = "0" }: Props) => {
     helper.xhr
       .Post(
         `/Roles/${mode === "create" ? "CreateRole" : "UpdateRole"}`,
-        helper.ConvertToFormData({ obj: obj })
+        helper.ConvertToFormData({
+          obj: obj,
+          RoleId: isReplictionChecked ? selectedRole : 0,
+          Menus: !isReplictionChecked
+            ? allMenus.map((menu) => ({
+                MenuId: menu.MenuId,
+                View: menu.View,
+                Create: menu.Create,
+                Edit: menu.Edit,
+                Delete: menu.Delete,
+              }))
+            : [],
+        })
       )
       .then((response) => {
         console.log(response);
-      })
-      .catch((error) => {
-        console.error(error);
-      })
-      .finally(() => {
-        setIsCruding(false);
         toast.toast({
           title: "Operation Successful",
           description: `Role ${
             mode === "create" ? "Created" : "Updated"
           } Successfully`,
         });
+      })
+      .catch((error) => {
+        console.error(error);
+      })
+      .finally(() => {
+        setIsCruding(false);
         router.back();
       });
   }
@@ -80,7 +113,45 @@ const RoleCrud = ({ mode = "create", id = "0" }: Props) => {
     if (id !== "0") {
       GetRoleById();
     }
+    GetAllRoles();
+    GetAllMenus();
   }, [id]);
+
+  function GetAllRoles() {
+    helper.xhr
+      .Get("/Roles/GetAllRoles")
+      .then((response) => {
+        setRoles(
+          response.roles.map((role: any) => ({
+            label: role.RoleName,
+            value: role.RoleId,
+          }))
+        );
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
+  function GetAllMenus() {
+    helper.xhr
+      .Get("/Menu/GetAllMenus")
+      .then((response) => {
+        setAllMenus(
+          response.menus.map((menu: any) => ({
+            MenuId: menu.MenuId,
+            MenuName: menu.MenuName,
+            View: false,
+            Edit: false,
+            Create: false,
+            Delete: false,
+          }))
+        );
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
 
   function GetRoleById() {
     helper.xhr
@@ -95,6 +166,10 @@ const RoleCrud = ({ mode = "create", id = "0" }: Props) => {
         console.log(error);
       });
   }
+
+  const handleUpdateRoleAccess = (menuAccess: MenuExtendedProps[]) => {
+    setAllMenus(menuAccess);
+  };
 
   return (
     <div className="flex-1 space-y-4">
@@ -112,7 +187,7 @@ const RoleCrud = ({ mode = "create", id = "0" }: Props) => {
         <CardHeader></CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-2 gap-y-3">
+            <div className="grid grid-cols-1 md:grid-cols-4 xl:grid-cols-4 gap-2 gap-y-3">
               <InputTag
                 label="Role Name"
                 value={obj.RoleName}
@@ -120,6 +195,15 @@ const RoleCrud = ({ mode = "create", id = "0" }: Props) => {
                 name="RoleName"
                 placeHolder="Enter Role Name"
               />
+              <div className="col-span-2">
+                <InputTag
+                  label="Description"
+                  value={obj.Description}
+                  setter={handleChange}
+                  name="Description"
+                  placeHolder="Enter Role Description"
+                />
+              </div>
               <div className="flex items-end h-full">
                 <Toggle
                   label="Is Active"
@@ -129,13 +213,26 @@ const RoleCrud = ({ mode = "create", id = "0" }: Props) => {
                 />
               </div>
             </div>
-            <TextArea
-              label="Description"
-              value={obj.Description}
-              setter={handleChange}
-              name="Description"
-              placeHolder="Enter Role Description"
-            />
+          </div>
+          <div className="my-3 space-y-2">
+            <span className="text-sm">Access Control</span>
+            <RadioButton data={data} setradio={setIsReplicationChecked} />
+            {isReplictionChecked ? (
+              <div className="grid grid-cols-3">
+                <Dropdown
+                  name="Menus"
+                  options={roles}
+                  activeId={selectedRole}
+                  handleDropdownChange={(n, v) => setSelectedRole(Number(v))}
+                  label="Roles"
+                />
+              </div>
+            ) : (
+              <PermissionsComp
+                allMenus={allMenus}
+                onUpdateAccess={handleUpdateRoleAccess}
+              />
+            )}
           </div>
         </CardContent>
         <CardFooter>

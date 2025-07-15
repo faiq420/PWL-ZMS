@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Shield, Users, Menu, Save } from "lucide-react";
+import { Shield, Users, Menu, Save, View, Delete } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -45,40 +45,67 @@ export default function AccessControlPage() {
   const handleSavePermissions = () => {
     setIsCruding(true);
     Promise.allSettled(
-      roles.map((role: RoleProps) => {
-        return helper.xhr.Post(
-          "/Mapping/CreateMapping",
-          helper.ConvertToFormData({
-            MenuId: role.Menus,
-            RoleId: role.RoleId,
-          })
-        );
-      })
+      roles
+        .filter((role) => role.Menus.length > 0)
+        .map((role: RoleProps) => {
+          return helper.xhr.Post(
+            "/Mapping/CreateMapping",
+            helper.ConvertToFormData({
+              MenuId: role.Menus,
+              RoleId: role.RoleId,
+            })
+          );
+        })
     )
       .then((response) => {
         console.log(response);
+        toast({
+          title: "Permissions Updated",
+          description:
+            "Role-based menu access permissions have been saved successfully.",
+        });
       })
       .catch((error) => {
         console.log(error);
       })
       .finally(() => {
         setIsCruding(false);
-        toast({
-          title: "Permissions Updated",
-          description:
-            "Role-based menu access permissions have been saved successfully.",
-        });
       });
   };
 
-  const handleUpdateRoleAccess = (roleId: number, menuAccess: MenuProps[] | []) => {
+  const handleUpdateRoleAccess = (
+    roleId: number,
+    menuAccess: MenuProps[] | []
+  ) => {
     setRoles(
       roles.map((role) =>
         role.RoleId === roleId ? { ...role, Menus: menuAccess } : role
       )
     );
-    console.log(roles);
   };
+
+  // const handleAllMenuAccess = (
+  //   roleId: number,
+  //   menuId: number,
+  //   checked: boolean
+  // ) => {
+  //   const role = roles.find((role) => role.RoleId === roleId);
+  //   const menu = role?.Menus.map((menu) =>
+  //     menu.MenuId === menuId
+  //       ? { MenuId: menuId, View: true, Edit: true, Create: true, Delete: true }
+  //       : menu
+  //   );
+
+  //   console.log(menu);
+  //   // setRoles(
+  //   //   roles.map((role) =>
+  //   //     role.RoleId === roleId &&
+  //   //     role.Menus.find((menu) => menu.MenuId === menuId)
+  //   //       ? { ...role, Menus: [...role.Menus, menu] }
+  //   //       : role
+  //   //   )
+  //   // );
+  // };
 
   function GetRoleMenuMapping() {
     helper.xhr
@@ -102,7 +129,7 @@ export default function AccessControlPage() {
   }, []);
 
   return (
-    <div className="flex-1 space-y-4">
+    <div className="flex-1 space-y-4 w-full md:w-min-[83vw] md:w-max-[95vw] xl:w-min-[85vw]">
       <div className="flex items-center justify-between">
         <SectionIntro
           title="Access Control"
@@ -154,11 +181,11 @@ export default function AccessControlPage() {
         ))}
       </div>
 
-      <Tabs defaultValue="matrix" className="space-y-4 w-full flex flex-col">
+      <Tabs defaultValue="mapping" className="space-y-4 w-full flex flex-col">
         <TabsList className="w-full flex-1">
-          <TabsTrigger className="flex-1" value="matrix">
+          {/* <TabsTrigger className="flex-1" value="matrix">
             Access Matrix
-          </TabsTrigger>
+          </TabsTrigger> */}
           <TabsTrigger className="flex-1" value="mapping">
             Role Mapping
           </TabsTrigger>
@@ -167,7 +194,7 @@ export default function AccessControlPage() {
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="matrix" className="space-y-4">
+        {/* <TabsContent value="matrix" className="space-y-4 overflow-x-auto w-full">
           <Card>
             <CardHeader>
               <CardTitle>Permission Matrix</CardTitle>
@@ -176,7 +203,7 @@ export default function AccessControlPage() {
                 matrix format
               </CardDescription>
             </CardHeader>
-            <CardContent className="overflow-x-auto">
+            <CardContent className="w-full overflow-x-auto">
               <AccessMatrix
                 roles={roles}
                 menuItems={menuItems}
@@ -184,7 +211,7 @@ export default function AccessControlPage() {
               />
             </CardContent>
           </Card>
-        </TabsContent>
+        </TabsContent> */}
 
         <TabsContent value="mapping" className="space-y-4">
           <Card>

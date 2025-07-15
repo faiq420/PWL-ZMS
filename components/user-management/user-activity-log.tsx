@@ -178,9 +178,9 @@ export function UserActivityLog({ user }: UserActivityLogProps) {
       </CardHeader>
       <CardContent className="mt-4">
         <div className="space-y-2">
-          {filteredActivities.map((activity) => (
+          {filteredActivities.map((activity, index) => (
             <div
-              key={activity.id}
+              key={index}
               className="flex items-start space-x-3 p-3 border rounded-lg"
             >
               <div className="flex-shrink-0 mt-1">

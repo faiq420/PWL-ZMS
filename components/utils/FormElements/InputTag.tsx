@@ -14,6 +14,7 @@ interface Props {
   subfield?: string;
   isRequired?: boolean;
   onEnterPress?: () => void;
+  error?: string;
 }
 
 const InputTag = ({
@@ -28,6 +29,7 @@ const InputTag = ({
   subfield,
   isRequired,
   onEnterPress,
+  error = ""
 }: Props) => {
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && onEnterPress) {
@@ -49,7 +51,7 @@ const InputTag = ({
         )}
       </div>
       <Input
-        className={styles.input}
+        className={`${styles.input} ${error !== "" && "!border-red-600"}`}
         id={name}
         name={name}
         value={value}
@@ -65,6 +67,9 @@ const InputTag = ({
           }
         }}
       />
+      {error !== "" && (
+        <p className="text-xs self-end text-red-400">{error}</p>
+      )}
     </div>
   );
 };

@@ -218,13 +218,6 @@ export default function UserManagementPage() {
           </Tabs>
         </CardContent>
       </Card>
-      <UserModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSave={handleSaveUser}
-        user={selectedUser}
-      />
-         
     </div>
   );
 }

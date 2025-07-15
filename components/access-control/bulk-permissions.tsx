@@ -287,7 +287,7 @@ export function BulkPermissions({
               </Label>
               <div className="grid grid-cols-1 gap-2 max-h-32 overflow-y-auto border rounded-md p-2">
                 {roles
-                  .filter((role) => role.RoleId !== Number(sourceRole))
+                  .filter((role) => role.RoleId !== Number(sourceRole) && role.RoleName !== "Administrator")
                   .map((role) => (
                     <div
                       key={role.RoleId}

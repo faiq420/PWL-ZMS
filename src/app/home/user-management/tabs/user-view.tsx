@@ -85,7 +85,7 @@ const UserView = ({ mode = "create", id = "0" }: Props) => {
           lastLogin: response.user.LastLogin,
           permissions: response.permissions,
           phone: response.user.UserPhone,
-          ImagePath: `https://localhost:44383/user/${response.user.UserId}${response.user.Extension}` || "",
+          ImagePath: `https://localhost:44383/user/${response.user.UserId}${response.user.Extension}?v=${Date.now()}` || "",
           activityLog: response.logs,
         });
       })

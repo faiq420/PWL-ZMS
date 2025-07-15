@@ -28,10 +28,15 @@ export const formatPhoneNumber = (string: string) => {
 
   let result = "";
   if (len === 5) {
-    result = string.substring(0, 4) + "-" + string[4];
+    result = string.substring(0, 4) + string[4];
   } else {
-    result = string.substring(0, 12);
+    result = string.substring(0, 11);
   }
 
   return result;
+}
+
+export const validEmail = (string: string) => {
+  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return regex.test(string) ? string : "";
 }

@@ -82,6 +82,7 @@ export function UserTable({ users, onDelete }: UserTableProps) {
       value: user.Id,
     });
     setIsModalOpen(true);
+    document.body.style.pointerEvents = "auto"; // because when close the modal the screen become unresponsive
   }
 
   function NavigateToRecord(mode: string, id?: number) {
@@ -128,12 +129,12 @@ export function UserTable({ users, onDelete }: UserTableProps) {
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Badge className={getRoleColor(user.role)}>
+                  <Badge className={getRoleColor(user.role)} variant={"outline"}>
                     {formatRole(user.role)}
                   </Badge>
                 </TableCell>
                 <TableCell>
-                  <Badge className={getStatusColor(user.status)}>
+                  <Badge className={getStatusColor(user.status)} variant={"outline"}>
                     {user.status}
                   </Badge>
                 </TableCell>
@@ -209,18 +210,17 @@ export function UserTable({ users, onDelete }: UserTableProps) {
             ))}
           </TableBody>
         </Table>
+        <Modal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onDelete={(id: number) => {
+            onDelete(id);
+            setIsModalOpen(false);
+          }}
+          item={selectedUser !== null ? selectedUser : { label: "", value: 0 }}
+          type="User"
+        />
       </div>
-
-      <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onDelete={(id: number) => {
-          onDelete(id);
-          setIsModalOpen(false);
-        }}
-        item={selectedUser !== null ? selectedUser : { label: "", value: 0 }}
-        type="User"
-      />
     </>
   );
 }

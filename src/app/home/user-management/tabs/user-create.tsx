@@ -15,7 +15,7 @@ import InputTag from "@/components/utils/FormElements/InputTag";
 import Checkbox from "@/components/utils/FormElements/Checkbox";
 import { FileUploader } from "@/components/animal/file-uploader";
 import Toggle from "@/components/utils/FormElements/Toggle";
-import { formatCnic } from "@/Helper/Utility";
+import { formatCnic, formatPhoneNumber, validEmail } from "@/Helper/Utility";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import useHelper from "@/Helper/helper";
@@ -54,6 +54,11 @@ const UserCreate = ({ mode = "create", id = "0" }: Props) => {
   const helper = useHelper();
   const [imgFile, setImgFile] = useState<File | null>(null);
   const [isCruding, setIsCruding] = useState<boolean>(false);
+  const [isValidInput, setIsValidInput] = useState<{
+    email: boolean;
+    cnic: boolean;
+    contact: boolean;
+  }>({ email: true, cnic: true, contact: true });
   const toast = useToast();
   const [obj, setObj] = useState<UserObject>({
     UserId: 0,
@@ -100,6 +105,28 @@ const UserCreate = ({ mode = "create", id = "0" }: Props) => {
     }
   };
 
+  function validations(data: {
+    UserId: number;
+    UserEmail: string;
+    UserName: string;
+    UserPhone: string;
+    IsActive: boolean;
+    UserCnic: string;
+    RoleId: number;
+  }): boolean {
+    const isValidEmail = Boolean(validEmail(data.UserEmail));
+    const isValidCnic = data.UserCnic.length === 15;
+    const isValidPhone = data.UserPhone.length === 11;
+
+    setIsValidInput({
+      email: isValidEmail,
+      cnic: isValidCnic,
+      contact: isValidPhone,
+    });
+
+    return isValidEmail && isValidCnic && isValidPhone;
+  }
+
   useEffect(() => {
     // Fetch roles from the server
     helper.xhr
@@ -118,7 +145,6 @@ const UserCreate = ({ mode = "create", id = "0" }: Props) => {
 
   useEffect(() => {
     if (id && id !== "0") {
-      // Fetch user data by ID
       helper.xhr
         .Get(
           "/Users/GetUserById",
@@ -129,7 +155,7 @@ const UserCreate = ({ mode = "create", id = "0" }: Props) => {
           setObj({
             ...response.user,
             ImagePath:
-              `https://localhost:44383/user/${response.user.UserId}${response.user.Extension}` ||
+              `https://localhost:44383/user/${response.user.UserId}${response.user.Extension}?v=${Date.now()}` ||
               "",
             UserPassword: "",
           });
@@ -157,6 +183,7 @@ const UserCreate = ({ mode = "create", id = "0" }: Props) => {
       UserCnic: obj.UserCnic,
       RoleId: obj.RoleId,
     };
+    if (!validations(data)) return;
     helper.xhr
       .Post(
         `/Users/${mode === "create" ? "CreateUser" : "UpdateUser"}`,
@@ -168,18 +195,18 @@ const UserCreate = ({ mode = "create", id = "0" }: Props) => {
       )
       .then((response) => {
         console.log(response);
-      })
-      .catch((error) => {
-        console.log(error);
-      })
-      .finally(() => {
-        setIsCruding(false);
         toast.toast({
           title: "Operation Successful",
           description: `User ${
             mode === "create" ? "Created" : "Updated"
           } Successfully`,
         });
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+      .finally(() => {
+        setIsCruding(false);
         router.back();
       });
   }
@@ -273,6 +300,7 @@ const UserCreate = ({ mode = "create", id = "0" }: Props) => {
                 setter={handleChange}
                 label="User Name"
                 placeHolder="User Name"
+                isRequired={true}
               />
               <InputTag
                 name="UserCnic"
@@ -282,6 +310,8 @@ const UserCreate = ({ mode = "create", id = "0" }: Props) => {
                 }}
                 placeHolder="xxxxx-xxxxxxx-x"
                 label="Cnic"
+                error={!isValidInput.cnic ? "Incorrect cnic" : ""}
+                isRequired={true}
               />
               <InputTag
                 name="UserEmail"
@@ -289,13 +319,19 @@ const UserCreate = ({ mode = "create", id = "0" }: Props) => {
                 setter={handleChange}
                 label="Email"
                 placeHolder="example@org.com"
+                error={!isValidInput.email ? "Incorrect email" : ""}
+                isRequired={true}
               />
               <InputTag
                 name="UserPhone"
                 value={obj.UserPhone}
-                setter={handleChange}
+                setter={(n, v) => {
+                  handleChange(n, formatPhoneNumber(v));
+                }}
                 label="Contact"
                 placeHolder="03xx-xxxxxxx"
+                error={!isValidInput.contact ? "Incorrect phone" : ""}
+                isRequired={true}
               />
               <Dropdown
                 name="RoleId"

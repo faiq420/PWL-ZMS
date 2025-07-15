@@ -61,7 +61,7 @@ export function RoleTable({ roles, onEdit, onDelete }: RoleTableProps) {
                 <Badge className={getRoleLevelColor(role.level)}>Level {role.level}</Badge>
               </TableCell> */}
               <TableCell>
-                <Badge variant={role.IsActive ? "default" : "secondary"}>
+                <Badge variant={"outline"} className="bg-green-100 text-green-800">
                   {role.IsActive ? "Active" : "Inactive"}
                 </Badge>
               </TableCell>
