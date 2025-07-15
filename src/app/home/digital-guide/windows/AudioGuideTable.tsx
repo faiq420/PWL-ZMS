@@ -35,7 +35,8 @@ const AudioGuideTable = () => {
       duration: "3:45",
       zoo: "Lahore Zoo",
       lastUpdated: "2023-05-15",
-      audioFile: "/audio/elephant-exhibit.mp3",
+      audioFile:
+        "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
       transcript:
         "Welcome to the African Elephant exhibit. The African elephant is the largest living terrestrial animal...",
       narrator: "David Attenborough",
@@ -46,7 +47,8 @@ const AudioGuideTable = () => {
       duration: "4:20",
       zoo: "Lahore Zoo",
       lastUpdated: "2023-06-22",
-      audioFile: "/audio/big-cat-kingdom.mp3",
+      audioFile:
+        "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
       transcript:
         "Welcome to the Big Cat Kingdom. Here you'll find our magnificent lions, tigers, and leopards...",
       narrator: "Jane Goodall",
@@ -57,7 +59,8 @@ const AudioGuideTable = () => {
       duration: "2:50",
       zoo: "Lahore Safari Park",
       lastUpdated: "2023-07-10",
-      audioFile: "/audio/penguin-colony.mp3",
+      audioFile:
+        "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
       transcript:
         "Welcome to our Penguin Colony. These remarkable birds have adapted to some of the harshest conditions on Earth...",
       narrator: "Chris Packham",
@@ -68,7 +71,8 @@ const AudioGuideTable = () => {
       duration: "5:15",
       zoo: "Bahawalpur Zoo",
       lastUpdated: "2023-08-05",
-      audioFile: "/audio/rainforest-experience.mp3",
+      audioFile:
+        "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
       transcript:
         "Welcome to the Rainforest Experience. Tropical rainforests are home to over half of the world's plant and animal species...",
       narrator: "Steve Backshall",
@@ -79,7 +83,8 @@ const AudioGuideTable = () => {
       duration: "4:00",
       zoo: "Bahawalpur Zoo",
       lastUpdated: "2023-09-18",
-      audioFile: "/audio/reptile-house.mp3",
+      audioFile:
+        "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
       transcript:
         "Welcome to the Reptile House. Reptiles are a diverse group of animals that have been on Earth for over 300 million years...",
       narrator: "Mark O'Shea",
@@ -174,57 +179,58 @@ const AudioGuideTable = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
             {audioGuides.map((audio) => (
-              <div key={audio.id} className="flex gap-4 border rounded-lg p-4">
-                <div className="flex-shrink-0 flex items-center justify-center h-12 w-12 bg-gray-100 rounded-full">
-                  <Headphones className="h-6 w-6 text-gray-400" />
-                </div>
-                <div className="flex-1 flex flex-col">
-                  <h3 className="font-medium flex items-start justify-between gap-2 flex-1 text-sm">
-                    {audio.title}
-                    <span className="text-xs text-muted-foreground flex items-center">
-                      <Clock className="h-3 w-3 mr-1" />
-                      {audio.duration}
-                    </span>
-                  </h3>
-                  <p className="text-xs text-muted-foreground flex items-center">
-                    <MapPin className="h-3 w-3 mr-1" /> {audio.zoo}
-                  </p>
-                  <div className="flex-shrink-0 flex gap-1">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => toggleAudioPlayback(audio.id)}
-                    >
-                      {playingAudioId === audio.id ? (
-                        <Pause className="h-3 w-3" />
-                      ) : (
-                        <Play className="h-3 w-3" />
-                      )}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        router.push(
-                          NavigateToRecord("guide", "audio", "edit", audio.id)
-                        );
-                      }}
-                    >
-                      <Edit className="h-3 w-3" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => openDeleteDialog("audio", audio)}
-                    >
-                      <Trash2 className="h-3 w-3" />
-                    </Button>
+              <div key={audio.id} className="border rounded-lg p-4">
+                <div className="flex gap-4">
+                  <div className="flex-shrink-0 flex items-center justify-center h-12 w-12 bg-gray-100 rounded-full">
+                    <Headphones className="h-6 w-6 text-gray-400" />
                   </div>
-                  <div className="flex items-center text-sm text-muted-foreground mt-1">
-                    {/* <span className="mx-2">•</span>
+                  <div className="flex-1 flex flex-col">
+                    <h3 className="font-medium flex items-start justify-between gap-2 flex-1 text-sm">
+                      {audio.title}
+                      <span className="text-xs text-muted-foreground flex items-center">
+                        <Clock className="h-3 w-3 mr-1" />
+                        {audio.duration}
+                      </span>
+                    </h3>
+                    <p className="text-xs text-muted-foreground flex items-center">
+                      <MapPin className="h-3 w-3 mr-1" /> {audio.zoo}
+                    </p>
+                    <div className="flex-shrink-0 flex gap-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => toggleAudioPlayback(audio.id)}
+                      >
+                        {playingAudioId === audio.id ? (
+                          <Pause className="h-3 w-3" />
+                        ) : (
+                          <Play className="h-3 w-3" />
+                        )}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          router.push(
+                            NavigateToRecord("guide", "audio", "edit", audio.id)
+                          );
+                        }}
+                      >
+                        <Edit className="h-3 w-3" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => openDeleteDialog("audio", audio)}
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    </div>
+                    <div className="flex items-center text-sm text-muted-foreground mt-1">
+                      {/* <span className="mx-2">•</span>
                     <Volume2 className="h-3 w-3 mr-1" /> */}
-                  </div>
-                  {/* <div className="flex flex-wrap gap-1 mt-2">
+                    </div>
+                    {/* <div className="flex flex-wrap gap-1 mt-2">
                     {audio.languages.map((lang) => (
                       <span
                         key={lang}
@@ -234,9 +240,11 @@ const AudioGuideTable = () => {
                       </span>
                     ))}
                   </div> */}
-                  {playingAudioId === audio.id && (
-                    <div className="mt-3">
-                      <div className="text-xs text-muted-foreground mb-1">
+                  </div>
+                </div>
+                {playingAudioId === audio.id && (
+                  <div className="mt-3">
+                    {/* <div className="text-xs text-muted-foreground mb-1">
                         Now playing...
                       </div>
                       <div className="flex items-center gap-2">
@@ -247,10 +255,13 @@ const AudioGuideTable = () => {
                           className="w-full"
                         />
                         <span className="text-xs">1:45 / {audio.duration}</span>
-                      </div>
-                    </div>
-                  )}
-                </div>
+                      </div> */}
+                    <audio controls className="w-full">
+                      <source src={audio.audioFile} type="audio/mpeg" />
+                      Your browser does not support the audio element.
+                    </audio>
+                  </div>
+                )}
               </div>
             ))}
           </div>
