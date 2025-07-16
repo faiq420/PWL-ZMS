@@ -293,7 +293,7 @@ const UserCreate = ({ mode = "create", id = "0" }: Props) => {
               )}
               <Label className="text-center block w-full">Profile Image</Label>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-2 gap-y-3 items-center">
+            <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-2 gap-y-3 items-start">
               <InputTag
                 name="UserName"
                 value={obj.UserName}
@@ -367,7 +367,7 @@ const UserCreate = ({ mode = "create", id = "0" }: Props) => {
                   placeHolder="VET-2024-001"
                 />
               )}
-              <div className="flex h-full items-end">
+              <div className={`flex h-full ${isValidInput.contact ? 'items-end' : 'items-center'}`}>
                 <Toggle
                   name="IsActive"
                   value={obj.IsActive}
