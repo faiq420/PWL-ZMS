@@ -60,8 +60,7 @@ export default function LoginPage() {
         }
       })
       .catch((e) => {
-        console.log(e.Message, "jiosdjsib");
-        setError(e.Message);
+        setError(e.message);
       })
       .finally(() => {
         setIsLoading(false);

@@ -214,26 +214,28 @@ const RoleCrud = ({ mode = "create", id = "0" }: Props) => {
               </div>
             </div>
           </div>
-          <div className="my-3 space-y-2">
-            <span className="text-sm">Access Control</span>
-            <RadioButton data={data} setradio={setIsReplicationChecked} />
-            {isReplictionChecked ? (
-              <div className="grid grid-cols-3">
-                <Dropdown
-                  name="Menus"
-                  options={roles}
-                  activeId={selectedRole}
-                  handleDropdownChange={(n, v) => setSelectedRole(Number(v))}
-                  label="Roles"
+          {mode !== "edit" && (
+            <div className="my-3 space-y-2">
+              <span className="text-sm">Access Control</span>
+              <RadioButton data={data} setradio={setIsReplicationChecked} />
+              {isReplictionChecked ? (
+                <div className="grid grid-cols-3">
+                  <Dropdown
+                    name="Menus"
+                    options={roles}
+                    activeId={selectedRole}
+                    handleDropdownChange={(n, v) => setSelectedRole(Number(v))}
+                    label="Roles"
+                  />
+                </div>
+              ) : (
+                <PermissionsComp
+                  allMenus={allMenus}
+                  onUpdateAccess={handleUpdateRoleAccess}
                 />
-              </div>
-            ) : (
-              <PermissionsComp
-                allMenus={allMenus}
-                onUpdateAccess={handleUpdateRoleAccess}
-              />
-            )}
-          </div>
+              )}
+            </div>
+          )}
         </CardContent>
         <CardFooter>
           <div className="w-full flex justify-end">

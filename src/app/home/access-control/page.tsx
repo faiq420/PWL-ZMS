@@ -60,13 +60,18 @@ export default function AccessControlPage() {
       .then((response) => {
         console.log(response);
         toast({
-          title: "Permissions Updated",
+          title: "Permissions Updated Successfully",
           description:
             "Role-based menu access permissions have been saved successfully.",
+          variant: "success",
         });
       })
       .catch((error) => {
-        console.log(error);
+        toast({
+          title: "Permissions Not Updated",
+          description: error.message,
+          variant: "success",
+        });
       })
       .finally(() => {
         setIsCruding(false);

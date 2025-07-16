@@ -165,15 +165,13 @@ const useHelper = () => {
           Authorization: "Bearer " + getData("token"),
         }),
       });
-      // console.clear();
+      console.clear();
       if (response.ok) {
         const data = await response.json();
         return data;
       } else {
         const err = await response.json();
-        console.error(err);
-        alert(err.Message)
-        throw new Error(err);
+        throw new Error(err.Message);
       }
     },
     Get: async (
