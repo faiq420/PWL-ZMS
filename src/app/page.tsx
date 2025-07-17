@@ -42,6 +42,8 @@ export default function LoginPage() {
     setIsLoading(true);
     setError("");
 
+    if (email === "" || password === "") { setError("Email And Password is required"); setIsLoading(false); return; }
+
     helper.xhr
       .Post(
         "/Auth/Login",

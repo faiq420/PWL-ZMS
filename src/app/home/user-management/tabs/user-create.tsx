@@ -59,7 +59,7 @@ const UserCreate = ({ mode = "create", id = "0" }: Props) => {
     cnic: boolean;
     contact: boolean;
   }>({ email: true, cnic: true, contact: true });
-  const toast = useToast();
+  const { toast } = useToast();
   const [obj, setObj] = useState<UserObject>({
     UserId: 0,
     UserEmail: "",
@@ -155,8 +155,9 @@ const UserCreate = ({ mode = "create", id = "0" }: Props) => {
           setObj({
             ...response.user,
             ImagePath:
-              `https://localhost:44383/user/${response.user.UserId}${response.user.Extension}?v=${Date.now()}` ||
-              "",
+              `https://localhost:44383/user/${response.user.UserId}${
+                response.user.Extension
+              }?v=${Date.now()}` || "",
             UserPassword: "",
           });
         })
@@ -194,16 +195,20 @@ const UserCreate = ({ mode = "create", id = "0" }: Props) => {
         })
       )
       .then((response) => {
-        console.log(response);
-        toast.toast({
-          title: "Operation Successful",
-          description: `User ${
+        toast({
+          title: `User ${mode === "edit" ? "Updated" : "Created"} Successfully`,
+          description: `User \"${data.UserName}\" ${
             mode === "create" ? "Created" : "Updated"
           } Successfully`,
+          variant: "success",
         });
       })
       .catch((error) => {
-        console.log(error);
+        toast({
+          title: `User Not ${mode === "edit" ? "Updated" : "Created"} Successfully`,
+          description: error.message,
+          variant: "danger",
+        });
       })
       .finally(() => {
         setIsCruding(false);
@@ -367,7 +372,11 @@ const UserCreate = ({ mode = "create", id = "0" }: Props) => {
                   placeHolder="VET-2024-001"
                 />
               )}
-              <div className={`flex h-full ${isValidInput.contact ? 'items-end' : 'items-center'}`}>
+              <div
+                className={`flex h-full ${
+                  isValidInput.contact ? "items-end" : "items-center"
+                }`}
+              >
                 <Toggle
                   name="IsActive"
                   value={obj.IsActive}
