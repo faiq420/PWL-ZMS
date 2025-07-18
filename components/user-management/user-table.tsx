@@ -135,7 +135,7 @@ export function UserTable({ users, onDelete }: UserTableProps) {
                 </TableCell>
                 <TableCell>
                   <Badge className={getStatusColor(user.status)} variant={"outline"}>
-                    {user.status}
+                    {formatRole(user.status)}
                   </Badge>
                 </TableCell>
                 <TableCell>
