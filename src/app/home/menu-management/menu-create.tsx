@@ -40,7 +40,7 @@ type MenuItemProps = {
 const MenuCreate = ({ mode = "create", id = "0" }: Props) => {
   const router = useRouter();
   const helper = useHelper();
-  const toast = useToast();
+  const { toast } = useToast();
   const [menus, setMenus] = useState<OPTION[]>([]);
   const [icons, setIcons] = useState<OPTION[]>([]);
   const [isCruding, setIsCruding] = useState<boolean>(false);
@@ -97,15 +97,17 @@ const MenuCreate = ({ mode = "create", id = "0" }: Props) => {
   }, [id]);
 
   function GetMenuById() {
-    helper.xhr.Get(
-      '/Menu/GetMenuById',
-      helper.GetURLParamString({ MenuId: Number(id) }).toString()
-    ).then((response) => {
-      // console.log(response);
-      setObj(response.menu);
-    }).catch((error) => {
-      console.error(error);
-    })
+    helper.xhr
+      .Get(
+        "/Menu/GetMenuById",
+        helper.GetURLParamString({ MenuId: Number(id) }).toString()
+      )
+      .then((response) => {
+        setObj(response.menu);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   }
 
   const capitalize = (value: string, space = " ") => {
@@ -124,26 +126,40 @@ const MenuCreate = ({ mode = "create", id = "0" }: Props) => {
 
   function handleChange(name: string, value: string | number) {
     console.log(value);
-    if(name==="SortingOrder" && (String(value).includes("-") || Number(value) < 0)) return;
+    if (
+      name === "SortingOrder" &&
+      (String(value).includes("-") || Number(value) < 0)
+    )
+      return;
     setObj((prev: any) => ({ ...prev, [name]: value }));
   }
 
   function HandleSubmit() {
     setIsCruding(true);
     helper.xhr
-      .Post(`/Menu/${mode === "create" ? "CreateMenu" : "UpdateMenu"}`, helper.ConvertToFormData({ obj: obj }))
+      .Post(
+        `/Menu/${mode === "create" ? "CreateMenu" : "UpdateMenu"}`,
+        helper.ConvertToFormData({ obj: obj })
+      )
       .then((response) => {
         console.log(response);
+        toast({
+          title: `Menu ${mode === "edit" ? "Updated" : "Created"} Successfully`,
+          description: `Menu \"${obj.MenuName}\" ${
+            mode === "create" ? "Created" : "Updated"
+          } Successfully`,
+          variant: "success"
+        });
       })
       .catch((error) => {
-        console.log(error);
+        toast({
+          title: `Menu Not ${mode === "edit" ? "Updated" : "Created"} Successfully`,
+          description: error.message,
+          variant: "danger"
+        });
       })
       .finally(() => {
         setIsCruding(false);
-        toast.toast({
-          title: "Operation Successful",
-          description: `Menu ${mode === "create" ? "Created" : "Updated"} Successfully`,
-        });
         router.back();
       });
   }
@@ -211,7 +227,7 @@ const MenuCreate = ({ mode = "create", id = "0" }: Props) => {
             </div>
             <TextArea
               name="Description"
-              value={obj.Description}
+              value={!!obj.Description ? obj.Description : "" }
               setter={handleChange}
               label="Description"
             />

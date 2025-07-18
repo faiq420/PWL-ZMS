@@ -150,13 +150,19 @@ export function BulkPermissions({
       .then((response) => {
         console.log(response);
         toast({
-          title: "Permissions Updated",
+          title: "Permissions Updated Successfully",
           description:
             "Role-based menu access permissions have been saved successfully.",
+          variant: "success"
         });
       })
       .catch((error) => {
         console.log(error);
+        toast({
+          title: "Permissions Not Updated Successfully",
+          description: error.message,
+          variant: "danger"
+        });
       })
       .finally(() => {
         targetRoles.map((role) => {

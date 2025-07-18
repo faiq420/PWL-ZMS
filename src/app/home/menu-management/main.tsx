@@ -194,6 +194,7 @@ export default function MenuManagementPage() {
         toast({
           title: "Reordering Successful",
           description: 'Menu Reordered Successfully',
+          variant: "success"
         });
       })
       .catch((error) => {

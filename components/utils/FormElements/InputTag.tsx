@@ -68,7 +68,7 @@ const InputTag = ({
         }}
       />
       {error !== "" && (
-        <p className="text-xs self-end text-red-400">{error}</p>
+        <span className="text-xs self-end text-red-400 !m-0">{error}</span>
       )}
     </div>
   );

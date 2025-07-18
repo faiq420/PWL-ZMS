@@ -155,7 +155,7 @@ const UserCreate = ({ mode = "create", id = "0" }: Props) => {
           setObj({
             ...response.user,
             ImagePath:
-              `https://localhost:44383/user/${response.user.UserId}${
+              `/user/${response.user.UserId}${
                 response.user.Extension
               }?v=${Date.now()}` || "",
             UserPassword: "",
@@ -238,8 +238,8 @@ const UserCreate = ({ mode = "create", id = "0" }: Props) => {
                   <Image
                     src={
                       obj?.ImagePath && obj?.ImagePath != ""
-                        ? // ? helper.GetDocument(obj.ImagePath)
-                          obj.ImagePath
+                        ?  helper.GetDocument(obj.ImagePath)
+                          
                         : imgFile
                         ? URL.createObjectURL(imgFile)
                         : "/placeholder.svg"

@@ -36,7 +36,7 @@ export interface MenuExtendedProps extends MenuProps {
 const RoleCrud = ({ mode = "create", id = "0" }: Props) => {
   const router = useRouter();
   const helper = useHelper();
-  const toast = useToast();
+  const { toast } = useToast();
   const [isCruding, setIsCruding] = useState<boolean>(false);
   const [obj, setObj] = useState({
     RoleId: 0,
@@ -93,15 +93,20 @@ const RoleCrud = ({ mode = "create", id = "0" }: Props) => {
       )
       .then((response) => {
         console.log(response);
-        toast.toast({
-          title: "Operation Successful",
-          description: `Role ${
+        toast({
+          title: `Role ${mode === "edit" ? "Updated" : "Created"} Successfully`,
+          description: `Role \"${obj.RoleName}\" ${
             mode === "create" ? "Created" : "Updated"
           } Successfully`,
+          variant: "success",
         });
       })
       .catch((error) => {
-        console.error(error);
+        toast({
+          title: `Role Not ${mode === "edit" ? "Updated" : "Created"} Successfully`,
+          description: error.message,
+          variant: "success",
+        });
       })
       .finally(() => {
         setIsCruding(false);
