@@ -29,7 +29,7 @@ const InputTag = ({
   subfield,
   isRequired,
   onEnterPress,
-  error = ""
+  error = "",
 }: Props) => {
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && onEnterPress) {
@@ -38,18 +38,22 @@ const InputTag = ({
   };
 
   return (
-    <div className={`${styles.inputGroup} space-y-[6px] flex-1`}>
-      <div className="flex items-center space-x-2 text-[10px]">
-        {label && (
-          <Label htmlFor={name}>
-            {label}
-            {isRequired && <span className="text-red-900">*</span>}
-          </Label>
-        )}
-        {subfield && (
-          <span className="text-gray-400 text-[10px] text-center">{`( ${subfield} )`}</span>
-        )}
-      </div>
+    <div
+      className={`${styles.inputGroup} ${label ? "space-y-[6px]" : ""} flex-1`}
+    >
+      {label && (
+        <div className="flex items-center space-x-2 text-[10px]">
+          {label && (
+            <Label htmlFor={name}>
+              {label}
+              {isRequired && <span className="text-red-900">*</span>}
+            </Label>
+          )}
+          {subfield && (
+            <span className="text-gray-400 text-[10px] text-center">{`( ${subfield} )`}</span>
+          )}
+        </div>
+      )}
       <Input
         className={`${styles.input} ${error !== "" && "!border-red-600"}`}
         id={name}

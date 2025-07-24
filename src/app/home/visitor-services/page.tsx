@@ -1,32 +1,65 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FoodAndDining } from "@/components/visitor-services/food-and-dining";
-import { FacilitiesAndSafety } from "@/components/visitor-services/facilities-and-safety";
-import SectionIntro from "@/components/utils/Headings/SectionIntro";
+"use client";
+import { useRouter, useSearchParams } from "next/navigation";
+import React, { Suspense, useEffect } from "react";
+import VisitorServicesPage from "./main";
+import FoodCourt from "./Cruds/FoodCourt";
+import Cafetaria from "./Cruds/Cafetaria";
+import Safety from "./Cruds/Safety";
+import Facility from "./Cruds/Facility";
+import FirstAid from "./Cruds/FirstAid";
 
-export default function VisitorServicesPage() {
-  return (
-    <div className="flex-1 space-y-4">
-      <SectionIntro
-        title="Visitor Services"
-        description="Manage all visitor-related services including food, dining, facilities, and safety."
-      />
+const PageContent = () => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
-      <Tabs defaultValue="food-dining" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="food-dining">Food & Dining</TabsTrigger>
-          <TabsTrigger value="facilities-safety">
-            Facilities, First Aid & Safety
-          </TabsTrigger>
-        </TabsList>
+  const tabs = [
+    "food-court",
+    "restaurant-canteen-cart",
+    "facilities",
+    "first-aid",
+    "safety",
+  ];
+  const crudModes = ["create", "edit", "view"];
+  const activeTab = searchParams.get("tab");
+  const id = searchParams.get("id") || undefined;
+  const mode = searchParams.get("mode") || undefined;
 
-        <TabsContent value="food-dining" className="space-y-4">
-          <FoodAndDining />
-        </TabsContent>
+  useEffect(() => {
+    if (!activeTab || !tabs.includes(activeTab)) {
+      router.replace("/home/visitor-services");
+    }
+  }, [activeTab]);
 
-        <TabsContent value="facilities-safety" className="space-y-4">
-          <FacilitiesAndSafety />
-        </TabsContent>
-      </Tabs>
-    </div>
-  );
-}
+  if (!activeTab || !tabs.includes(activeTab)) {
+    return <VisitorServicesPage />;
+  }
+
+  const props = {
+    mode: crudModes.includes(mode ?? "") ? mode : "create",
+    tab: activeTab,
+    id,
+  };
+
+  switch (activeTab) {
+    case "food-court":
+      return <FoodCourt {...props} />;
+    case "restaurant-canteen-cart":
+      return <Cafetaria {...props} />;
+    case "facilities":
+      return <Facility {...props} />;
+    case "safety":
+      return <Safety {...props} />;
+    case "first-aid":
+      return <FirstAid {...props} />;
+    default:
+      return <p>Invalid tab.</p>;
+  }
+};
+
+const Page = () => (
+  <Suspense fallback={<div>Loading...</div>}>
+    <PageContent />
+  </Suspense>
+);
+
+export default Page;

@@ -23,7 +23,7 @@ const Checkbox = ({
     <div className="flex items-center space-x-[10px]">
       <input
         title="name"
-        className="w-4 h-4 accent-main-frostyBlue cursor-pointer"
+        className="w-4 h-4 accent-primary cursor-pointer"
         // id={name}
         type="checkbox"
         name={name}

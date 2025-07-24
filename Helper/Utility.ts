@@ -46,6 +46,7 @@ type ScreenKey =
   | "inspection"
   | "role"
   | "menu"
+  | "services"
   | "access";
 
 export const NavigateToRecord = (
@@ -60,6 +61,7 @@ export const NavigateToRecord = (
     guide: "digital-guide",
     animal: "animal-management",
     visits: "visit-planning",
+    services: "visitor-services",
     inspection: "veterinary-inspection",
     role: "role-management",
     menu: "menu-management",
