@@ -7,7 +7,7 @@ const useHelper = () => {
   const API: string =
     process.env.NODE_ENV === "development"
       ? "https://localhost:44383"
-      : "https://pwlzoo.runasp.net"
+      : "https://zms.runasp.net"
       // : "https://zms.com";
   const headers: Headers = new Headers({
     Authorization: "Bearer " + getData("token"),

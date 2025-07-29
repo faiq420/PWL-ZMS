@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
+import { useState } from "react";
 import {
   Plus,
   Search,
@@ -13,12 +13,19 @@ import {
   Accessibility,
   AmbulanceIcon as FirstAid,
   ShieldAlert,
-} from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Badge } from "@/components/ui/badge"
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -27,10 +34,16 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -40,7 +53,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+} from "@/components/ui/alert-dialog";
 
 // Sample data for facilities
 const initialFacilities = [
@@ -70,7 +83,12 @@ const initialFacilities = [
     type: "information",
     location: "Main Plaza",
     status: "operational",
-    features: ["Information desk", "Lost and found", "Tour booking", "Gift shop"],
+    features: [
+      "Information desk",
+      "Lost and found",
+      "Tour booking",
+      "Gift shop",
+    ],
     lastMaintenance: "2023-04-30",
     description: "Central information hub for visitors with various services.",
   },
@@ -82,9 +100,10 @@ const initialFacilities = [
     status: "maintenance",
     features: ["Seating", "Shade", "Water fountains"],
     lastMaintenance: "2023-05-20",
-    description: "Covered seating area for visitors to rest in the Rainforest Zone.",
+    description:
+      "Covered seating area for visitors to rest in the Rainforest Zone.",
   },
-]
+];
 
 // Sample data for first aid stations
 const initialFirstAid = [
@@ -118,10 +137,23 @@ const initialFirstAid = [
     equipment: ["First aid kits", "Emergency phone"],
     description: "Unstaffed first aid cabinet with emergency communication.",
   },
-]
+];
+
+// Types for safety features
+type SafetyItem = {
+  id: string;
+  name: string;
+  type: string;
+  locations: string[];
+  lastUpdated: string;
+  status: string;
+  description: string;
+  lastDrill?: string;
+  lastInspection?: string;
+};
 
 // Sample data for safety features
-const initialSafety = [
+const initialSafety: SafetyItem[] = [
   {
     id: "safety-1",
     name: "Emergency Evacuation Plan",
@@ -130,7 +162,8 @@ const initialSafety = [
     lastUpdated: "2023-04-01",
     lastDrill: "2023-03-15",
     status: "active",
-    description: "Comprehensive evacuation plan with marked routes throughout the zoo.",
+    description:
+      "Comprehensive evacuation plan with marked routes throughout the zoo.",
   },
   {
     id: "safety-2",
@@ -150,46 +183,46 @@ const initialSafety = [
     lastUpdated: "2023-02-15",
     lastDrill: "2023-01-30",
     status: "active",
-    description: "Procedures for severe weather events including shelter locations.",
+    description:
+      "Procedures for severe weather events including shelter locations.",
   },
   {
     id: "safety-4",
     name: "Fire Suppression System",
-    type: "equipment",
+    type: "evacuation",
     locations: ["All buildings"],
     lastUpdated: "2023-01-15",
     lastInspection: "2023-04-10",
     status: "active",
-    description: "Automatic sprinkler and alarm systems in all enclosed structures.",
+    description:
+      "Automatic sprinkler and alarm systems in all enclosed structures.",
   },
-]
+];
 
 export function FacilitiesAndSafety() {
-  const [activeTab, setActiveTab] = useState("facilities")
-  const [facilities, setFacilities] = useState(initialFacilities)
-  const [firstAid, setFirstAid] = useState(initialFirstAid)
-  const [safety, setSafety] = useState(initialSafety)
+  const [activeTab, setActiveTab] = useState("facilities");
+  const [facilities, setFacilities] = useState(initialFacilities);
+  const [firstAid, setFirstAid] = useState(initialFirstAid);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const [searchQuery, setSearchQuery] = useState("")
+  const [selectedFacility, setSelectedFacility] = useState<any>(null);
+  const [selectedFirstAid, setSelectedFirstAid] = useState<any>(null);
+  const [selectedSafety, setSelectedSafety] = useState<any>(null);
+  const [safety, setSafety] = useState<SafetyItem[]>(initialSafety);
+  const [isAddingFacility, setIsAddingFacility] = useState(false);
+  const [isEditingFacility, setIsEditingFacility] = useState(false);
+  const [isAddingFirstAid, setIsAddingFirstAid] = useState(false);
+  const [isEditingFirstAid, setIsEditingFirstAid] = useState(false);
+  const [isAddingSafety, setIsAddingSafety] = useState(false);
+  const [isEditingSafety, setIsEditingSafety] = useState(false);
 
-  const [selectedFacility, setSelectedFacility] = useState<any>(null)
-  const [selectedFirstAid, setSelectedFirstAid] = useState<any>(null)
-  const [selectedSafety, setSelectedSafety] = useState<any>(null)
+  const [deleteFacilityDialog, setDeleteFacilityDialog] = useState(false);
+  const [deleteFirstAidDialog, setDeleteFirstAidDialog] = useState(false);
+  const [deleteSafetyDialog, setDeleteSafetyDialog] = useState(false);
 
-  const [isAddingFacility, setIsAddingFacility] = useState(false)
-  const [isEditingFacility, setIsEditingFacility] = useState(false)
-  const [isAddingFirstAid, setIsAddingFirstAid] = useState(false)
-  const [isEditingFirstAid, setIsEditingFirstAid] = useState(false)
-  const [isAddingSafety, setIsAddingSafety] = useState(false)
-  const [isEditingSafety, setIsEditingSafety] = useState(false)
-
-  const [deleteFacilityDialog, setDeleteFacilityDialog] = useState(false)
-  const [deleteFirstAidDialog, setDeleteFirstAidDialog] = useState(false)
-  const [deleteSafetyDialog, setDeleteSafetyDialog] = useState(false)
-
-  const [facilityToDelete, setFacilityToDelete] = useState<any>(null)
-  const [firstAidToDelete, setFirstAidToDelete] = useState<any>(null)
-  const [safetyToDelete, setSafetyToDelete] = useState<any>(null)
+  const [facilityToDelete, setFacilityToDelete] = useState<any>(null);
+  const [firstAidToDelete, setFirstAidToDelete] = useState<any>(null);
+  const [safetyToDelete, setSafetyToDelete] = useState<any>(null);
 
   // Form states
   const [facilityForm, setFacilityForm] = useState({
@@ -200,7 +233,7 @@ export function FacilitiesAndSafety() {
     features: "",
     lastMaintenance: "",
     description: "",
-  })
+  });
 
   const [firstAidForm, setFirstAidForm] = useState({
     name: "",
@@ -210,7 +243,7 @@ export function FacilitiesAndSafety() {
     staffingHours: "",
     equipment: "",
     description: "",
-  })
+  });
 
   const [safetyForm, setSafetyForm] = useState({
     name: "",
@@ -220,32 +253,34 @@ export function FacilitiesAndSafety() {
     lastDrill: "",
     status: "active",
     description: "",
-  })
+  });
 
   // Filter items based on search query
   const filteredFacilities = facilities.filter(
     (facility) =>
       facility.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      facility.location.toLowerCase().includes(searchQuery.toLowerCase()),
-  )
+      facility.location.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const filteredFirstAid = firstAid.filter(
     (station) =>
       station.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      station.location.toLowerCase().includes(searchQuery.toLowerCase()),
-  )
+      station.location.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const filteredSafety = safety.filter(
     (item) =>
       item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.type.toLowerCase().includes(searchQuery.toLowerCase()),
-  )
+      item.type.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   // Handle facility form submission
   const handleFacilitySubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    const featuresArray = facilityForm.features.split(",").map((feature) => feature.trim())
+    const featuresArray = facilityForm.features
+      .split(",")
+      .map((feature) => feature.trim());
 
     if (isEditingFacility && selectedFacility) {
       // Update existing facility
@@ -261,9 +296,9 @@ export function FacilitiesAndSafety() {
               lastMaintenance: facilityForm.lastMaintenance,
               description: facilityForm.description,
             }
-          : facility,
-      )
-      setFacilities(updatedFacilities)
+          : facility
+      );
+      setFacilities(updatedFacilities);
       setSelectedFacility({
         ...selectedFacility,
         name: facilityForm.name,
@@ -273,7 +308,7 @@ export function FacilitiesAndSafety() {
         features: featuresArray,
         lastMaintenance: facilityForm.lastMaintenance,
         description: facilityForm.description,
-      })
+      });
     } else {
       // Add new facility
       const newFacility = {
@@ -285,8 +320,8 @@ export function FacilitiesAndSafety() {
         features: featuresArray,
         lastMaintenance: facilityForm.lastMaintenance,
         description: facilityForm.description,
-      }
-      setFacilities([...facilities, newFacility])
+      };
+      setFacilities([...facilities, newFacility]);
     }
 
     // Reset form and state
@@ -298,16 +333,18 @@ export function FacilitiesAndSafety() {
       features: "",
       lastMaintenance: "",
       description: "",
-    })
-    setIsAddingFacility(false)
-    setIsEditingFacility(false)
-  }
+    });
+    setIsAddingFacility(false);
+    setIsEditingFacility(false);
+  };
 
   // Handle first aid form submission
   const handleFirstAidSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    const equipmentArray = firstAidForm.equipment.split(",").map((item) => item.trim())
+    const equipmentArray = firstAidForm.equipment
+      .split(",")
+      .map((item) => item.trim());
 
     if (isEditingFirstAid && selectedFirstAid) {
       // Update existing first aid station
@@ -319,23 +356,27 @@ export function FacilitiesAndSafety() {
               location: firstAidForm.location,
               status: firstAidForm.status,
               staffed: firstAidForm.staffed,
-              staffingHours: firstAidForm.staffed ? firstAidForm.staffingHours : "N/A",
+              staffingHours: firstAidForm.staffed
+                ? firstAidForm.staffingHours
+                : "N/A",
               equipment: equipmentArray,
               description: firstAidForm.description,
             }
-          : station,
-      )
-      setFirstAid(updatedFirstAid)
+          : station
+      );
+      setFirstAid(updatedFirstAid);
       setSelectedFirstAid({
         ...selectedFirstAid,
         name: firstAidForm.name,
         location: firstAidForm.location,
         status: firstAidForm.status,
         staffed: firstAidForm.staffed,
-        staffingHours: firstAidForm.staffed ? firstAidForm.staffingHours : "N/A",
+        staffingHours: firstAidForm.staffed
+          ? firstAidForm.staffingHours
+          : "N/A",
         equipment: equipmentArray,
         description: firstAidForm.description,
-      })
+      });
     } else {
       // Add new first aid station
       const newFirstAid = {
@@ -344,11 +385,13 @@ export function FacilitiesAndSafety() {
         location: firstAidForm.location,
         status: firstAidForm.status,
         staffed: firstAidForm.staffed,
-        staffingHours: firstAidForm.staffed ? firstAidForm.staffingHours : "N/A",
+        staffingHours: firstAidForm.staffed
+          ? firstAidForm.staffingHours
+          : "N/A",
         equipment: equipmentArray,
         description: firstAidForm.description,
-      }
-      setFirstAid([...firstAid, newFirstAid])
+      };
+      setFirstAid([...firstAid, newFirstAid]);
     }
 
     // Reset form and state
@@ -360,16 +403,18 @@ export function FacilitiesAndSafety() {
       staffingHours: "",
       equipment: "",
       description: "",
-    })
-    setIsAddingFirstAid(false)
-    setIsEditingFirstAid(false)
-  }
+    });
+    setIsAddingFirstAid(false);
+    setIsEditingFirstAid(false);
+  };
 
   // Handle safety form submission
   const handleSafetySubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    const locationsArray = safetyForm.locations.split(",").map((location) => location.trim())
+    const locationsArray = safetyForm.locations
+      .split(",")
+      .map((location) => location.trim());
 
     if (isEditingSafety && selectedSafety) {
       // Update existing safety item
@@ -385,9 +430,9 @@ export function FacilitiesAndSafety() {
               status: safetyForm.status,
               description: safetyForm.description,
             }
-          : item,
-      )
-      setSafety(updatedSafety)
+          : item
+      );
+      setSafety(updatedSafety);
       setSelectedSafety({
         ...selectedSafety,
         name: safetyForm.name,
@@ -397,7 +442,7 @@ export function FacilitiesAndSafety() {
         lastDrill: safetyForm.lastDrill,
         status: safetyForm.status,
         description: safetyForm.description,
-      })
+      });
     } else {
       // Add new safety item
       const newSafety = {
@@ -409,8 +454,8 @@ export function FacilitiesAndSafety() {
         lastDrill: safetyForm.lastDrill,
         status: safetyForm.status,
         description: safetyForm.description,
-      }
-      setSafety([...safety, newSafety])
+      };
+      setSafety([...safety, newSafety]);
     }
 
     // Reset form and state
@@ -422,13 +467,13 @@ export function FacilitiesAndSafety() {
       lastDrill: "",
       status: "active",
       description: "",
-    })
-    setIsAddingSafety(false)
-    setIsEditingSafety(false)
-  }
+    });
+    setIsAddingSafety(false);
+    setIsEditingSafety(false);
+  };
 
   // Handle edit facility
-  const handleEditFacility = (facility) => {
+  const handleEditFacility = (facility: (typeof initialFacilities)[number]) => {
     setFacilityForm({
       name: facility.name,
       type: facility.type,
@@ -437,12 +482,12 @@ export function FacilitiesAndSafety() {
       features: facility.features.join(", "),
       lastMaintenance: facility.lastMaintenance,
       description: facility.description,
-    })
-    setIsEditingFacility(true)
-  }
+    });
+    setIsEditingFacility(true);
+  };
 
   // Handle edit first aid
-  const handleEditFirstAid = (station) => {
+  const handleEditFirstAid = (station: (typeof initialFirstAid)[number]) => {
     setFirstAidForm({
       name: station.name,
       location: station.location,
@@ -451,69 +496,79 @@ export function FacilitiesAndSafety() {
       staffingHours: station.staffingHours,
       equipment: station.equipment.join(", "),
       description: station.description,
-    })
-    setIsEditingFirstAid(true)
-  }
+    });
+    setIsEditingFirstAid(true);
+  };
 
   // Handle edit safety
-  const handleEditSafety = (item) => {
+  const handleEditSafety = (item: (typeof initialSafety)[number]) => {
     setSafetyForm({
       name: item.name,
       type: item.type,
       locations: item.locations.join(", "),
       lastUpdated: item.lastUpdated,
-      lastDrill: item.lastDrill,
+      lastDrill: item.lastDrill || "",
       status: item.status,
       description: item.description,
-    })
-    setIsEditingSafety(true)
-  }
+    });
+    setIsEditingSafety(true);
+  };
 
   // Handle delete facility
   const handleDeleteFacility = () => {
     if (facilityToDelete) {
-      const updatedFacilities = facilities.filter((facility) => facility.id !== facilityToDelete.id)
-      setFacilities(updatedFacilities)
+      const updatedFacilities = facilities.filter(
+        (facility) => facility.id !== facilityToDelete.id
+      );
+      setFacilities(updatedFacilities);
 
       if (selectedFacility && selectedFacility.id === facilityToDelete.id) {
-        setSelectedFacility(null)
+        setSelectedFacility(null);
       }
     }
-    setDeleteFacilityDialog(false)
-    setFacilityToDelete(null)
-  }
+    setDeleteFacilityDialog(false);
+    setFacilityToDelete(null);
+  };
 
   // Handle delete first aid
   const handleDeleteFirstAid = () => {
     if (firstAidToDelete) {
-      const updatedFirstAid = firstAid.filter((station) => station.id !== firstAidToDelete.id)
-      setFirstAid(updatedFirstAid)
+      const updatedFirstAid = firstAid.filter(
+        (station) => station.id !== firstAidToDelete.id
+      );
+      setFirstAid(updatedFirstAid);
 
       if (selectedFirstAid && selectedFirstAid.id === firstAidToDelete.id) {
-        setSelectedFirstAid(null)
+        setSelectedFirstAid(null);
       }
     }
-    setDeleteFirstAidDialog(false)
-    setFirstAidToDelete(null)
-  }
+    setDeleteFirstAidDialog(false);
+    setFirstAidToDelete(null);
+  };
 
   // Handle delete safety
   const handleDeleteSafety = () => {
     if (safetyToDelete) {
-      const updatedSafety = safety.filter((item) => item.id !== safetyToDelete.id)
-      setSafety(updatedSafety)
+      const updatedSafety = safety.filter(
+        (item) => item.id !== safetyToDelete.id
+      );
+      setSafety(updatedSafety);
 
       if (selectedSafety && selectedSafety.id === safetyToDelete.id) {
-        setSelectedSafety(null)
+        setSelectedSafety(null);
       }
     }
-    setDeleteSafetyDialog(false)
-    setSafetyToDelete(null)
-  }
+    setDeleteSafetyDialog(false);
+    setSafetyToDelete(null);
+  };
 
   return (
     <div className="space-y-4">
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+      <Tabs
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="space-y-4"
+      >
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="facilities">Facilities</TabsTrigger>
           <TabsTrigger value="firstaid">First Aid</TabsTrigger>
@@ -543,7 +598,9 @@ export function FacilitiesAndSafety() {
                 <form onSubmit={handleFacilitySubmit}>
                   <DialogHeader>
                     <DialogTitle>Add New Facility</DialogTitle>
-                    <DialogDescription>Create a new visitor facility in the zoo.</DialogDescription>
+                    <DialogDescription>
+                      Create a new visitor facility in the zoo.
+                    </DialogDescription>
                   </DialogHeader>
                   <div className="grid gap-4 py-4">
                     <div className="grid grid-cols-4 items-center gap-4">
@@ -553,7 +610,12 @@ export function FacilitiesAndSafety() {
                       <Input
                         id="name"
                         value={facilityForm.name}
-                        onChange={(e) => setFacilityForm({ ...facilityForm, name: e.target.value })}
+                        onChange={(e) =>
+                          setFacilityForm({
+                            ...facilityForm,
+                            name: e.target.value,
+                          })
+                        }
                         className="col-span-3"
                         required
                       />
@@ -564,14 +626,18 @@ export function FacilitiesAndSafety() {
                       </Label>
                       <Select
                         value={facilityForm.type}
-                        onValueChange={(value) => setFacilityForm({ ...facilityForm, type: value })}
+                        onValueChange={(value) =>
+                          setFacilityForm({ ...facilityForm, type: value })
+                        }
                       >
                         <SelectTrigger className="col-span-3">
                           <SelectValue placeholder="Select type" />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="restroom">Restroom</SelectItem>
-                          <SelectItem value="information">Information</SelectItem>
+                          <SelectItem value="information">
+                            Information
+                          </SelectItem>
                           <SelectItem value="rest_area">Rest Area</SelectItem>
                           <SelectItem value="storage">Storage</SelectItem>
                           <SelectItem value="other">Other</SelectItem>
@@ -585,7 +651,12 @@ export function FacilitiesAndSafety() {
                       <Input
                         id="location"
                         value={facilityForm.location}
-                        onChange={(e) => setFacilityForm({ ...facilityForm, location: e.target.value })}
+                        onChange={(e) =>
+                          setFacilityForm({
+                            ...facilityForm,
+                            location: e.target.value,
+                          })
+                        }
                         className="col-span-3"
                         required
                       />
@@ -596,14 +667,20 @@ export function FacilitiesAndSafety() {
                       </Label>
                       <Select
                         value={facilityForm.status}
-                        onValueChange={(value) => setFacilityForm({ ...facilityForm, status: value })}
+                        onValueChange={(value) =>
+                          setFacilityForm({ ...facilityForm, status: value })
+                        }
                       >
                         <SelectTrigger className="col-span-3">
                           <SelectValue placeholder="Select status" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="operational">Operational</SelectItem>
-                          <SelectItem value="maintenance">Maintenance</SelectItem>
+                          <SelectItem value="operational">
+                            Operational
+                          </SelectItem>
+                          <SelectItem value="maintenance">
+                            Maintenance
+                          </SelectItem>
                           <SelectItem value="closed">Closed</SelectItem>
                         </SelectContent>
                       </Select>
@@ -615,7 +692,12 @@ export function FacilitiesAndSafety() {
                       <Input
                         id="features"
                         value={facilityForm.features}
-                        onChange={(e) => setFacilityForm({ ...facilityForm, features: e.target.value })}
+                        onChange={(e) =>
+                          setFacilityForm({
+                            ...facilityForm,
+                            features: e.target.value,
+                          })
+                        }
                         className="col-span-3"
                         placeholder="Comma-separated list of features"
                       />
@@ -628,7 +710,12 @@ export function FacilitiesAndSafety() {
                         id="maintenance"
                         type="date"
                         value={facilityForm.lastMaintenance}
-                        onChange={(e) => setFacilityForm({ ...facilityForm, lastMaintenance: e.target.value })}
+                        onChange={(e) =>
+                          setFacilityForm({
+                            ...facilityForm,
+                            lastMaintenance: e.target.value,
+                          })
+                        }
                         className="col-span-3"
                       />
                     </div>
@@ -639,7 +726,12 @@ export function FacilitiesAndSafety() {
                       <Textarea
                         id="description"
                         value={facilityForm.description}
-                        onChange={(e) => setFacilityForm({ ...facilityForm, description: e.target.value })}
+                        onChange={(e) =>
+                          setFacilityForm({
+                            ...facilityForm,
+                            description: e.target.value,
+                          })
+                        }
                         className="col-span-3"
                         rows={3}
                       />
@@ -664,7 +756,9 @@ export function FacilitiesAndSafety() {
                 <form onSubmit={handleFirstAidSubmit}>
                   <DialogHeader>
                     <DialogTitle>Add New First Aid Station</DialogTitle>
-                    <DialogDescription>Create a new first aid or medical station in the zoo.</DialogDescription>
+                    <DialogDescription>
+                      Create a new first aid or medical station in the zoo.
+                    </DialogDescription>
                   </DialogHeader>
                   <div className="grid gap-4 py-4">
                     <div className="grid grid-cols-4 items-center gap-4">
@@ -674,7 +768,12 @@ export function FacilitiesAndSafety() {
                       <Input
                         id="name"
                         value={firstAidForm.name}
-                        onChange={(e) => setFirstAidForm({ ...firstAidForm, name: e.target.value })}
+                        onChange={(e) =>
+                          setFirstAidForm({
+                            ...firstAidForm,
+                            name: e.target.value,
+                          })
+                        }
                         className="col-span-3"
                         required
                       />
@@ -686,7 +785,12 @@ export function FacilitiesAndSafety() {
                       <Input
                         id="location"
                         value={firstAidForm.location}
-                        onChange={(e) => setFirstAidForm({ ...firstAidForm, location: e.target.value })}
+                        onChange={(e) =>
+                          setFirstAidForm({
+                            ...firstAidForm,
+                            location: e.target.value,
+                          })
+                        }
                         className="col-span-3"
                         required
                       />
@@ -697,13 +801,17 @@ export function FacilitiesAndSafety() {
                       </Label>
                       <Select
                         value={firstAidForm.status}
-                        onValueChange={(value) => setFirstAidForm({ ...firstAidForm, status: value })}
+                        onValueChange={(value) =>
+                          setFirstAidForm({ ...firstAidForm, status: value })
+                        }
                       >
                         <SelectTrigger className="col-span-3">
                           <SelectValue placeholder="Select status" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="operational">Operational</SelectItem>
+                          <SelectItem value="operational">
+                            Operational
+                          </SelectItem>
                           <SelectItem value="unstaffed">Unstaffed</SelectItem>
                           <SelectItem value="closed">Closed</SelectItem>
                         </SelectContent>
@@ -715,7 +823,12 @@ export function FacilitiesAndSafety() {
                       </Label>
                       <Select
                         value={firstAidForm.staffed ? "true" : "false"}
-                        onValueChange={(value) => setFirstAidForm({ ...firstAidForm, staffed: value === "true" })}
+                        onValueChange={(value) =>
+                          setFirstAidForm({
+                            ...firstAidForm,
+                            staffed: value === "true",
+                          })
+                        }
                       >
                         <SelectTrigger className="col-span-3">
                           <SelectValue placeholder="Select staffing" />
@@ -734,7 +847,12 @@ export function FacilitiesAndSafety() {
                         <Input
                           id="staffingHours"
                           value={firstAidForm.staffingHours}
-                          onChange={(e) => setFirstAidForm({ ...firstAidForm, staffingHours: e.target.value })}
+                          onChange={(e) =>
+                            setFirstAidForm({
+                              ...firstAidForm,
+                              staffingHours: e.target.value,
+                            })
+                          }
                           className="col-span-3"
                           placeholder="e.g. 9:00 AM - 6:00 PM"
                           required={firstAidForm.staffed}
@@ -748,7 +866,12 @@ export function FacilitiesAndSafety() {
                       <Input
                         id="equipment"
                         value={firstAidForm.equipment}
-                        onChange={(e) => setFirstAidForm({ ...firstAidForm, equipment: e.target.value })}
+                        onChange={(e) =>
+                          setFirstAidForm({
+                            ...firstAidForm,
+                            equipment: e.target.value,
+                          })
+                        }
                         className="col-span-3"
                         placeholder="Comma-separated list of equipment"
                       />
@@ -760,7 +883,12 @@ export function FacilitiesAndSafety() {
                       <Textarea
                         id="description"
                         value={firstAidForm.description}
-                        onChange={(e) => setFirstAidForm({ ...firstAidForm, description: e.target.value })}
+                        onChange={(e) =>
+                          setFirstAidForm({
+                            ...firstAidForm,
+                            description: e.target.value,
+                          })
+                        }
                         className="col-span-3"
                         rows={3}
                       />
@@ -785,7 +913,9 @@ export function FacilitiesAndSafety() {
                 <form onSubmit={handleSafetySubmit}>
                   <DialogHeader>
                     <DialogTitle>Add New Safety Feature</DialogTitle>
-                    <DialogDescription>Create a new safety protocol or feature for the zoo.</DialogDescription>
+                    <DialogDescription>
+                      Create a new safety protocol or feature for the zoo.
+                    </DialogDescription>
                   </DialogHeader>
                   <div className="grid gap-4 py-4">
                     <div className="grid grid-cols-4 items-center gap-4">
@@ -795,7 +925,9 @@ export function FacilitiesAndSafety() {
                       <Input
                         id="name"
                         value={safetyForm.name}
-                        onChange={(e) => setSafetyForm({ ...safetyForm, name: e.target.value })}
+                        onChange={(e) =>
+                          setSafetyForm({ ...safetyForm, name: e.target.value })
+                        }
                         className="col-span-3"
                         required
                       />
@@ -806,7 +938,9 @@ export function FacilitiesAndSafety() {
                       </Label>
                       <Select
                         value={safetyForm.type}
-                        onValueChange={(value) => setSafetyForm({ ...safetyForm, type: value })}
+                        onValueChange={(value) =>
+                          setSafetyForm({ ...safetyForm, type: value })
+                        }
                       >
                         <SelectTrigger className="col-span-3">
                           <SelectValue placeholder="Select type" />
@@ -827,7 +961,12 @@ export function FacilitiesAndSafety() {
                       <Input
                         id="locations"
                         value={safetyForm.locations}
-                        onChange={(e) => setSafetyForm({ ...safetyForm, locations: e.target.value })}
+                        onChange={(e) =>
+                          setSafetyForm({
+                            ...safetyForm,
+                            locations: e.target.value,
+                          })
+                        }
                         className="col-span-3"
                         placeholder="Comma-separated list of locations"
                         required
@@ -841,7 +980,12 @@ export function FacilitiesAndSafety() {
                         id="lastUpdated"
                         type="date"
                         value={safetyForm.lastUpdated}
-                        onChange={(e) => setSafetyForm({ ...safetyForm, lastUpdated: e.target.value })}
+                        onChange={(e) =>
+                          setSafetyForm({
+                            ...safetyForm,
+                            lastUpdated: e.target.value,
+                          })
+                        }
                         className="col-span-3"
                         required
                       />
@@ -854,7 +998,12 @@ export function FacilitiesAndSafety() {
                         id="lastDrill"
                         type="date"
                         value={safetyForm.lastDrill}
-                        onChange={(e) => setSafetyForm({ ...safetyForm, lastDrill: e.target.value })}
+                        onChange={(e) =>
+                          setSafetyForm({
+                            ...safetyForm,
+                            lastDrill: e.target.value,
+                          })
+                        }
                         className="col-span-3"
                       />
                     </div>
@@ -864,7 +1013,9 @@ export function FacilitiesAndSafety() {
                       </Label>
                       <Select
                         value={safetyForm.status}
-                        onValueChange={(value) => setSafetyForm({ ...safetyForm, status: value })}
+                        onValueChange={(value) =>
+                          setSafetyForm({ ...safetyForm, status: value })
+                        }
                       >
                         <SelectTrigger className="col-span-3">
                           <SelectValue placeholder="Select status" />
@@ -883,7 +1034,12 @@ export function FacilitiesAndSafety() {
                       <Textarea
                         id="description"
                         value={safetyForm.description}
-                        onChange={(e) => setSafetyForm({ ...safetyForm, description: e.target.value })}
+                        onChange={(e) =>
+                          setSafetyForm({
+                            ...safetyForm,
+                            description: e.target.value,
+                          })
+                        }
                         className="col-span-3"
                         rows={3}
                         required
@@ -903,7 +1059,10 @@ export function FacilitiesAndSafety() {
           {selectedFacility ? (
             <div className="space-y-4">
               <div className="flex items-center">
-                <Button variant="ghost" onClick={() => setSelectedFacility(null)}>
+                <Button
+                  variant="ghost"
+                  onClick={() => setSelectedFacility(null)}
+                >
                   <ArrowLeft className="mr-2 h-4 w-4" />
                   Back to Facilities
                 </Button>
@@ -911,13 +1070,23 @@ export function FacilitiesAndSafety() {
 
               <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
                 <div>
-                  <h2 className="text-2xl font-bold">{selectedFacility.name}</h2>
-                  <p className="text-muted-foreground">{selectedFacility.location}</p>
+                  <h2 className="text-2xl font-bold">
+                    {selectedFacility.name}
+                  </h2>
+                  <p className="text-muted-foreground">
+                    {selectedFacility.location}
+                  </p>
                 </div>
                 <div className="flex space-x-2">
-                  <Dialog open={isEditingFacility} onOpenChange={setIsEditingFacility}>
+                  <Dialog
+                    open={isEditingFacility}
+                    onOpenChange={setIsEditingFacility}
+                  >
                     <DialogTrigger asChild>
-                      <Button variant="outline" onClick={() => handleEditFacility(selectedFacility)}>
+                      <Button
+                        variant="outline"
+                        onClick={() => handleEditFacility(selectedFacility)}
+                      >
                         <Edit className="mr-2 h-4 w-4" />
                         Edit Facility
                       </Button>
@@ -926,7 +1095,9 @@ export function FacilitiesAndSafety() {
                       <form onSubmit={handleFacilitySubmit}>
                         <DialogHeader>
                           <DialogTitle>Edit Facility</DialogTitle>
-                          <DialogDescription>Update the details for this facility.</DialogDescription>
+                          <DialogDescription>
+                            Update the details for this facility.
+                          </DialogDescription>
                         </DialogHeader>
                         <div className="grid gap-4 py-4">
                           <div className="grid grid-cols-4 items-center gap-4">
@@ -936,7 +1107,12 @@ export function FacilitiesAndSafety() {
                             <Input
                               id="edit-name"
                               value={facilityForm.name}
-                              onChange={(e) => setFacilityForm({ ...facilityForm, name: e.target.value })}
+                              onChange={(e) =>
+                                setFacilityForm({
+                                  ...facilityForm,
+                                  name: e.target.value,
+                                })
+                              }
                               className="col-span-3"
                               required
                             />
@@ -947,28 +1123,47 @@ export function FacilitiesAndSafety() {
                             </Label>
                             <Select
                               value={facilityForm.type}
-                              onValueChange={(value) => setFacilityForm({ ...facilityForm, type: value })}
+                              onValueChange={(value) =>
+                                setFacilityForm({
+                                  ...facilityForm,
+                                  type: value,
+                                })
+                              }
                             >
                               <SelectTrigger className="col-span-3">
                                 <SelectValue placeholder="Select type" />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="restroom">Restroom</SelectItem>
-                                <SelectItem value="information">Information</SelectItem>
-                                <SelectItem value="rest_area">Rest Area</SelectItem>
+                                <SelectItem value="restroom">
+                                  Restroom
+                                </SelectItem>
+                                <SelectItem value="information">
+                                  Information
+                                </SelectItem>
+                                <SelectItem value="rest_area">
+                                  Rest Area
+                                </SelectItem>
                                 <SelectItem value="storage">Storage</SelectItem>
                                 <SelectItem value="other">Other</SelectItem>
                               </SelectContent>
                             </Select>
                           </div>
                           <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="edit-location" className="text-right">
+                            <Label
+                              htmlFor="edit-location"
+                              className="text-right"
+                            >
                               Location
                             </Label>
                             <Input
                               id="edit-location"
                               value={facilityForm.location}
-                              onChange={(e) => setFacilityForm({ ...facilityForm, location: e.target.value })}
+                              onChange={(e) =>
+                                setFacilityForm({
+                                  ...facilityForm,
+                                  location: e.target.value,
+                                })
+                              }
                               className="col-span-3"
                               required
                             />
@@ -979,50 +1174,83 @@ export function FacilitiesAndSafety() {
                             </Label>
                             <Select
                               value={facilityForm.status}
-                              onValueChange={(value) => setFacilityForm({ ...facilityForm, status: value })}
+                              onValueChange={(value) =>
+                                setFacilityForm({
+                                  ...facilityForm,
+                                  status: value,
+                                })
+                              }
                             >
                               <SelectTrigger className="col-span-3">
                                 <SelectValue placeholder="Select status" />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="operational">Operational</SelectItem>
-                                <SelectItem value="maintenance">Maintenance</SelectItem>
+                                <SelectItem value="operational">
+                                  Operational
+                                </SelectItem>
+                                <SelectItem value="maintenance">
+                                  Maintenance
+                                </SelectItem>
                                 <SelectItem value="closed">Closed</SelectItem>
                               </SelectContent>
                             </Select>
                           </div>
                           <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="edit-features" className="text-right">
+                            <Label
+                              htmlFor="edit-features"
+                              className="text-right"
+                            >
                               Features
                             </Label>
                             <Input
                               id="edit-features"
                               value={facilityForm.features}
-                              onChange={(e) => setFacilityForm({ ...facilityForm, features: e.target.value })}
+                              onChange={(e) =>
+                                setFacilityForm({
+                                  ...facilityForm,
+                                  features: e.target.value,
+                                })
+                              }
                               className="col-span-3"
                               placeholder="Comma-separated list of features"
                             />
                           </div>
                           <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="edit-maintenance" className="text-right">
+                            <Label
+                              htmlFor="edit-maintenance"
+                              className="text-right"
+                            >
                               Last Maintenance
                             </Label>
                             <Input
                               id="edit-maintenance"
                               type="date"
                               value={facilityForm.lastMaintenance}
-                              onChange={(e) => setFacilityForm({ ...facilityForm, lastMaintenance: e.target.value })}
+                              onChange={(e) =>
+                                setFacilityForm({
+                                  ...facilityForm,
+                                  lastMaintenance: e.target.value,
+                                })
+                              }
                               className="col-span-3"
                             />
                           </div>
                           <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="edit-description" className="text-right">
+                            <Label
+                              htmlFor="edit-description"
+                              className="text-right"
+                            >
                               Description
                             </Label>
                             <Textarea
                               id="edit-description"
                               value={facilityForm.description}
-                              onChange={(e) => setFacilityForm({ ...facilityForm, description: e.target.value })}
+                              onChange={(e) =>
+                                setFacilityForm({
+                                  ...facilityForm,
+                                  description: e.target.value,
+                                })
+                              }
                               className="col-span-3"
                               rows={3}
                             />
@@ -1037,8 +1265,8 @@ export function FacilitiesAndSafety() {
                   <Button
                     variant="destructive"
                     onClick={() => {
-                      setFacilityToDelete(selectedFacility)
-                      setDeleteFacilityDialog(true)
+                      setFacilityToDelete(selectedFacility);
+                      setDeleteFacilityDialog(true);
                     }}
                   >
                     <Trash2 className="mr-2 h-4 w-4" />
@@ -1054,57 +1282,79 @@ export function FacilitiesAndSafety() {
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <h3 className="text-sm font-medium text-muted-foreground">Type</h3>
-                      <p className="mt-1 capitalize">{selectedFacility.type.replace("_", " ")}</p>
+                      <h3 className="text-sm font-medium text-muted-foreground">
+                        Type
+                      </h3>
+                      <p className="mt-1 capitalize">
+                        {selectedFacility.type.replace("_", " ")}
+                      </p>
                     </div>
                     <div>
-                      <h3 className="text-sm font-medium text-muted-foreground">Status</h3>
+                      <h3 className="text-sm font-medium text-muted-foreground">
+                        Status
+                      </h3>
                       <Badge
                         className="mt-1"
                         variant={
                           selectedFacility.status === "operational"
-                            ? "success"
+                            ? "default"
                             : selectedFacility.status === "maintenance"
-                              ? "warning"
-                              : "destructive"
+                            ? "warning"
+                            : "destructive"
                         }
                       >
-                        {selectedFacility.status.charAt(0).toUpperCase() + selectedFacility.status.slice(1)}
+                        {selectedFacility.status.charAt(0).toUpperCase() +
+                          selectedFacility.status.slice(1)}
                       </Badge>
                     </div>
                     <div>
-                      <h3 className="text-sm font-medium text-muted-foreground">Location</h3>
+                      <h3 className="text-sm font-medium text-muted-foreground">
+                        Location
+                      </h3>
                       <p className="mt-1">{selectedFacility.location}</p>
                     </div>
                     <div>
-                      <h3 className="text-sm font-medium text-muted-foreground">Last Maintenance</h3>
-                      <p className="mt-1">{selectedFacility.lastMaintenance || "Not recorded"}</p>
+                      <h3 className="text-sm font-medium text-muted-foreground">
+                        Last Maintenance
+                      </h3>
+                      <p className="mt-1">
+                        {selectedFacility.lastMaintenance || "Not recorded"}
+                      </p>
                     </div>
                     <div className="md:col-span-2">
-                      <h3 className="text-sm font-medium text-muted-foreground">Features</h3>
+                      <h3 className="text-sm font-medium text-muted-foreground">
+                        Features
+                      </h3>
                       <div className="mt-1 flex flex-wrap gap-2">
-                        {selectedFacility.features.map((feature, index) => (
-                          <Badge key={index} variant="outline">
-                            {feature}
-                          </Badge>
-                        ))}
+                        {selectedFacility.features.map(
+                          (feature: string, index: number) => (
+                            <Badge key={index} variant="outline">
+                              {feature}
+                            </Badge>
+                          )
+                        )}
                       </div>
                     </div>
                     <div className="md:col-span-2">
-                      <h3 className="text-sm font-medium text-muted-foreground">Description</h3>
+                      <h3 className="text-sm font-medium text-muted-foreground">
+                        Description
+                      </h3>
                       <p className="mt-1">{selectedFacility.description}</p>
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
-              <AlertDialog open={deleteFacilityDialog} onOpenChange={setDeleteFacilityDialog}>
+              <AlertDialog
+                open={deleteFacilityDialog}
+                onOpenChange={setDeleteFacilityDialog}
+              >
                 <AlertDialogContent>
                   <AlertDialogHeader>
                     <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                     <AlertDialogDescription>
-                      This will permanently delete the facility "{facilityToDelete?.name}". This action cannot be
-                      undone.
+                      This will permanently delete the facility "
+                      {facilityToDelete?.name}". This action cannot be undone.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
@@ -1130,13 +1380,14 @@ export function FacilitiesAndSafety() {
                         <Badge
                           variant={
                             facility.status === "operational"
-                              ? "success"
+                              ? "default"
                               : facility.status === "maintenance"
-                                ? "warning"
-                                : "destructive"
+                              ? "warning"
+                              : "destructive"
                           }
                         >
-                          {facility.status.charAt(0).toUpperCase() + facility.status.slice(1)}
+                          {facility.status.charAt(0).toUpperCase() +
+                            facility.status.slice(1)}
                         </Badge>
                       </div>
                       <CardDescription>{facility.location}</CardDescription>
@@ -1145,20 +1396,30 @@ export function FacilitiesAndSafety() {
                       <div className="space-y-2">
                         <div className="flex justify-between text-sm">
                           <span className="text-muted-foreground">Type:</span>
-                          <span className="capitalize">{facility.type.replace("_", " ")}</span>
+                          <span className="capitalize">
+                            {facility.type.replace("_", " ")}
+                          </span>
                         </div>
                         <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">Features:</span>
+                          <span className="text-muted-foreground">
+                            Features:
+                          </span>
                           <span>{facility.features.length}</span>
                         </div>
                         <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">Last Maintenance:</span>
+                          <span className="text-muted-foreground">
+                            Last Maintenance:
+                          </span>
                           <span>{facility.lastMaintenance || "N/A"}</span>
                         </div>
                       </div>
                     </CardContent>
                     <CardFooter className="flex justify-between">
-                      <Button variant="outline" size="sm" onClick={() => setSelectedFacility(facility)}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setSelectedFacility(facility)}
+                      >
                         View Details
                         <ChevronRight className="ml-2 h-4 w-4" />
                       </Button>
@@ -1167,9 +1428,9 @@ export function FacilitiesAndSafety() {
                           variant="outline"
                           size="icon"
                           onClick={() => {
-                            handleEditFacility(facility)
-                            setSelectedFacility(facility)
-                            setIsEditingFacility(true)
+                            handleEditFacility(facility);
+                            setSelectedFacility(facility);
+                            setIsEditingFacility(true);
                           }}
                         >
                           <Edit className="h-4 w-4" />
@@ -1178,8 +1439,8 @@ export function FacilitiesAndSafety() {
                           variant="outline"
                           size="icon"
                           onClick={() => {
-                            setFacilityToDelete(facility)
-                            setDeleteFacilityDialog(true)
+                            setFacilityToDelete(facility);
+                            setDeleteFacilityDialog(true);
                           }}
                         >
                           <Trash2 className="h-4 w-4" />
@@ -1192,9 +1453,13 @@ export function FacilitiesAndSafety() {
                 <div className="col-span-full flex justify-center items-center h-40 border rounded-lg border-dashed">
                   <div className="text-center">
                     <Accessibility className="mx-auto h-10 w-10 text-muted-foreground" />
-                    <h3 className="mt-2 text-sm font-semibold">No facilities found</h3>
+                    <h3 className="mt-2 text-sm font-semibold">
+                      No facilities found
+                    </h3>
                     <p className="mt-1 text-sm text-muted-foreground">
-                      {searchQuery ? "Try a different search term" : "Get started by adding a new facility"}
+                      {searchQuery
+                        ? "Try a different search term"
+                        : "Get started by adding a new facility"}
                     </p>
                   </div>
                 </div>
@@ -1202,12 +1467,16 @@ export function FacilitiesAndSafety() {
             </div>
           )}
 
-          <AlertDialog open={deleteFacilityDialog} onOpenChange={setDeleteFacilityDialog}>
+          <AlertDialog
+            open={deleteFacilityDialog}
+            onOpenChange={setDeleteFacilityDialog}
+          >
             <AlertDialogContent>
               <AlertDialogHeader>
                 <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  This will permanently delete the facility "{facilityToDelete?.name}". This action cannot be undone.
+                  This will permanently delete the facility "
+                  {facilityToDelete?.name}". This action cannot be undone.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
@@ -1227,7 +1496,10 @@ export function FacilitiesAndSafety() {
           {selectedFirstAid ? (
             <div className="space-y-4">
               <div className="flex items-center">
-                <Button variant="ghost" onClick={() => setSelectedFirstAid(null)}>
+                <Button
+                  variant="ghost"
+                  onClick={() => setSelectedFirstAid(null)}
+                >
                   <ArrowLeft className="mr-2 h-4 w-4" />
                   Back to First Aid Stations
                 </Button>
@@ -1235,13 +1507,23 @@ export function FacilitiesAndSafety() {
 
               <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
                 <div>
-                  <h2 className="text-2xl font-bold">{selectedFirstAid.name}</h2>
-                  <p className="text-muted-foreground">{selectedFirstAid.location}</p>
+                  <h2 className="text-2xl font-bold">
+                    {selectedFirstAid.name}
+                  </h2>
+                  <p className="text-muted-foreground">
+                    {selectedFirstAid.location}
+                  </p>
                 </div>
                 <div className="flex space-x-2">
-                  <Dialog open={isEditingFirstAid} onOpenChange={setIsEditingFirstAid}>
+                  <Dialog
+                    open={isEditingFirstAid}
+                    onOpenChange={setIsEditingFirstAid}
+                  >
                     <DialogTrigger asChild>
-                      <Button variant="outline" onClick={() => handleEditFirstAid(selectedFirstAid)}>
+                      <Button
+                        variant="outline"
+                        onClick={() => handleEditFirstAid(selectedFirstAid)}
+                      >
                         <Edit className="mr-2 h-4 w-4" />
                         Edit Station
                       </Button>
@@ -1250,7 +1532,9 @@ export function FacilitiesAndSafety() {
                       <form onSubmit={handleFirstAidSubmit}>
                         <DialogHeader>
                           <DialogTitle>Edit First Aid Station</DialogTitle>
-                          <DialogDescription>Update the details for this first aid station.</DialogDescription>
+                          <DialogDescription>
+                            Update the details for this first aid station.
+                          </DialogDescription>
                         </DialogHeader>
                         <div className="grid gap-4 py-4">
                           <div className="grid grid-cols-4 items-center gap-4">
@@ -1260,19 +1544,32 @@ export function FacilitiesAndSafety() {
                             <Input
                               id="edit-name"
                               value={firstAidForm.name}
-                              onChange={(e) => setFirstAidForm({ ...firstAidForm, name: e.target.value })}
+                              onChange={(e) =>
+                                setFirstAidForm({
+                                  ...firstAidForm,
+                                  name: e.target.value,
+                                })
+                              }
                               className="col-span-3"
                               required
                             />
                           </div>
                           <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="edit-location" className="text-right">
+                            <Label
+                              htmlFor="edit-location"
+                              className="text-right"
+                            >
                               Location
                             </Label>
                             <Input
                               id="edit-location"
                               value={firstAidForm.location}
-                              onChange={(e) => setFirstAidForm({ ...firstAidForm, location: e.target.value })}
+                              onChange={(e) =>
+                                setFirstAidForm({
+                                  ...firstAidForm,
+                                  location: e.target.value,
+                                })
+                              }
                               className="col-span-3"
                               required
                             />
@@ -1283,25 +1580,42 @@ export function FacilitiesAndSafety() {
                             </Label>
                             <Select
                               value={firstAidForm.status}
-                              onValueChange={(value) => setFirstAidForm({ ...firstAidForm, status: value })}
+                              onValueChange={(value) =>
+                                setFirstAidForm({
+                                  ...firstAidForm,
+                                  status: value,
+                                })
+                              }
                             >
                               <SelectTrigger className="col-span-3">
                                 <SelectValue placeholder="Select status" />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="operational">Operational</SelectItem>
-                                <SelectItem value="unstaffed">Unstaffed</SelectItem>
+                                <SelectItem value="operational">
+                                  Operational
+                                </SelectItem>
+                                <SelectItem value="unstaffed">
+                                  Unstaffed
+                                </SelectItem>
                                 <SelectItem value="closed">Closed</SelectItem>
                               </SelectContent>
                             </Select>
                           </div>
                           <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="edit-staffed" className="text-right">
+                            <Label
+                              htmlFor="edit-staffed"
+                              className="text-right"
+                            >
                               Staffed
                             </Label>
                             <Select
                               value={firstAidForm.staffed ? "true" : "false"}
-                              onValueChange={(value) => setFirstAidForm({ ...firstAidForm, staffed: value === "true" })}
+                              onValueChange={(value) =>
+                                setFirstAidForm({
+                                  ...firstAidForm,
+                                  staffed: value === "true",
+                                })
+                              }
                             >
                               <SelectTrigger className="col-span-3">
                                 <SelectValue placeholder="Select staffing" />
@@ -1314,13 +1628,21 @@ export function FacilitiesAndSafety() {
                           </div>
                           {firstAidForm.staffed && (
                             <div className="grid grid-cols-4 items-center gap-4">
-                              <Label htmlFor="edit-staffingHours" className="text-right">
+                              <Label
+                                htmlFor="edit-staffingHours"
+                                className="text-right"
+                              >
                                 Staffing Hours
                               </Label>
                               <Input
                                 id="edit-staffingHours"
                                 value={firstAidForm.staffingHours}
-                                onChange={(e) => setFirstAidForm({ ...firstAidForm, staffingHours: e.target.value })}
+                                onChange={(e) =>
+                                  setFirstAidForm({
+                                    ...firstAidForm,
+                                    staffingHours: e.target.value,
+                                  })
+                                }
                                 className="col-span-3"
                                 placeholder="e.g. 9:00 AM - 6:00 PM"
                                 required={firstAidForm.staffed}
@@ -1328,25 +1650,41 @@ export function FacilitiesAndSafety() {
                             </div>
                           )}
                           <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="edit-equipment" className="text-right">
+                            <Label
+                              htmlFor="edit-equipment"
+                              className="text-right"
+                            >
                               Equipment
                             </Label>
                             <Input
                               id="edit-equipment"
                               value={firstAidForm.equipment}
-                              onChange={(e) => setFirstAidForm({ ...firstAidForm, equipment: e.target.value })}
+                              onChange={(e) =>
+                                setFirstAidForm({
+                                  ...firstAidForm,
+                                  equipment: e.target.value,
+                                })
+                              }
                               className="col-span-3"
                               placeholder="Comma-separated list of equipment"
                             />
                           </div>
                           <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="edit-description" className="text-right">
+                            <Label
+                              htmlFor="edit-description"
+                              className="text-right"
+                            >
                               Description
                             </Label>
                             <Textarea
                               id="edit-description"
                               value={firstAidForm.description}
-                              onChange={(e) => setFirstAidForm({ ...firstAidForm, description: e.target.value })}
+                              onChange={(e) =>
+                                setFirstAidForm({
+                                  ...firstAidForm,
+                                  description: e.target.value,
+                                })
+                              }
                               className="col-span-3"
                               rows={3}
                             />
@@ -1361,8 +1699,8 @@ export function FacilitiesAndSafety() {
                   <Button
                     variant="destructive"
                     onClick={() => {
-                      setFirstAidToDelete(selectedFirstAid)
-                      setDeleteFirstAidDialog(true)
+                      setFirstAidToDelete(selectedFirstAid);
+                      setDeleteFirstAidDialog(true);
                     }}
                   >
                     <Trash2 className="mr-2 h-4 w-4" />
@@ -1378,57 +1716,77 @@ export function FacilitiesAndSafety() {
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <h3 className="text-sm font-medium text-muted-foreground">Status</h3>
+                      <h3 className="text-sm font-medium text-muted-foreground">
+                        Status
+                      </h3>
                       <Badge
                         className="mt-1"
                         variant={
                           selectedFirstAid.status === "operational"
-                            ? "success"
+                            ? "default"
                             : selectedFirstAid.status === "unstaffed"
-                              ? "warning"
-                              : "destructive"
+                            ? "warning"
+                            : "destructive"
                         }
                       >
-                        {selectedFirstAid.status.charAt(0).toUpperCase() + selectedFirstAid.status.slice(1)}
+                        {selectedFirstAid.status.charAt(0).toUpperCase() +
+                          selectedFirstAid.status.slice(1)}
                       </Badge>
                     </div>
                     <div>
-                      <h3 className="text-sm font-medium text-muted-foreground">Location</h3>
+                      <h3 className="text-sm font-medium text-muted-foreground">
+                        Location
+                      </h3>
                       <p className="mt-1">{selectedFirstAid.location}</p>
                     </div>
                     <div>
-                      <h3 className="text-sm font-medium text-muted-foreground">Staffed</h3>
-                      <p className="mt-1">{selectedFirstAid.staffed ? "Yes" : "No"}</p>
+                      <h3 className="text-sm font-medium text-muted-foreground">
+                        Staffed
+                      </h3>
+                      <p className="mt-1">
+                        {selectedFirstAid.staffed ? "Yes" : "No"}
+                      </p>
                     </div>
                     <div>
-                      <h3 className="text-sm font-medium text-muted-foreground">Staffing Hours</h3>
+                      <h3 className="text-sm font-medium text-muted-foreground">
+                        Staffing Hours
+                      </h3>
                       <p className="mt-1">{selectedFirstAid.staffingHours}</p>
                     </div>
                     <div className="md:col-span-2">
-                      <h3 className="text-sm font-medium text-muted-foreground">Equipment</h3>
+                      <h3 className="text-sm font-medium text-muted-foreground">
+                        Equipment
+                      </h3>
                       <div className="mt-1 flex flex-wrap gap-2">
-                        {selectedFirstAid.equipment.map((item, index) => (
-                          <Badge key={index} variant="outline">
-                            {item}
-                          </Badge>
-                        ))}
+                        {selectedFirstAid.equipment.map(
+                          (item: string, index: number) => (
+                            <Badge key={index} variant="outline">
+                              {item}
+                            </Badge>
+                          )
+                        )}
                       </div>
                     </div>
                     <div className="md:col-span-2">
-                      <h3 className="text-sm font-medium text-muted-foreground">Description</h3>
+                      <h3 className="text-sm font-medium text-muted-foreground">
+                        Description
+                      </h3>
                       <p className="mt-1">{selectedFirstAid.description}</p>
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
-              <AlertDialog open={deleteFirstAidDialog} onOpenChange={setDeleteFirstAidDialog}>
+              <AlertDialog
+                open={deleteFirstAidDialog}
+                onOpenChange={setDeleteFirstAidDialog}
+              >
                 <AlertDialogContent>
                   <AlertDialogHeader>
                     <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                     <AlertDialogDescription>
-                      This will permanently delete the first aid station "{firstAidToDelete?.name}". This action cannot
-                      be undone.
+                      This will permanently delete the first aid station "
+                      {firstAidToDelete?.name}". This action cannot be undone.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
@@ -1454,13 +1812,14 @@ export function FacilitiesAndSafety() {
                         <Badge
                           variant={
                             station.status === "operational"
-                              ? "success"
+                              ? "default"
                               : station.status === "unstaffed"
-                                ? "warning"
-                                : "destructive"
+                              ? "warning"
+                              : "destructive"
                           }
                         >
-                          {station.status.charAt(0).toUpperCase() + station.status.slice(1)}
+                          {station.status.charAt(0).toUpperCase() +
+                            station.status.slice(1)}
                         </Badge>
                       </div>
                       <CardDescription>{station.location}</CardDescription>
@@ -1468,23 +1827,33 @@ export function FacilitiesAndSafety() {
                     <CardContent>
                       <div className="space-y-2">
                         <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">Staffed:</span>
+                          <span className="text-muted-foreground">
+                            Staffed:
+                          </span>
                           <span>{station.staffed ? "Yes" : "No"}</span>
                         </div>
                         {station.staffed && (
                           <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">Hours:</span>
+                            <span className="text-muted-foreground">
+                              Hours:
+                            </span>
                             <span>{station.staffingHours}</span>
                           </div>
                         )}
                         <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">Equipment:</span>
+                          <span className="text-muted-foreground">
+                            Equipment:
+                          </span>
                           <span>{station.equipment.length} items</span>
                         </div>
                       </div>
                     </CardContent>
                     <CardFooter className="flex justify-between">
-                      <Button variant="outline" size="sm" onClick={() => setSelectedFirstAid(station)}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setSelectedFirstAid(station)}
+                      >
                         View Details
                         <ChevronRight className="ml-2 h-4 w-4" />
                       </Button>
@@ -1493,9 +1862,9 @@ export function FacilitiesAndSafety() {
                           variant="outline"
                           size="icon"
                           onClick={() => {
-                            handleEditFirstAid(station)
-                            setSelectedFirstAid(station)
-                            setIsEditingFirstAid(true)
+                            handleEditFirstAid(station);
+                            setSelectedFirstAid(station);
+                            setIsEditingFirstAid(true);
                           }}
                         >
                           <Edit className="h-4 w-4" />
@@ -1504,8 +1873,8 @@ export function FacilitiesAndSafety() {
                           variant="outline"
                           size="icon"
                           onClick={() => {
-                            setFirstAidToDelete(station)
-                            setDeleteFirstAidDialog(true)
+                            setFirstAidToDelete(station);
+                            setDeleteFirstAidDialog(true);
                           }}
                         >
                           <Trash2 className="h-4 w-4" />
@@ -1518,9 +1887,13 @@ export function FacilitiesAndSafety() {
                 <div className="col-span-full flex justify-center items-center h-40 border rounded-lg border-dashed">
                   <div className="text-center">
                     <FirstAid className="mx-auto h-10 w-10 text-muted-foreground" />
-                    <h3 className="mt-2 text-sm font-semibold">No first aid stations found</h3>
+                    <h3 className="mt-2 text-sm font-semibold">
+                      No first aid stations found
+                    </h3>
                     <p className="mt-1 text-sm text-muted-foreground">
-                      {searchQuery ? "Try a different search term" : "Get started by adding a new first aid station"}
+                      {searchQuery
+                        ? "Try a different search term"
+                        : "Get started by adding a new first aid station"}
                     </p>
                   </div>
                 </div>
@@ -1528,13 +1901,16 @@ export function FacilitiesAndSafety() {
             </div>
           )}
 
-          <AlertDialog open={deleteFirstAidDialog} onOpenChange={setDeleteFirstAidDialog}>
+          <AlertDialog
+            open={deleteFirstAidDialog}
+            onOpenChange={setDeleteFirstAidDialog}
+          >
             <AlertDialogContent>
               <AlertDialogHeader>
                 <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  This will permanently delete the first aid station "{firstAidToDelete?.name}". This action cannot be
-                  undone.
+                  This will permanently delete the first aid station "
+                  {firstAidToDelete?.name}". This action cannot be undone.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
@@ -1563,12 +1939,20 @@ export function FacilitiesAndSafety() {
               <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
                 <div>
                   <h2 className="text-2xl font-bold">{selectedSafety.name}</h2>
-                  <p className="text-muted-foreground capitalize">{selectedSafety.type}</p>
+                  <p className="text-muted-foreground capitalize">
+                    {selectedSafety.type}
+                  </p>
                 </div>
                 <div className="flex space-x-2">
-                  <Dialog open={isEditingSafety} onOpenChange={setIsEditingSafety}>
+                  <Dialog
+                    open={isEditingSafety}
+                    onOpenChange={setIsEditingSafety}
+                  >
                     <DialogTrigger asChild>
-                      <Button variant="outline" onClick={() => handleEditSafety(selectedSafety)}>
+                      <Button
+                        variant="outline"
+                        onClick={() => handleEditSafety(selectedSafety)}
+                      >
                         <Edit className="mr-2 h-4 w-4" />
                         Edit Safety Feature
                       </Button>
@@ -1577,7 +1961,9 @@ export function FacilitiesAndSafety() {
                       <form onSubmit={handleSafetySubmit}>
                         <DialogHeader>
                           <DialogTitle>Edit Safety Feature</DialogTitle>
-                          <DialogDescription>Update the details for this safety feature.</DialogDescription>
+                          <DialogDescription>
+                            Update the details for this safety feature.
+                          </DialogDescription>
                         </DialogHeader>
                         <div className="grid gap-4 py-4">
                           <div className="grid grid-cols-4 items-center gap-4">
@@ -1587,7 +1973,12 @@ export function FacilitiesAndSafety() {
                             <Input
                               id="edit-name"
                               value={safetyForm.name}
-                              onChange={(e) => setSafetyForm({ ...safetyForm, name: e.target.value })}
+                              onChange={(e) =>
+                                setSafetyForm({
+                                  ...safetyForm,
+                                  name: e.target.value,
+                                })
+                              }
                               className="col-span-3"
                               required
                             />
@@ -1598,55 +1989,89 @@ export function FacilitiesAndSafety() {
                             </Label>
                             <Select
                               value={safetyForm.type}
-                              onValueChange={(value) => setSafetyForm({ ...safetyForm, type: value })}
+                              onValueChange={(value) =>
+                                setSafetyForm({ ...safetyForm, type: value })
+                              }
                             >
                               <SelectTrigger className="col-span-3">
                                 <SelectValue placeholder="Select type" />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="protocol">Protocol</SelectItem>
-                                <SelectItem value="evacuation">Evacuation</SelectItem>
-                                <SelectItem value="equipment">Equipment</SelectItem>
-                                <SelectItem value="training">Training</SelectItem>
+                                <SelectItem value="protocol">
+                                  Protocol
+                                </SelectItem>
+                                <SelectItem value="evacuation">
+                                  Evacuation
+                                </SelectItem>
+                                <SelectItem value="equipment">
+                                  Equipment
+                                </SelectItem>
+                                <SelectItem value="training">
+                                  Training
+                                </SelectItem>
                                 <SelectItem value="other">Other</SelectItem>
                               </SelectContent>
                             </Select>
                           </div>
                           <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="edit-locations" className="text-right">
+                            <Label
+                              htmlFor="edit-locations"
+                              className="text-right"
+                            >
                               Locations
                             </Label>
                             <Input
                               id="edit-locations"
                               value={safetyForm.locations}
-                              onChange={(e) => setSafetyForm({ ...safetyForm, locations: e.target.value })}
+                              onChange={(e) =>
+                                setSafetyForm({
+                                  ...safetyForm,
+                                  locations: e.target.value,
+                                })
+                              }
                               className="col-span-3"
                               placeholder="Comma-separated list of locations"
                               required
                             />
                           </div>
                           <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="edit-lastUpdated" className="text-right">
+                            <Label
+                              htmlFor="edit-lastUpdated"
+                              className="text-right"
+                            >
                               Last Updated
                             </Label>
                             <Input
                               id="edit-lastUpdated"
                               type="date"
                               value={safetyForm.lastUpdated}
-                              onChange={(e) => setSafetyForm({ ...safetyForm, lastUpdated: e.target.value })}
+                              onChange={(e) =>
+                                setSafetyForm({
+                                  ...safetyForm,
+                                  lastUpdated: e.target.value,
+                                })
+                              }
                               className="col-span-3"
                               required
                             />
                           </div>
                           <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="edit-lastDrill" className="text-right">
+                            <Label
+                              htmlFor="edit-lastDrill"
+                              className="text-right"
+                            >
                               Last Drill
                             </Label>
                             <Input
                               id="edit-lastDrill"
                               type="date"
                               value={safetyForm.lastDrill}
-                              onChange={(e) => setSafetyForm({ ...safetyForm, lastDrill: e.target.value })}
+                              onChange={(e) =>
+                                setSafetyForm({
+                                  ...safetyForm,
+                                  lastDrill: e.target.value,
+                                })
+                              }
                               className="col-span-3"
                             />
                           </div>
@@ -1656,26 +2081,40 @@ export function FacilitiesAndSafety() {
                             </Label>
                             <Select
                               value={safetyForm.status}
-                              onValueChange={(value) => setSafetyForm({ ...safetyForm, status: value })}
+                              onValueChange={(value) =>
+                                setSafetyForm({ ...safetyForm, status: value })
+                              }
                             >
                               <SelectTrigger className="col-span-3">
                                 <SelectValue placeholder="Select status" />
                               </SelectTrigger>
                               <SelectContent>
                                 <SelectItem value="active">Active</SelectItem>
-                                <SelectItem value="review">Under Review</SelectItem>
-                                <SelectItem value="inactive">Inactive</SelectItem>
+                                <SelectItem value="review">
+                                  Under Review
+                                </SelectItem>
+                                <SelectItem value="inactive">
+                                  Inactive
+                                </SelectItem>
                               </SelectContent>
                             </Select>
                           </div>
                           <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="edit-description" className="text-right">
+                            <Label
+                              htmlFor="edit-description"
+                              className="text-right"
+                            >
                               Description
                             </Label>
                             <Textarea
                               id="edit-description"
                               value={safetyForm.description}
-                              onChange={(e) => setSafetyForm({ ...safetyForm, description: e.target.value })}
+                              onChange={(e) =>
+                                setSafetyForm({
+                                  ...safetyForm,
+                                  description: e.target.value,
+                                })
+                              }
                               className="col-span-3"
                               rows={3}
                               required
@@ -1691,8 +2130,8 @@ export function FacilitiesAndSafety() {
                   <Button
                     variant="destructive"
                     onClick={() => {
-                      setSafetyToDelete(selectedSafety)
-                      setDeleteSafetyDialog(true)
+                      setSafetyToDelete(selectedSafety);
+                      setDeleteSafetyDialog(true);
                     }}
                   >
                     <Trash2 className="mr-2 h-4 w-4" />
@@ -1708,59 +2147,79 @@ export function FacilitiesAndSafety() {
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <h3 className="text-sm font-medium text-muted-foreground">Type</h3>
+                      <h3 className="text-sm font-medium text-muted-foreground">
+                        Type
+                      </h3>
                       <p className="mt-1 capitalize">{selectedSafety.type}</p>
                     </div>
                     <div>
-                      <h3 className="text-sm font-medium text-muted-foreground">Status</h3>
+                      <h3 className="text-sm font-medium text-muted-foreground">
+                        Status
+                      </h3>
                       <Badge
                         className="mt-1"
                         variant={
                           selectedSafety.status === "active"
-                            ? "success"
+                            ? "default"
                             : selectedSafety.status === "review"
-                              ? "warning"
-                              : "destructive"
+                            ? "warning"
+                            : "destructive"
                         }
                       >
                         {selectedSafety.status === "review"
                           ? "Under Review"
-                          : selectedSafety.status.charAt(0).toUpperCase() + selectedSafety.status.slice(1)}
+                          : selectedSafety.status.charAt(0).toUpperCase() +
+                            selectedSafety.status.slice(1)}
                       </Badge>
                     </div>
                     <div>
-                      <h3 className="text-sm font-medium text-muted-foreground">Last Updated</h3>
+                      <h3 className="text-sm font-medium text-muted-foreground">
+                        Last Updated
+                      </h3>
                       <p className="mt-1">{selectedSafety.lastUpdated}</p>
                     </div>
                     <div>
-                      <h3 className="text-sm font-medium text-muted-foreground">Last Drill/Test</h3>
-                      <p className="mt-1">{selectedSafety.lastDrill || "N/A"}</p>
+                      <h3 className="text-sm font-medium text-muted-foreground">
+                        Last Drill/Test
+                      </h3>
+                      <p className="mt-1">
+                        {selectedSafety.lastDrill || "N/A"}
+                      </p>
                     </div>
                     <div className="md:col-span-2">
-                      <h3 className="text-sm font-medium text-muted-foreground">Locations</h3>
+                      <h3 className="text-sm font-medium text-muted-foreground">
+                        Locations
+                      </h3>
                       <div className="mt-1 flex flex-wrap gap-2">
-                        {selectedSafety.locations.map((location, index) => (
-                          <Badge key={index} variant="outline">
-                            {location}
-                          </Badge>
-                        ))}
+                        {selectedSafety.locations.map(
+                          (location: string, index: number) => (
+                            <Badge key={index} variant="outline">
+                              {location}
+                            </Badge>
+                          )
+                        )}
                       </div>
                     </div>
                     <div className="md:col-span-2">
-                      <h3 className="text-sm font-medium text-muted-foreground">Description</h3>
+                      <h3 className="text-sm font-medium text-muted-foreground">
+                        Description
+                      </h3>
                       <p className="mt-1">{selectedSafety.description}</p>
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
-              <AlertDialog open={deleteSafetyDialog} onOpenChange={setDeleteSafetyDialog}>
+              <AlertDialog
+                open={deleteSafetyDialog}
+                onOpenChange={setDeleteSafetyDialog}
+              >
                 <AlertDialogContent>
                   <AlertDialogHeader>
                     <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                     <AlertDialogDescription>
-                      This will permanently delete the safety feature "{safetyToDelete?.name}". This action cannot be
-                      undone.
+                      This will permanently delete the safety feature "
+                      {safetyToDelete?.name}". This action cannot be undone.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
@@ -1785,34 +2244,51 @@ export function FacilitiesAndSafety() {
                         <CardTitle>{item.name}</CardTitle>
                         <Badge
                           variant={
-                            item.status === "active" ? "success" : item.status === "review" ? "warning" : "destructive"
+                            item.status === "active"
+                              ? "default"
+                              : item.status === "review"
+                              ? "warning"
+                              : "destructive"
                           }
                         >
                           {item.status === "review"
                             ? "Under Review"
-                            : item.status.charAt(0).toUpperCase() + item.status.slice(1)}
+                            : item.status.charAt(0).toUpperCase() +
+                              item.status.slice(1)}
                         </Badge>
                       </div>
-                      <CardDescription className="capitalize">{item.type}</CardDescription>
+                      <CardDescription className="capitalize">
+                        {item.type}
+                      </CardDescription>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-2">
                         <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">Locations:</span>
+                          <span className="text-muted-foreground">
+                            Locations:
+                          </span>
                           <span>{item.locations.length}</span>
                         </div>
                         <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">Last Updated:</span>
+                          <span className="text-muted-foreground">
+                            Last Updated:
+                          </span>
                           <span>{item.lastUpdated}</span>
                         </div>
                         <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">Last Drill:</span>
+                          <span className="text-muted-foreground">
+                            Last Drill:
+                          </span>
                           <span>{item.lastDrill || "N/A"}</span>
                         </div>
                       </div>
                     </CardContent>
                     <CardFooter className="flex justify-between">
-                      <Button variant="outline" size="sm" onClick={() => setSelectedSafety(item)}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setSelectedSafety(item)}
+                      >
                         View Details
                         <ChevronRight className="ml-2 h-4 w-4" />
                       </Button>
@@ -1821,9 +2297,9 @@ export function FacilitiesAndSafety() {
                           variant="outline"
                           size="icon"
                           onClick={() => {
-                            handleEditSafety(item)
-                            setSelectedSafety(item)
-                            setIsEditingSafety(true)
+                            handleEditSafety(item);
+                            setSelectedSafety(item);
+                            setIsEditingSafety(true);
                           }}
                         >
                           <Edit className="h-4 w-4" />
@@ -1832,8 +2308,8 @@ export function FacilitiesAndSafety() {
                           variant="outline"
                           size="icon"
                           onClick={() => {
-                            setSafetyToDelete(item)
-                            setDeleteSafetyDialog(true)
+                            setSafetyToDelete(item);
+                            setDeleteSafetyDialog(true);
                           }}
                         >
                           <Trash2 className="h-4 w-4" />
@@ -1846,9 +2322,13 @@ export function FacilitiesAndSafety() {
                 <div className="col-span-full flex justify-center items-center h-40 border rounded-lg border-dashed">
                   <div className="text-center">
                     <ShieldAlert className="mx-auto h-10 w-10 text-muted-foreground" />
-                    <h3 className="mt-2 text-sm font-semibold">No safety features found</h3>
+                    <h3 className="mt-2 text-sm font-semibold">
+                      No safety features found
+                    </h3>
                     <p className="mt-1 text-sm text-muted-foreground">
-                      {searchQuery ? "Try a different search term" : "Get started by adding a new safety feature"}
+                      {searchQuery
+                        ? "Try a different search term"
+                        : "Get started by adding a new safety feature"}
                     </p>
                   </div>
                 </div>
@@ -1856,18 +2336,24 @@ export function FacilitiesAndSafety() {
             </div>
           )}
 
-          <AlertDialog open={deleteSafetyDialog} onOpenChange={setDeleteSafetyDialog}>
+          <AlertDialog
+            open={deleteSafetyDialog}
+            onOpenChange={setDeleteSafetyDialog}
+          >
             <AlertDialogContent>
               <AlertDialogHeader>
                 <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  This will permanently delete the safety feature "{safetyToDelete?.name}". This action cannot be
-                  undone.
+                  This will permanently delete the safety feature "
+                  {safetyToDelete?.name}". This action cannot be undone.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={handleDeleteSafety} className="bg-destructive text-destructive-foreground">
+                <AlertDialogAction
+                  onClick={handleDeleteSafety}
+                  className="bg-destructive text-destructive-foreground"
+                >
                   Delete
                 </AlertDialogAction>
               </AlertDialogFooter>
@@ -1876,5 +2362,5 @@ export function FacilitiesAndSafety() {
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }

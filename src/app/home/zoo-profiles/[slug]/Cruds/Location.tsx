@@ -26,6 +26,7 @@ import MapLocationModal from "../../../visit-planning/components/MapLocationPick
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import useHelper from "@/Helper/helper";
+import { servicesStatus } from "@/data";
 
 interface Props {
   mode?: string;
@@ -138,12 +139,7 @@ const Location = ({ mode = "create", id = "0", tab }: Props) => {
     useState(false);
   const [imageFiles, setImageFiles] = useState<ImagesFiles[]>([]);
   const [mapPinFile, setMapPinFile] = useState<File | null>(null);
-  const [status, setStatus] = useState([
-    { value: 1, label: "Open" },
-    { value: 2, label: "Closed" },
-    { value: 3, label: "Under-Construction" },
-    { value: 4, label: "Renovating" },
-  ]);
+  const [status, setStatus] = useState(servicesStatus);
   const [buildingType, setBuildingType] = useState([
     { value: 1, label: "Sanctuary" },
     { value: 2, label: "Prayer Area" },
@@ -388,7 +384,7 @@ const Location = ({ mode = "create", id = "0", tab }: Props) => {
                   </>
                 )}
               </div>
-              <div className="">
+              {/* <div className="">
                 <Label>Location Images</Label>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                   {imageFiles.map((image, index) => (
@@ -484,7 +480,7 @@ const Location = ({ mode = "create", id = "0", tab }: Props) => {
                     <span className="text-xs text-main-gray">Add Image</span>
                   </button>
                 </div>
-              </div>
+              </div> */}
             </div>
           </CardContent>
           <CardFooter>

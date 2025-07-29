@@ -12,6 +12,7 @@ import Dropdown from "@/components/utils/FormElements/Dropdown";
 import InputTag from "@/components/utils/FormElements/InputTag";
 import Paragraph from "@/components/utils/Headings/Paragraph";
 import Subheading from "@/components/utils/Headings/Subheading";
+import { servicesStatus } from "@/data";
 import { zoos } from "@/data/users";
 import useHelper from "@/Helper/helper";
 import { OPTION } from "@/types/utils";
@@ -47,12 +48,7 @@ const FoodCourt = ({ mode = "create", id = "0", tab }: Props) => {
     Status: 0,
   });
   const [imageFiles, setImageFiles] = useState<ImagesFiles[]>([]);
-  const [statuses, setStatuses] = useState<OPTION[]>([
-    { value: 1, label: "OPEN" },
-    { value: 2, label: "CLOSED" },
-    { value: 3, label: "UNDER MAINTAINANCE" },
-    { value: 4, label: "TO BE OPENED" },
-  ]);
+  const [statuses, setStatuses] = useState<OPTION[]>(servicesStatus);
   const [zooList, setZooList] = useState(
     zoos.map((z) => ({ value: z.value || 0, label: z.label }))
   );
