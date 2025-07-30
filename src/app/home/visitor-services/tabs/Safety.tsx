@@ -69,6 +69,7 @@ import {
 } from "@/components/ui/table";
 import CardIntro from "@/components/utils/Headings/CardIntro";
 import { changeDateFormat } from "@/Helper/DateFormats";
+import Checkbox from "@/components/utils/FormElements/Checkbox";
 
 interface Prop {
     searchQuery: string;
@@ -136,6 +137,7 @@ const initialSafety: SafetyItem[] = [
 
 export default function Safety({ searchQuery }: Prop) {
     const [sortOrder, setSortOrder] = useState("name-asc");
+    const [checkSafety, setCheckSafety] = useState<number[]>([])
     const [safety, setSafety] = useState<SafetyItem[]>(initialSafety);
     const [selectedSafety, setSelectedSafety] = useState<any>(null);
     const [isAddingSafety, setIsAddingSafety] = useState(false);
@@ -253,7 +255,7 @@ export default function Safety({ searchQuery }: Prop) {
 
 
     // Sort Courts based on selected sort order
-    const sortedFacilties = [...filteredSafety].sort((a, b) => {
+    const sortedSafety = [...filteredSafety].sort((a, b) => {
         switch (sortOrder) {
             case "name-asc":
                 return a.name.localeCompare(b.name);
@@ -269,10 +271,28 @@ export default function Safety({ searchQuery }: Prop) {
     const postsPerPage = 20;
     const indexOfLastPost = currentPage * postsPerPage;
     const indexOfFirstPost = indexOfLastPost - postsPerPage;
-    const currentPosts = sortedFacilties.slice(indexOfFirstPost, indexOfLastPost);
+    const currentPosts = sortedSafety.slice(indexOfFirstPost, indexOfLastPost);
 
     const totalPages = Math.ceil(safety.length / postsPerPage);
     const paginationLabels = Array.from({ length: totalPages }, (_, i) => i + 1);
+
+    // Toggle
+    const toggleSelectSafety = (fId: number) => {
+        setCheckSafety((prev) =>
+            prev.includes(fId)
+                ? prev.filter((id) => id !== fId)
+                : [...prev, fId]
+        );
+    };
+
+    const toggleSelectAll = () => {
+        if (checkSafety.length === filteredSafety.length) {
+            console.log("Select All If Condition")
+            setCheckSafety([]);
+        } else {
+            setCheckSafety(filteredSafety.map((safe: any) => safe.id));
+        }
+    };
 
     return (
         <>
@@ -745,20 +765,37 @@ export default function Safety({ searchQuery }: Prop) {
                         </div>
                     </CardHeader>
                     <CardContent>
+                        {checkSafety.length > 0 && (
+                            <div className="flex items-center gap-2 p-2 bg-main-frostyBlue/10 rounded-md">
+                                <span className="text-sm text-main-darkFadedBlue">
+                                    {checkSafety.length} Safet
+                                    {checkSafety.length > 1 ? "ies" : "y"} Selected
+                                </span>
+                                <div className="flex-1"></div>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="border-red-500 text-red-500 hover:bg-red-50"
+                                >
+                                    <Trash2 className="mr-2 h-4 w-4" />
+                                    Delete
+                                </Button>
+                            </div>
+                        )}
                         <div className="border rounded-md">
                             <Table>
                                 <TableHeader>
                                     <TableRow className="bg-main-frostyBlue/5">
-                                        {/* <TableHead className="w-12">
-                                                        <Checkbox
-                                                            value={
-                                                                selectedFacility.length === filteredFacilities.length &&
-                                                                filteredFacilities.length > 0
-                                                            }
-                                                            // setter={toggleSelectAll}
-                                                            name=""
-                                                        />
-                                                    </TableHead> */}
+                                        <TableHead className="w-12">
+                                            <Checkbox
+                                                value={
+                                                    checkSafety.length === filteredSafety.length &&
+                                                    filteredSafety.length > 0
+                                                }
+                                                setter={toggleSelectAll}
+                                                name=""
+                                            />
+                                        </TableHead>
                                         <TableHead>
                                             <div
                                                 className="flex items-center gap-1 cursor-pointer"
@@ -783,16 +820,16 @@ export default function Safety({ searchQuery }: Prop) {
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody className="!text-sm">
-                                    {filteredSafety.length > 0 ? (
-                                        safety.map((safe: any, index: number) => (
+                                    {currentPosts.length > 0 ? (
+                                        currentPosts.map((safe: any, index: number) => (
                                             <TableRow key={index}>
-                                                {/* <TableCell>
-                                                                <Checkbox
-                                                                    value={selectedCourts.includes(court.Id)}
-                                                                    setter={(n, v) => toggleSelectcourt(court.Id)}
-                                                                    name="id"
-                                                                />
-                                                            </TableCell> */}
+                                                <TableCell>
+                                                    <Checkbox
+                                                        value={checkSafety.includes(safe.id)}
+                                                        setter={(n, v) => toggleSelectSafety(safe.id)}
+                                                        name="id"
+                                                    />
+                                                </TableCell>
                                                 <TableCell>{safe.name}</TableCell>
                                                 <TableCell>{safe.type}</TableCell>
                                                 <TableCell>{safe.locations}</TableCell>
@@ -851,7 +888,7 @@ export default function Safety({ searchQuery }: Prop) {
                                                 colSpan={6}
                                                 className="h-24 text-center text-main-gray"
                                             >
-                                                No products found.
+                                                No Safeties Found!
                                             </TableCell>
                                         </TableRow>
                                     )}

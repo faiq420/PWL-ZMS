@@ -387,7 +387,7 @@ const FoodCourtTable = () => {
                       colSpan={6}
                       className="h-24 text-center text-main-gray"
                     >
-                      No products found.
+                      No Food Courts Found!
                     </TableCell>
                   </TableRow>
                 )}

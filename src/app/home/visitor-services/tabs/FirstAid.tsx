@@ -60,6 +60,7 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import CardIntro from "@/components/utils/Headings/CardIntro";
+import Checkbox from "@/components/utils/FormElements/Checkbox";
 
 interface Prop {
     searchQuery: string;
@@ -101,6 +102,7 @@ const initialFirstAid = [
 
 export default function FirstAidTab({ searchQuery }: Prop) {
     const [sortOrder, setSortOrder] = useState("name-asc");
+    const [checkFirstAid, setCheckFirstAid] = useState<number[]>([])
     const [firstAid, setFirstAid] = useState(initialFirstAid);
     const [selectedFirstAid, setSelectedFirstAid] = useState<any>(null);
     const [isAddingFirstAid, setIsAddingFirstAid] = useState(false);
@@ -222,7 +224,7 @@ export default function FirstAidTab({ searchQuery }: Prop) {
     };
 
     // Sort Courts based on selected sort order
-    const sortedFacilties = [...filteredFirstAid].sort((a, b) => {
+    const sortedFirstAid = [...filteredFirstAid].sort((a, b) => {
         switch (sortOrder) {
             case "name-asc":
                 return a.name.localeCompare(b.name);
@@ -238,10 +240,28 @@ export default function FirstAidTab({ searchQuery }: Prop) {
     const postsPerPage = 20;
     const indexOfLastPost = currentPage * postsPerPage;
     const indexOfFirstPost = indexOfLastPost - postsPerPage;
-    const currentPosts = sortedFacilties.slice(indexOfFirstPost, indexOfLastPost);
+    const currentPosts = sortedFirstAid.slice(indexOfFirstPost, indexOfLastPost);
 
     const totalPages = Math.ceil(firstAid.length / postsPerPage);
     const paginationLabels = Array.from({ length: totalPages }, (_, i) => i + 1);
+
+    // Toggle
+    const toggleSelectFirstAid = (fId: number) => {
+        setCheckFirstAid((prev) =>
+            prev.includes(fId)
+                ? prev.filter((id) => id !== fId)
+                : [...prev, fId]
+        );
+    };
+
+    const toggleSelectAll = () => {
+        if (checkFirstAid.length === filteredFirstAid.length) {
+            console.log("Select All If Condition")
+            setCheckFirstAid([]);
+        } else {
+            setCheckFirstAid(filteredFirstAid.map((aid: any) => aid.id));
+        }
+    };
 
     return (
         <>
@@ -720,20 +740,37 @@ export default function FirstAidTab({ searchQuery }: Prop) {
                         </div>
                     </CardHeader>
                     <CardContent>
+                        {checkFirstAid.length > 0 && (
+                            <div className="flex items-center gap-2 p-2 bg-main-frostyBlue/10 rounded-md">
+                                <span className="text-sm text-main-darkFadedBlue">
+                                    {checkFirstAid.length} First Aid
+                                    {checkFirstAid.length > 1 ? "s" : ""} Selected
+                                </span>
+                                <div className="flex-1"></div>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="border-red-500 text-red-500 hover:bg-red-50"
+                                >
+                                    <Trash2 className="mr-2 h-4 w-4" />
+                                    Delete
+                                </Button>
+                            </div>
+                        )}
                         <div className="border rounded-md">
                             <Table>
                                 <TableHeader>
                                     <TableRow className="bg-main-frostyBlue/5">
-                                        {/* <TableHead className="w-12">
-                                        <Checkbox
-                                            value={
-                                                selectedFacility.length === filteredFacilities.length &&
-                                                filteredFacilities.length > 0
-                                            }
-                                            // setter={toggleSelectAll}
-                                            name=""
-                                        />
-                                    </TableHead> */}
+                                        <TableHead className="w-12">
+                                            <Checkbox
+                                                value={
+                                                    checkFirstAid.length === filteredFirstAid.length &&
+                                                    filteredFirstAid.length > 0
+                                                }
+                                                setter={toggleSelectAll}
+                                                name=""
+                                            />
+                                        </TableHead>
                                         <TableHead>
                                             <div
                                                 className="flex items-center gap-1 cursor-pointer"
@@ -758,16 +795,16 @@ export default function FirstAidTab({ searchQuery }: Prop) {
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody className="!text-sm">
-                                    {filteredFirstAid.length > 0 ? (
-                                        firstAid.map((aid: any, index: number) => (
+                                    {currentPosts.length > 0 ? (
+                                        currentPosts.map((aid: any, index: number) => (
                                             <TableRow key={index}>
-                                                {/* <TableCell>
-                                                <Checkbox
-                                                    value={selectedCourts.includes(court.Id)}
-                                                    setter={(n, v) => toggleSelectcourt(court.Id)}
-                                                    name="id"
-                                                />
-                                            </TableCell> */}
+                                                <TableCell>
+                                                    <Checkbox
+                                                        value={checkFirstAid.includes(aid.id)}
+                                                        setter={(n, v) => toggleSelectFirstAid(aid.id)}
+                                                        name="id"
+                                                    />
+                                                </TableCell>
                                                 <TableCell>{aid.name}</TableCell>
                                                 <TableCell>{aid.location}</TableCell>
                                                 <TableCell>{aid.staffed ? "Yes" : "No"}</TableCell>
@@ -826,7 +863,7 @@ export default function FirstAidTab({ searchQuery }: Prop) {
                                                 colSpan={6}
                                                 className="h-24 text-center text-main-gray"
                                             >
-                                                No products found.
+                                                No First Aids Found!
                                             </TableCell>
                                         </TableRow>
                                     )}
@@ -876,104 +913,6 @@ export default function FirstAidTab({ searchQuery }: Prop) {
                         </div>
                     </CardContent>
                 </Card >
-
-                // <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                //     {filteredFirstAid.length > 0 ? (
-                //         filteredFirstAid.map((station) => (
-                //             <Card key={station.id}>
-                //                 <CardHeader className="pb-2">
-                //                     <div className="flex justify-between items-start">
-                //                         <CardTitle>{station.name}</CardTitle>
-                //                         <Badge
-                //                             variant={
-                //                                 station.status === "operational"
-                //                                     ? "default"
-                //                                     : station.status === "unstaffed"
-                //                                         ? "warning"
-                //                                         : "destructive"
-                //                             }
-                //                         >
-                //                             {station.status.charAt(0).toUpperCase() +
-                //                                 station.status.slice(1)}
-                //                         </Badge>
-                //                     </div>
-                //                     <CardDescription>{station.location}</CardDescription>
-                //                 </CardHeader>
-                //                 <CardContent>
-                //                     <div className="space-y-2">
-                //                         <div className="flex justify-between text-sm">
-                //                             <span className="text-muted-foreground">
-                //                                 Staffed:
-                //                             </span>
-                //                             <span>{station.staffed ? "Yes" : "No"}</span>
-                //                         </div>
-                //                         {station.staffed && (
-                //                             <div className="flex justify-between text-sm">
-                //                                 <span className="text-muted-foreground">
-                //                                     Hours:
-                //                                 </span>
-                //                                 <span>{station.staffingHours}</span>
-                //                             </div>
-                //                         )}
-                //                         <div className="flex justify-between text-sm">
-                //                             <span className="text-muted-foreground">
-                //                                 Equipment:
-                //                             </span>
-                //                             <span>{station.equipment.length} items</span>
-                //                         </div>
-                //                     </div>
-                //                 </CardContent>
-                //                 <CardFooter className="flex justify-between">
-                //                     <Button
-                //                         variant="outline"
-                //                         size="sm"
-                //                         onClick={() => setSelectedFirstAid(station)}
-                //                     >
-                //                         View Details
-                //                         <ChevronRight className="ml-2 h-4 w-4" />
-                //                     </Button>
-                //                     <div className="flex space-x-2">
-                //                         <Button
-                //                             variant="outline"
-                //                             size="icon"
-                //                             onClick={() => {
-                //                                 handleEditFirstAid(station);
-                //                                 setSelectedFirstAid(station);
-                //                                 setIsEditingFirstAid(true);
-                //                             }}
-                //                         >
-                //                             <Edit className="h-4 w-4" />
-                //                         </Button>
-                //                         <Button
-                //                             variant="outline"
-                //                             size="icon"
-                //                             onClick={() => {
-                //                                 setFirstAidToDelete(station);
-                //                                 setDeleteFirstAidDialog(true);
-                //                             }}
-                //                         >
-                //                             <Trash2 className="h-4 w-4" />
-                //                         </Button>
-                //                     </div>
-                //                 </CardFooter>
-                //             </Card>
-                //         ))
-                //     ) : (
-                //         <div className="col-span-full flex justify-center items-center h-40 border rounded-lg border-dashed">
-                //             <div className="text-center">
-                //                 <FirstAid className="mx-auto h-10 w-10 text-muted-foreground" />
-                //                 <h3 className="mt-2 text-sm font-semibold">
-                //                     No first aid stations found
-                //                 </h3>
-                //                 <p className="mt-1 text-sm text-muted-foreground">
-                //                     {searchQuery
-                //                         ? "Try a different search term"
-                //                         : "Get started by adding a new first aid station"}
-                //                 </p>
-                //             </div>
-                //         </div>
-                //     )}
-                // </div>
             )
             }
 

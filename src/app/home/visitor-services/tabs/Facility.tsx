@@ -69,7 +69,7 @@ interface Prop {
 
 const initialFacilities = [
     {
-        id: "facility-1",
+        id: "1",
         name: "Main Restrooms",
         type: "restroom",
         location: "Main Entrance",
@@ -79,7 +79,7 @@ const initialFacilities = [
         description: "Large restroom facility with multiple stalls and amenities.",
     },
     {
-        id: "facility-2",
+        id: "2",
         name: "Safari Zone Restrooms",
         type: "restroom",
         location: "Safari Zone",
@@ -89,7 +89,7 @@ const initialFacilities = [
         description: "Medium-sized restroom facility serving the Safari Zone area.",
     },
     {
-        id: "facility-3",
+        id: "3",
         name: "Visitor Center",
         type: "information",
         location: "Main Plaza",
@@ -104,7 +104,7 @@ const initialFacilities = [
         description: "Central information hub for visitors with various services.",
     },
     {
-        id: "facility-4",
+        id: "4",
         name: "Rainforest Rest Area",
         type: "rest_area",
         location: "Rainforest Zone",
@@ -114,10 +114,111 @@ const initialFacilities = [
         description:
             "Covered seating area for visitors to rest in the Rainforest Zone.",
     },
+    {
+        id: "5",
+        name: "North Gate Storage",
+        type: "storage",
+        location: "North Gate",
+        status: "operational",
+        features: ["Equipment storage", "Staff only"],
+        lastMaintenance: "2023-05-12",
+        description: "Storage facility for maintenance and cleaning equipment.",
+    },
+    {
+        id: "6",
+        name: "Children's Playground",
+        type: "rest_area",
+        location: "Kids Zone",
+        status: "operational",
+        features: ["Playground", "Seating", "Shade"],
+        lastMaintenance: "2023-05-18",
+        description: "Playground area with benches and shade for families.",
+    },
+    {
+        id: "7",
+        name: "Aquarium Info Desk",
+        type: "information",
+        location: "Aquarium Entrance",
+        status: "operational",
+        features: ["Information desk", "Guided tour info"],
+        lastMaintenance: "2023-05-08",
+        description: "Information desk for aquarium visitors and tour bookings.",
+    },
+    {
+        id: "8",
+        name: "East Restrooms",
+        type: "restroom",
+        location: "East Wing",
+        status: "maintenance",
+        features: ["Wheelchair accessible"],
+        lastMaintenance: "2023-05-22",
+        description: "Restroom facility currently under maintenance.",
+    },
+    {
+        id: "9",
+        name: "Picnic Area",
+        type: "rest_area",
+        location: "Lake Side",
+        status: "operational",
+        features: ["Picnic tables", "Trash bins", "Shade"],
+        lastMaintenance: "2023-05-14",
+        description: "Outdoor picnic area with tables and shade near the lake.",
+    },
+    {
+        id: "10",
+        name: "Lost & Found",
+        type: "information",
+        location: "Main Entrance",
+        status: "operational",
+        features: ["Lost and found", "Information desk"],
+        lastMaintenance: "2023-05-11",
+        description: "Lost and found office for visitor belongings.",
+    },
+    {
+        id: "11",
+        name: "Staff Break Room",
+        type: "other",
+        location: "Admin Building",
+        status: "operational",
+        features: ["Seating", "Kitchenette", "Rest area"],
+        lastMaintenance: "2023-05-09",
+        description: "Break room for zoo staff with basic amenities.",
+    },
+    {
+        id: "12",
+        name: "Butterfly Garden Rest Area",
+        type: "rest_area",
+        location: "Butterfly Garden",
+        status: "operational",
+        features: ["Seating", "Shade", "Water fountains"],
+        lastMaintenance: "2023-05-13",
+        description: "Rest area for visitors in the Butterfly Garden.",
+    },
+    {
+        id: "13",
+        name: "West Storage",
+        type: "storage",
+        location: "West Wing",
+        status: "closed",
+        features: ["Equipment storage"],
+        lastMaintenance: "2023-04-28",
+        description: "Storage facility currently closed for renovations.",
+    },
+    {
+        id: "14",
+        name: "Giraffe Overlook Restrooms",
+        type: "restroom",
+        location: "Giraffe Overlook",
+        status: "operational",
+        features: ["Wheelchair accessible", "Family restroom"],
+        lastMaintenance: "2023-05-16",
+        description: "Restroom facility near the Giraffe Overlook.",
+    }
 ];
 
 export default function Faciltiy({ searchQuery }: Prop) {
     const [sortOrder, setSortOrder] = useState("name-asc");
+    const [checkFacility, setCheckFacility] = useState<number[]>([])
     const [facilities, setFacilities] = useState(initialFacilities);
     const [selectedFacility, setSelectedFacility] = useState<any>(null);
     const [isAddingFacility, setIsAddingFacility] = useState(false);
@@ -237,11 +338,20 @@ export default function Faciltiy({ searchQuery }: Prop) {
     };
 
     // Toggle
+    const toggleSelectFacility = (fId: number) => {
+        setCheckFacility((prev) =>
+            prev.includes(fId)
+                ? prev.filter((id) => id !== fId)
+                : [...prev, fId]
+        );
+    };
+
     const toggleSelectAll = () => {
-        if (selectedFacility?.length === filteredFacilities.length) {
-            setSelectedFacility([]);
+        if (checkFacility.length === filteredFacilities.length) {
+            console.log("Select All If Condition")
+            setCheckFacility([]);
         } else {
-            setSelectedFacility(filteredFacilities.map((court: any) => court.Id));
+            setCheckFacility(filteredFacilities.map((facility: any) => facility.id));
         }
     };
 
@@ -259,7 +369,7 @@ export default function Faciltiy({ searchQuery }: Prop) {
 
     // Pagination
     const [currentPage, setCurrentPage] = useState(1);
-    const postsPerPage = 20;
+    const postsPerPage = 10;
     const indexOfLastPost = currentPage * postsPerPage;
     const indexOfFirstPost = indexOfLastPost - postsPerPage;
     const currentPosts = sortedFacilties.slice(indexOfFirstPost, indexOfLastPost);
@@ -752,20 +862,37 @@ export default function Faciltiy({ searchQuery }: Prop) {
                         </CardHeader>
 
                         <CardContent>
+                            {checkFacility.length > 0 && (
+                                <div className="flex items-center gap-2 p-2 bg-main-frostyBlue/10 rounded-md">
+                                    <span className="text-sm text-main-darkFadedBlue">
+                                        {checkFacility.length} Facilit
+                                        {checkFacility.length > 1 ? "ies" : "y"} Selected
+                                    </span>
+                                    <div className="flex-1"></div>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="border-red-500 text-red-500 hover:bg-red-50"
+                                    >
+                                        <Trash2 className="mr-2 h-4 w-4" />
+                                        Delete
+                                    </Button>
+                                </div>
+                            )}
                             <div className="border rounded-md">
                                 <Table>
                                     <TableHeader>
                                         <TableRow className="bg-main-frostyBlue/5">
-                                            {/* <TableHead className="w-12">
-                                        <Checkbox
-                                            value={
-                                                selectedFacility.length === filteredFacilities.length &&
-                                                filteredFacilities.length > 0
-                                            }
-                                            // setter={toggleSelectAll}
-                                            name=""
-                                        />
-                                    </TableHead> */}
+                                            <TableHead className="w-12">
+                                                <Checkbox
+                                                    value={
+                                                        checkFacility.length === filteredFacilities.length &&
+                                                        filteredFacilities.length > 0
+                                                    }
+                                                    setter={toggleSelectAll}
+                                                    name=""
+                                                />
+                                            </TableHead>
                                             <TableHead>
                                                 <div
                                                     className="flex items-center gap-1 cursor-pointer"
@@ -790,16 +917,16 @@ export default function Faciltiy({ searchQuery }: Prop) {
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody className="!text-sm">
-                                        {filteredFacilities.length > 0 ? (
-                                            facilities.map((facility: any, index: number) => (
+                                        {currentPosts.length > 0 ? (
+                                            currentPosts.map((facility: any, index: number) => (
                                                 <TableRow key={index}>
-                                                    {/* <TableCell>
-                                                <Checkbox
-                                                    value={selectedCourts.includes(court.Id)}
-                                                    setter={(n, v) => toggleSelectcourt(court.Id)}
-                                                    name="id"
-                                                />
-                                            </TableCell> */}
+                                                    <TableCell>
+                                                        <Checkbox
+                                                            value={checkFacility.includes(facility.id)}
+                                                            setter={(n, v) => toggleSelectFacility(facility.id)}
+                                                            name="id"
+                                                        />
+                                                    </TableCell>
                                                     <TableCell>{facility.name}</TableCell>
                                                     <TableCell>{facility.location}</TableCell>
                                                     <TableCell>{facility.type}</TableCell>
@@ -858,7 +985,7 @@ export default function Faciltiy({ searchQuery }: Prop) {
                                                     colSpan={6}
                                                     className="h-24 text-center text-main-gray"
                                                 >
-                                                    No products found.
+                                                    No Facilties Found!
                                                 </TableCell>
                                             </TableRow>
                                         )}
