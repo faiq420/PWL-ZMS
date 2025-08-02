@@ -24,6 +24,9 @@ import {
   UserCog,
   PanelLeftOpen,
   PanelRightOpen,
+  Logs,
+  HomeIcon,
+  Clock,
 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "../ui/button";
@@ -58,6 +61,16 @@ export function SideMenu() {
       title: "Animal Directory",
       href: "/home/animal-directory",
       icon: <Paw className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />,
+    },
+    {
+      title: "Enclosure Management",
+      href: "/home/enclosure-zone-management",
+      icon: <HomeIcon className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />,
+    },
+    {
+      title: "Feed Scheduling",
+      href: "/home/feed-scheduling",
+      icon: <Clock className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />,
     },
     {
       title: "Planned Visits",
@@ -101,6 +114,13 @@ export function SideMenu() {
       href: "/home/access-control",
       icon: (
         <TowerControl className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />
+      ),
+    },
+    {
+      title: "Reports & Logs",
+      href: "/home/report-logs",
+      icon: (
+        <Logs className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />
       ),
     },
   ];
