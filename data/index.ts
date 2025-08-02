@@ -20,3 +20,11 @@ export const safetyTypes = [
   { value: 4, label: "Training" },
   { value: 5, label: "Other" },
 ];
+
+export const enclosureTypes = [
+  { value: 1, label: "Open" },
+  { value: 2, label: "Caged" },
+  { value: 3, label: "Aquatic" },
+  { value: 4, label: "Aviary" },
+  { value: 5, label: "Other" },
+];

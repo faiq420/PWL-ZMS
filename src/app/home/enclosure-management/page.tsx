@@ -37,69 +37,21 @@ import {
 } from "@/components/ui/pagination";
 import { changeDateFormat } from "@/Helper/DateFormats";
 import Checkbox from "@/components/utils/FormElements/Checkbox";
+import { Enclosure, mockEnclosures } from "@/data/enclosures";
 
-interface FeedSchedule {
-  id: number;
-  animalId: number;
-  animalName: string;
-  feedType: string;
-  quantity: string;
-  time: string;
-  frequency: string; // e.g., Daily, Weekly, Mon-Fri
-  notes?: string;
-  startDate: string;
-  endDate?: string;
-}
-
-const initialFeedSchedules: FeedSchedule[] = [
-  {
-    id: 1,
-    animalId: 1,
-    animalName: "Lion Simba",
-    feedType: "Raw Meat",
-    quantity: "5 kg",
-    time: "09:00 AM",
-    frequency: "Daily",
-    notes: "Supplement with vitamins",
-    startDate: "2025-03-12",
-  },
-  {
-    id: 2,
-    animalId: 3,
-    animalName: "Elephant Dumbo",
-    feedType: "Hay & Fruits",
-    quantity: "50 kg",
-    time: "10:30 AM",
-    frequency: "Daily",
-    notes: "Large water intake",
-    startDate: "2025-03-12",
-  },
-  {
-    id: 3,
-    animalId: 5,
-    animalName: "Penguin Pingu",
-    feedType: "Fish",
-    quantity: "0.5 kg",
-    time: "02:00 PM",
-    frequency: "Daily",
-    notes: "Feed in water",
-    startDate: "2025-05-01",
-  },
-];
-
-export default function FeedSchedulingPage() {
+export default function EnclosurePage() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
-  const [schedules, setSchedules] = useState<FeedSchedule[]>([
-    ...initialFeedSchedules,
+  const [enclosures, setEnclosures] = useState<Enclosure[]>([
+    ...mockEnclosures,
   ]);
-  const [selectedSchedules, setSelectedSchedules] = useState<number[]>([]);
+  const [selectedEnclosures, setSelectedEnclosures] = useState<number[]>([]);
   const [sortOrder, setSortOrder] = useState("name-asc");
-  const [deleteSchedulesDialog, setDeleteSchedulesDialog] = useState(false);
-  const [scheduleToDelete, setSchedulesToDelete] = useState<any>(null);
+  const [deleteEnclosuresDialog, setDeleteEnclosuresDialog] = useState(false);
+  const [enclosureToDelete, setEnclosuresToDelete] = useState<any>(null);
 
-  const toggleSelectSchedule = (bookingId: number) => {
-    setSelectedSchedules((prev) =>
+  const toggleSelectEnclosure = (bookingId: number) => {
+    setSelectedEnclosures((prev) =>
       prev.includes(bookingId)
         ? prev.filter((id) => id !== bookingId)
         : [...prev, bookingId]
@@ -107,28 +59,30 @@ export default function FeedSchedulingPage() {
   };
 
   const toggleSelectAll = () => {
-    if (selectedSchedules.length === filteredSchedules.length) {
-      setSelectedSchedules([]);
+    if (selectedEnclosures.length === filteredEnclosures.length) {
+      setSelectedEnclosures([]);
     } else {
-      setSelectedSchedules(filteredSchedules.map((booking: any) => booking.id));
+      setSelectedEnclosures(
+        filteredEnclosures.map((booking: any) => booking.id)
+      );
     }
   };
 
-  const filteredSchedules = schedules.filter((schedule) => {
-    const matchesSearch = schedule.animalName
+  const filteredEnclosures = enclosures.filter((enclosure) => {
+    const matchesSearch = enclosure.name
       .toLowerCase()
       .includes(searchQuery.toLowerCase());
 
     return matchesSearch;
   });
 
-  // Sort Schedules based on selected sort order
-  const sortedSchedules = [...filteredSchedules].sort((a, b) => {
+  // Sort Enclosures based on selected sort order
+  const sortedEnclosures = [...filteredEnclosures].sort((a, b) => {
     switch (sortOrder) {
       case "name-asc":
-        return a.animalName.localeCompare(b.animalName);
+        return a.name.localeCompare(b.name);
       case "name-desc":
-        return b.animalName.localeCompare(a.animalName);
+        return b.name.localeCompare(a.name);
       default:
         return 0;
     }
@@ -139,43 +93,46 @@ export default function FeedSchedulingPage() {
   const postsPerPage = 20;
   const indexOfLastPost = currentPage * postsPerPage;
   const indexOfFirstPost = indexOfLastPost - postsPerPage;
-  const currentPosts = sortedSchedules.slice(indexOfFirstPost, indexOfLastPost);
+  const currentPosts = sortedEnclosures.slice(
+    indexOfFirstPost,
+    indexOfLastPost
+  );
 
-  const totalPages = Math.ceil(schedules.length / postsPerPage);
+  const totalPages = Math.ceil(enclosures.length / postsPerPage);
   const paginationLabels = Array.from({ length: totalPages }, (_, i) => i + 1);
 
   /////////////////////////////////////
 
-  const handleDeleteSchedules = () => {
-    if (scheduleToDelete) {
-      const updatedSafeties = schedules.filter(
-        (schedule: any) => schedule.id !== scheduleToDelete.id
+  const handleDeleteEnclosures = () => {
+    if (enclosureToDelete) {
+      const updatedSafeties = enclosures.filter(
+        (enclosure: any) => enclosure.id !== enclosureToDelete.id
       );
-      setSchedules(updatedSafeties);
-      setDeleteSchedulesDialog(false);
-      setSchedulesToDelete(null);
+      setEnclosures(updatedSafeties);
+      setDeleteEnclosuresDialog(false);
+      setEnclosuresToDelete(null);
     }
   };
 
   return (
     <>
       <AlertDialog
-        open={deleteSchedulesDialog}
-        onOpenChange={setDeleteSchedulesDialog}
+        open={deleteEnclosuresDialog}
+        onOpenChange={setDeleteEnclosuresDialog}
       >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete the schedule for "
-              {scheduleToDelete?.animalName}
+              This will permanently delete the enclosure "
+              {enclosureToDelete?.animalName}
               ". This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              onClick={handleDeleteSchedules}
+              onClick={handleDeleteEnclosures}
               className="bg-destructive text-destructive-foreground"
             >
               Delete
@@ -185,23 +142,23 @@ export default function FeedSchedulingPage() {
       </AlertDialog>
       <div className="flex flex-col gap-6">
         <SectionIntro
-          title="Feed Scheduling"
-          description="Manage feeding schedules for all animals in the zoo."
+          title="Enclosure Management"
+          description="Manage zoo enclosures and geographical zones."
         />
 
         <Card className="space-y-4">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardIntro
-              title="Active Feed Schedules"
-              description="Overview of all active feeding plans."
+              title="Enclosures"
+              description="Overview of all enclosures."
             />
             <div className="w-fit">
               <ButtonComp
-                text="Add New Schedule"
+                text="Add New Enclosure"
                 type={"dark"}
                 beforeIcon={<Plus className="h-4 w-4" />}
                 clickEvent={() => {
-                  router.push("/home/feed-scheduling/new");
+                  router.push("/home/enclosure-management/new");
                 }}
               />
             </div>
@@ -210,13 +167,13 @@ export default function FeedSchedulingPage() {
             <SearchTag
               value={searchQuery}
               setter={(value) => setSearchQuery(value)}
-              placeHolder="Select Schedules..."
+              placeHolder="Select Enclosures..."
             />
-            {selectedSchedules.length > 0 && (
+            {selectedEnclosures.length > 0 && (
               <div className="flex items-center gap-2 mb-4 p-2 bg-main-frostyBlue/10 rounded-md">
                 <span className="text-sm text-main-darkFadedBlue">
-                  {selectedSchedules.length} schedule
-                  {selectedSchedules.length > 1 ? "s" : ""} selected
+                  {selectedEnclosures.length} enclosure
+                  {selectedEnclosures.length > 1 ? "s" : ""} selected
                 </span>
                 <div className="flex-1"></div>
                 <Button
@@ -236,9 +193,9 @@ export default function FeedSchedulingPage() {
                     <TableHead className="w-12">
                       <Checkbox
                         value={
-                          selectedSchedules.length ===
-                            filteredSchedules.length &&
-                          filteredSchedules.length > 0
+                          selectedEnclosures.length ===
+                            filteredEnclosures.length &&
+                          filteredEnclosures.length > 0
                         }
                         setter={toggleSelectAll}
                         name=""
@@ -255,48 +212,42 @@ export default function FeedSchedulingPage() {
                       Animal
                       <ArrowUpDown className="h-4 w-4" />
                     </TableHead>
-                    <TableHead>Feed Type</TableHead>
-                    <TableHead>Quantity</TableHead>
-                    <TableHead>Time</TableHead>
-                    <TableHead>Frequency</TableHead>
-                    <TableHead>Start Date</TableHead>
-                    <TableHead>End Date</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Capacity</TableHead>
+                    <TableHead>Inhabitants</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Location</TableHead>
                     <TableHead className="text-center">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {currentPosts.length > 0 ? (
-                    currentPosts.map((schedule) => (
-                      <TableRow key={schedule.id}>
+                    currentPosts.map((enclosure) => (
+                      <TableRow key={enclosure.id}>
                         <TableCell>
                           <Checkbox
-                            value={selectedSchedules.includes(schedule.id)}
-                            setter={(n, v) => toggleSelectSchedule(schedule.id)}
+                            value={selectedEnclosures.includes(enclosure.id)}
+                            setter={(n, v) =>
+                              toggleSelectEnclosure(enclosure.id)
+                            }
                             name="id"
                           />
                         </TableCell>
                         <TableCell className="font-medium">
-                          {schedule.animalName}
+                          {enclosure.name}
                         </TableCell>
-                        <TableCell>{schedule.feedType}</TableCell>
-                        <TableCell>{schedule.quantity}</TableCell>
-                        <TableCell>{schedule.time}</TableCell>
-                        <TableCell>{schedule.frequency}</TableCell>
-                        <TableCell>
-                          {changeDateFormat(schedule.startDate)}
-                        </TableCell>
-                        <TableCell>
-                          {schedule.endDate
-                            ? changeDateFormat(schedule.endDate)
-                            : "-"}
-                        </TableCell>
+                        <TableCell>{enclosure.type}</TableCell>
+                        <TableCell>{enclosure.capacity}</TableCell>
+                        <TableCell>{enclosure.currentAnimals}</TableCell>
+                        <TableCell>{enclosure.status}</TableCell>
+                        <TableCell>{enclosure.location}</TableCell>
                         <TableCell className="text-right flex justify-end">
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => {
                               router.push(
-                                `/home/feed-scheduling/${schedule.id}`
+                                `/home/enclosure-management/${enclosure.id}`
                               );
                             }}
                           >
@@ -307,8 +258,8 @@ export default function FeedSchedulingPage() {
                             variant="ghost"
                             size="sm"
                             onClick={() => {
-                              setSchedulesToDelete(schedule);
-                              setDeleteSchedulesDialog(true);
+                              setEnclosuresToDelete(enclosure);
+                              setDeleteEnclosuresDialog(true);
                             }}
                             className="text-destructive hover:text-destructive"
                           >
@@ -323,7 +274,7 @@ export default function FeedSchedulingPage() {
                         colSpan={9}
                         className="h-24 text-center text-main-gray"
                       >
-                        No schedules found.
+                        No enclosures found.
                       </TableCell>
                     </TableRow>
                   )}

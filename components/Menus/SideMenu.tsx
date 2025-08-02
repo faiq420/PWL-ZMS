@@ -64,7 +64,7 @@ export function SideMenu() {
     },
     {
       title: "Enclosure Management",
-      href: "/home/enclosure-zone-management",
+      href: "/home/enclosure-management",
       icon: <HomeIcon className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />,
     },
     {
@@ -119,9 +119,7 @@ export function SideMenu() {
     {
       title: "Reports & Logs",
       href: "/home/report-logs",
-      icon: (
-        <Logs className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />
-      ),
+      icon: <Logs className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />,
     },
   ];
 
@@ -165,7 +163,7 @@ export function SideMenu() {
                       onClick={() => setSidebarOpen(false)}
                       className={cn(
                         "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all hover:text-main-jungleGreen",
-                        pathname === item.href
+                        pathname.startsWith(item.href.replace(/\/$/, ""))
                           ? "bg-main-jungleGreen/10 font-medium text-main-jungleGreen"
                           : "text-muted-foreground"
                       )}
@@ -284,7 +282,11 @@ export function SideMenu() {
                 // <span className="uppercase text-4xl leading-5 font-montserrat font-semibold">
                 //   ZMS
                 // </span>
-                <Image src={typographyIcon} className="w-[60%] xl:w-[40%]" alt="Logo" />
+                <Image
+                  src={typographyIcon}
+                  className="w-[60%] xl:w-[40%]"
+                  alt="Logo"
+                />
               )}
             </Link>
           </div>
