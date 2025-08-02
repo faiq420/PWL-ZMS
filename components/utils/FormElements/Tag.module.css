@@ -12,6 +12,7 @@
   font-size: 12px;
   font-weight: 400;
   @apply font-tajawal;
+  height: 36px;
 }
 
 .input:disabled {

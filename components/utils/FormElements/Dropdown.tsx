@@ -55,16 +55,17 @@ const Dropdown = ({
     control: (provided: any) => ({
       ...provided,
       fontSize: 12,
-      minHeight: "34px",
-      height: "34px",
-      maxHeight: "34px",
+      minHeight: "36px",
+      height: "36px",
+      maxHeight: "36px",
       padding: 0,
       display: "flex",
       outline: "none",
+      borderColor: "#dfdfdf",
     }),
     valueContainer: (provided: any) => ({
       ...provided,
-      height: "34px",
+      height: "36px",
       display: "flex",
       alignItems: "center",
       padding: "0 8px",
@@ -77,12 +78,12 @@ const Dropdown = ({
     }),
     singleValue: (provided: any) => ({
       ...provided,
-      lineHeight: "34px",
+      lineHeight: "36px",
       margin: 0,
     }),
     indicatorsContainer: (provided: any) => ({
       ...provided,
-      height: "34px",
+      height: "36px",
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
@@ -112,6 +113,7 @@ const Dropdown = ({
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
+      color: "#000",
     }),
     clearIndicator: (provided: any) => ({
       ...provided,
@@ -142,7 +144,7 @@ const Dropdown = ({
             {isRequired && <span className="text-red-900">*</span>}
           </Label>
         )}
-        <div className="h-[34px] bg-[#f6f8fc] rounded"></div>
+        <div className="h-[36px] bg-[#f6f8fc] rounded"></div>
       </div>
     );
   }

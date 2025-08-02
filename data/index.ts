@@ -12,3 +12,11 @@ export const facilityTypes = [
   { value: 4, label: "Storage" },
   { value: 5, label: "Other" },
 ];
+
+export const safetyTypes = [
+  { value: 1, label: "Protocol" },
+  { value: 2, label: "Evacuation" },
+  { value: 3, label: "Equipment" },
+  { value: 4, label: "Training" },
+  { value: 5, label: "Other" },
+];

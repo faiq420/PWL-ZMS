@@ -305,7 +305,7 @@ const BookingsTable = () => {
                       colSpan={6}
                       className="h-24 text-center text-main-gray"
                     >
-                      No products found.
+                      No bookings found.
                     </TableCell>
                   </TableRow>
                 )}

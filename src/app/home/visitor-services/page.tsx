@@ -15,9 +15,9 @@ const PageContent = () => {
   const tabs = [
     "food-court",
     "restaurant-canteen-cart",
-    "facilities",
-    "first-aid",
-    "safety",
+    "Facilities",
+    "First_Aid",
+    "Safety",
   ];
   const crudModes = ["create", "edit", "view"];
   const activeTab = searchParams.get("tab");
@@ -25,6 +25,7 @@ const PageContent = () => {
   const mode = searchParams.get("mode") || undefined;
 
   useEffect(() => {
+    console.log(activeTab);
     if (!activeTab || !tabs.includes(activeTab)) {
       router.replace("/home/visitor-services");
     }
@@ -45,11 +46,11 @@ const PageContent = () => {
       return <FoodCourt {...props} />;
     case "restaurant-canteen-cart":
       return <Cafetaria {...props} />;
-    case "facilities":
+    case "Facilities":
       return <Facility {...props} />;
-    case "safety":
+    case "Safety":
       return <Safety {...props} />;
-    case "first-aid":
+    case "First_Aid":
       return <FirstAid {...props} />;
     default:
       return <p>Invalid tab.</p>;
