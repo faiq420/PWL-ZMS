@@ -2,8 +2,7 @@ import type React from "react";
 import { SideMenu } from "@/components/Menus/SideMenu";
 import Footer from "@/components/Menus/Footer";
 import Header from "@/components/Menus/Header";
-import 'leaflet/dist/leaflet.css';
-
+import "leaflet/dist/leaflet.css";
 
 export default function DashboardLayout({
   children,
@@ -16,7 +15,9 @@ export default function DashboardLayout({
         <SideMenu />
       </div>
       <main className="flex-1 h-screen flex flex-col pr-4 py-1 pl-0">
-        <Header />
+        <div className="hidden md:block">
+          <Header />
+        </div>
         <div
           className={`flex flex-col flex-1 rounded-lg overflow-auto w-full md:w-min-[83vw] md:w-max-[95vw] xl:w-min-[85vw]`}
         >

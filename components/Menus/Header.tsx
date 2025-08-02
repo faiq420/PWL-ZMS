@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { LogOut } from "lucide-react";
+import { LogOut, UserCog } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
@@ -45,20 +45,20 @@ const Header = () => {
             </div>
           </div>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuLabel>{userName}</DropdownMenuLabel>
+        <DropdownMenuContent align="end" className="font-roboto text-[6px]">
+          <DropdownMenuLabel className="text-xs font-medium text-center uppercase truncate">{userName}</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          {/* <DropdownMenuItem onClick={() => router.push("/account/orders")}>
-            <Package className="mr-2 h-4 w-4" />
-            <span>Orders</span>
-          </DropdownMenuItem> */}
+          <DropdownMenuItem onClick={() => router.push("/home/change-password")}>
+            <UserCog className="mr-2 h-3 w-3" />
+            <span className="text-xs">Change Password</span>
+          </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
             className="text-red-500 focus:text-red-500"
             onClick={Logout}
           >
-            <LogOut className="mr-2 h-4 w-4" />
-            <span>Log out</span>
+            <LogOut className="mr-2 h-3 w-3" />
+            <span className="text-xs">Log out</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

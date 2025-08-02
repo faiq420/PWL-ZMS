@@ -195,6 +195,15 @@ export function SideMenu() {
                   </div>
                 </div>
                 <Link
+                  href={"/home/change-password"}
+                  className={
+                    "flex-1 flex items-end gap-3 rounded-lg px-5 py-2 text-xs transition-all hover:text-gray-900 text-muted-foreground space-x-3"
+                  }
+                >
+                  <UserCog className={`h-3 w-3`} />
+                  <span>Change Password</span>
+                </Link>
+                <Link
                   href={"/"}
                   className={
                     "flex-1 flex items-end gap-3 rounded-lg px-5 py-2 text-xs transition-all hover:text-gray-900 text-muted-foreground space-x-3"
