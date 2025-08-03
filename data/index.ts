@@ -37,3 +37,15 @@ export const animalGroups = [
   { value: 5, label: "Reptiles" },
   { value: 5, label: "Invertebrates" },
 ];
+
+export const conservationStatus = [
+  { value: 1, label: "Extinct" },
+  { value: 2, label: "Critically Endangered" },
+  { value: 3, label: "Endangered" },
+  { value: 4, label: "Vulnerable" },
+  { value: 5, label: "Near Threatened" },
+  { value: 6, label: "Least Concern" },
+  { value: 7, label: "Data Deficient" },
+  { value: 8, label: "Not Evaluated" },
+  { value: 9, label: "Critically Endangered" },
+];

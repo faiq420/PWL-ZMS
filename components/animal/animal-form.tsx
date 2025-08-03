@@ -1,171 +1,151 @@
-"use client"
-import { Card, CardContent } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Checkbox } from "@/components/ui/checkbox"
+"use client";
+import { Card, CardContent } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import TextArea from "../utils/FormElements/TextArea";
+import InputTag from "../utils/FormElements/InputTag";
+import Dropdown from "../utils/FormElements/Dropdown";
+import { animalGroups, conservationStatus } from "@/data";
+import { useState } from "react";
+import { OPTION } from "@/types/utils";
+import Checkbox from "../utils/FormElements/Checkbox";
 
 interface Zoo {
-  id: string
-  name: string
+  id: string;
+  name: string;
 }
 
 interface AnimalFormProps {
-  animal: any
-  setAnimal: (animal: any) => void
-  zoos: Zoo[]
+  animal: any;
+  setAnimal: (animal: any) => void;
+  zoos: Zoo[];
 }
 
 export function AnimalForm({ animal, setAnimal, zoos }: AnimalFormProps) {
+  const [enclosures, setEnclosures] = useState<OPTION[]>([]);
   const handleChange = (field: string, value: any) => {
-    setAnimal({ ...animal, [field]: value })
-  }
+    setAnimal({ ...animal, [field]: value });
+  };
 
   const handleZooToggle = (zooId: string, checked: boolean) => {
     if (checked) {
       setAnimal({
         ...animal,
-        zooIds: [...animal.zooIds, zooId],
-      })
+        ZooIds: [...animal.ZooIds, zooId],
+      });
     } else {
       setAnimal({
         ...animal,
-        zooIds: animal.zooIds.filter((id: string) => id !== zooId),
-      })
+        ZooIds: animal.ZooIds.filter((id: string) => id !== zooId),
+      });
     }
-  }
+  };
 
   return (
     <Card>
       <CardContent className="pt-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
-              <Input
-                id="name"
-                value={animal.name}
-                onChange={(e) => handleChange("name", e.target.value)}
-                placeholder="Common name of the animal"
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="scientificName">Scientific Name</Label>
-              <Input
-                id="scientificName"
-                value={animal.scientificName}
-                onChange={(e) => handleChange("scientificName", e.target.value)}
-                placeholder="Scientific name (Latin)"
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="category">Category</Label>
-              <Select value={animal.category} onValueChange={(value) => handleChange("category", value)}>
-                <SelectTrigger id="category">
-                  <SelectValue placeholder="Select category" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Mammals">Mammals</SelectItem>
-                  <SelectItem value="Birds">Birds</SelectItem>
-                  <SelectItem value="Reptiles">Reptiles</SelectItem>
-                  <SelectItem value="Amphibians">Amphibians</SelectItem>
-                  <SelectItem value="Fish">Fish</SelectItem>
-                  <SelectItem value="Invertebrates">Invertebrates</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="conservationStatus">Conservation Status</Label>
-              <Select
-                value={animal.conservationStatus}
-                onValueChange={(value) => handleChange("conservationStatus", value)}
-              >
-                <SelectTrigger id="conservationStatus">
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Extinct">Extinct</SelectItem>
-                  <SelectItem value="Extinct in the Wild">Extinct in the Wild</SelectItem>
-                  <SelectItem value="Critically Endangered">Critically Endangered</SelectItem>
-                  <SelectItem value="Endangered">Endangered</SelectItem>
-                  <SelectItem value="Vulnerable">Vulnerable</SelectItem>
-                  <SelectItem value="Near Threatened">Near Threatened</SelectItem>
-                  <SelectItem value="Least Concern">Least Concern</SelectItem>
-                  <SelectItem value="Data Deficient">Data Deficient</SelectItem>
-                  <SelectItem value="Not Evaluated">Not Evaluated</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="habitat">Habitat</Label>
-              <Input
-                id="habitat"
-                value={animal.habitat}
-                onChange={(e) => handleChange("habitat", e.target.value)}
-                placeholder="Natural habitat"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="diet">Diet</Label>
-              <Input
-                id="diet"
-                value={animal.diet}
-                onChange={(e) => handleChange("diet", e.target.value)}
-                placeholder="Dietary habits"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="lifespan">Lifespan</Label>
-              <Input
-                id="lifespan"
-                value={animal.lifespan}
-                onChange={(e) => handleChange("lifespan", e.target.value)}
-                placeholder="Average lifespan"
-              />
-            </div>
+          <div className="space-y-3">
+            <InputTag
+              value={animal.Name}
+              name="Name"
+              setter={handleChange}
+              label="Name"
+              placeHolder="Common name of the animal"
+              isRequired
+            />
+            <InputTag
+              value={animal.ScientificName}
+              name="ScientificName"
+              setter={handleChange}
+              label="Scientific Name"
+              placeHolder="Scientific name (Latin)"
+              isRequired
+            />
+            <Dropdown
+              activeId={animal.CategoryId}
+              options={animalGroups}
+              handleDropdownChange={handleChange}
+              name="CategoryId"
+              label="Category"
+              isRequired
+            />
+            <Dropdown
+              isRequired
+              activeId={animal.ConservationStatusId}
+              options={conservationStatus}
+              handleDropdownChange={handleChange}
+              name="ConservationStatusId"
+              label="Conservation Status"
+            />
+            <Dropdown
+              isRequired
+              activeId={animal.Enclosure}
+              options={conservationStatus}
+              handleDropdownChange={handleChange}
+              name="Enclosure"
+              label="Enclosure"
+            />
+            <InputTag
+              value={animal.Habitat}
+              name="Habitat"
+              setter={handleChange}
+              label="Habitat"
+              placeHolder="Natural habitat"
+              isRequired
+            />
+            <InputTag
+              value={animal.Diet}
+              name="Diet"
+              setter={handleChange}
+              label="Diet"
+              placeHolder="Dietary habits"
+              isRequired
+            />
+            <InputTag
+              value={animal.Lifespan}
+              name="Lifespan"
+              setter={handleChange}
+              label="Life span"
+              placeHolder="Average lifespan"
+              isRequired
+            />
+            <InputTag
+              value={animal.BirthDate}
+              name="BirthDate"
+              type="date"
+              setter={handleChange}
+              label="Birth Date"
+            />
           </div>
 
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
-              <Textarea
-                id="description"
-                value={animal.description}
-                onChange={(e) => handleChange("description", e.target.value)}
-                placeholder="Detailed description of the animal"
-                className="min-h-[150px]"
-              />
-            </div>
-
-            <div className="space-y-2">
+          <div className="space-y-4 flex flex-col">
+            <div className="space-y-[6px] flex flex-col justify-start">
               <Label>Available at Zoos</Label>
               <div className="grid grid-cols-1 gap-2 pt-1">
                 {zoos.map((zoo) => (
                   <div key={zoo.id} className="flex items-center space-x-2">
                     <Checkbox
-                      id={`zoo-${zoo.id}`}
-                      checked={animal.zooIds.includes(zoo.id)}
-                      onCheckedChange={(checked) => handleZooToggle(zoo.id, checked === true)}
+                      name="Id"
+                      value={animal.ZooIds.includes(zoo.id)}
+                      setter={(n, checked) =>
+                        handleZooToggle(zoo.id, checked === true)
+                      }
+                      label={zoo.name}
                     />
-                    <Label htmlFor={`zoo-${zoo.id}`} className="font-normal">
-                      {zoo.name}
-                    </Label>
                   </div>
                 ))}
               </div>
             </div>
+            <TextArea
+              name="Description"
+              value={animal.Description}
+              setter={handleChange}
+              label="Description"
+              placeHolder="Detailed description of the animal"
+            />
           </div>
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

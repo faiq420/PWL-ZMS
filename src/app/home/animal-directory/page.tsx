@@ -20,7 +20,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Clock, Filter, Plus, Search, Eye, Edit, Trash2 } from "lucide-react";
+import {
+  Clock,
+  Filter,
+  Plus,
+  Search,
+  Eye,
+  Edit,
+  Trash2,
+  ArrowUpDown,
+} from "lucide-react";
 import Image from "next/image";
 import { AnimalDeleteDialog } from "@/components/animal/animal-delete-dialog";
 import { toast } from "@/components/ui/use-toast";
@@ -29,82 +38,23 @@ import Subheading from "@/components/utils/Headings/Subheading";
 import SectionIntro from "@/components/utils/Headings/SectionIntro";
 import ButtonComp from "@/components/utils/Button";
 import SearchTag from "@/components/utils/FormElements/SearchTag";
-
-// Mock data for demonstration
-const animals = [
-  {
-    id: "african-elephant",
-    name: "African Elephant",
-    scientificName: "Loxodonta africana",
-    category: "Mammals",
-    conservationStatus: "Vulnerable",
-    location: ["lahore-zoo", "bahawalpur-zoo"],
-    image: "/placeholder.svg?height=200&width=200",
-  },
-  {
-    id: "bengal-tiger",
-    name: "Bengal Tiger",
-    scientificName: "Panthera tigris tigris",
-    category: "Mammals",
-    conservationStatus: "Endangered",
-    location: ["lahore-safari-park"],
-    image: "/placeholder.svg?height=200&width=200",
-  },
-  {
-    id: "giant-panda",
-    name: "Giant Panda",
-    scientificName: "Ailuropoda melanoleuca",
-    category: "Mammals",
-    conservationStatus: "Vulnerable",
-    location: ["lahore-zoo"],
-    image: "/placeholder.svg?height=200&width=200",
-  },
-  {
-    id: "komodo-dragon",
-    name: "Komodo Dragon",
-    scientificName: "Varanus komodoensis",
-    category: "Reptiles",
-    conservationStatus: "Endangered",
-    location: ["bahawalpur-zoo"],
-    image: "/placeholder.svg?height=200&width=200",
-  },
-  {
-    id: "blue-poison-dart-frog",
-    name: "Blue Poison Dart Frog",
-    scientificName: "Dendrobates azureus",
-    category: "Amphibians",
-    conservationStatus: "Least Concern",
-    location: ["lahore-zoo"],
-    image: "/placeholder.svg?height=200&width=200",
-  },
-  {
-    id: "scarlet-macaw",
-    name: "Scarlet Macaw",
-    scientificName: "Ara macao",
-    category: "Birds",
-    conservationStatus: "Least Concern",
-    location: ["lahore-safari-park"],
-    image: "/placeholder.svg?height=200&width=200",
-  },
-  {
-    id: "emperor-penguin",
-    name: "Emperor Penguin",
-    scientificName: "Aptenodytes forsteri",
-    category: "Birds",
-    conservationStatus: "Near Threatened",
-    location: ["lahore-zoo"],
-    image: "/placeholder.svg?height=200&width=200",
-  },
-  {
-    id: "saltwater-crocodile",
-    name: "Saltwater Crocodile",
-    scientificName: "Crocodylus porosus",
-    category: "Reptiles",
-    conservationStatus: "Least Concern",
-    location: ["bahawalpur-zoo"],
-    image: "/placeholder.svg?height=200&width=200",
-  },
-];
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import CardIntro from "@/components/utils/Headings/CardIntro";
 
 export default function AnimalDirectoryPage() {
   const router = useRouter();
@@ -112,12 +62,94 @@ export default function AnimalDirectoryPage() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [activeTab, setActiveTab] = useState("all");
   const [animalToDelete, setAnimalToDelete] = useState<string | null>(null);
+  const [sortOrder, setSortOrder] = useState("name-asc");
   const [zoos, setZoos] = useState([
     { value: "lahore-zoo", label: "Lahore Zoo" },
     { value: "lahore-safari-park", label: "Lahore Safari Park" },
     { value: "bahawalpur-zoo", label: "Bahawalpur Zoo" },
   ]);
-
+  const [animals, setAnimals] = useState([
+    {
+      id: "african-elephant",
+      name: "African Elephant",
+      scientificName: "Loxodonta africana",
+      category: "Mammals",
+      conservationStatus: "Vulnerable",
+      location: ["lahore-zoo", "bahawalpur-zoo"],
+      enclosure: "Elephant Savannah",
+      image: "/placeholder.svg?height=200&width=200",
+    },
+    {
+      id: "bengal-tiger",
+      name: "Bengal Tiger",
+      scientificName: "Panthera tigris tigris",
+      category: "Mammals",
+      conservationStatus: "Endangered",
+      location: ["lahore-safari-park"],
+      enclosure: "Tiger's Den",
+      image: "/placeholder.svg?height=200&width=200",
+    },
+    {
+      id: "giant-panda",
+      name: "Giant Panda",
+      scientificName: "Ailuropoda melanoleuca",
+      category: "Mammals",
+      conservationStatus: "Vulnerable",
+      location: ["lahore-zoo"],
+      enclosure: "Bamboo Forest",
+      image: "/placeholder.svg?height=200&width=200",
+    },
+    {
+      id: "komodo-dragon",
+      name: "Komodo Dragon",
+      scientificName: "Varanus komodoensis",
+      category: "Reptiles",
+      conservationStatus: "Endangered",
+      location: ["bahawalpur-zoo"],
+      enclosure: "The Grassland",
+      image: "/placeholder.svg?height=200&width=200",
+    },
+    {
+      id: "blue-poison-dart-frog",
+      name: "Blue Poison Dart Frog",
+      scientificName: "Dendrobates azureus",
+      category: "Amphibians",
+      conservationStatus: "Least Concern",
+      location: ["lahore-zoo"],
+      enclosure: "Eye Pond",
+      image: "/placeholder.svg?height=200&width=200",
+    },
+    {
+      id: "scarlet-macaw",
+      name: "Scarlet Macaw",
+      scientificName: "Ara macao",
+      category: "Birds",
+      conservationStatus: "Least Concern",
+      location: ["lahore-safari-park"],
+      enclosure: "Bird's Sanctuary",
+      image: "/placeholder.svg?height=200&width=200",
+    },
+    {
+      id: "emperor-penguin",
+      name: "Emperor Penguin",
+      scientificName: "Aptenodytes forsteri",
+      category: "Birds",
+      conservationStatus: "Near Threatened",
+      location: ["lahore-zoo"],
+      enclosure: "Iceland",
+      image: "/placeholder.svg?height=200&width=200",
+    },
+    {
+      id: "saltwater-crocodile",
+      name: "Saltwater Crocodile",
+      scientificName: "Crocodylus porosus",
+      category: "Reptiles",
+      conservationStatus: "Least Concern",
+      location: ["bahawalpur-zoo"],
+      enclosure: "The Nile",
+      image: "/placeholder.svg?height=200&width=200",
+    },
+  ]);
   const filteredAnimals = animals.filter((animal) => {
     const matchesSearch =
       animal.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -142,8 +174,32 @@ export default function AnimalDirectoryPage() {
     );
   });
 
+  const sortedAnimals = [...filteredAnimals].sort((a, b) => {
+    switch (sortOrder) {
+      case "name-asc":
+        return a.name.localeCompare(b.name);
+      case "name-desc":
+        return b.name.localeCompare(a.name);
+      default:
+        return 0;
+    }
+  });
+
+  /////////////////////////////////////
+  const [currentPage, setCurrentPage] = useState(1);
+  const postsPerPage = 20;
+  const indexOfLastPost = currentPage * postsPerPage;
+  const indexOfFirstPost = indexOfLastPost - postsPerPage;
+  const currentPosts = sortedAnimals.slice(indexOfFirstPost, indexOfLastPost);
+
+  const totalPages = Math.ceil(animals.length / postsPerPage);
+  const paginationLabels = Array.from({ length: totalPages }, (_, i) => i + 1);
+
+  /////////////////////////////////////
+
   const handleDelete = (animalId: string) => {
     // In a real app, delete from API
+    setAnimals(animals.filter((x) => x.id != animalId));
     toast({
       title: "Animal deleted",
       description: `The animal has been removed from the directory.`,
@@ -159,14 +215,6 @@ export default function AnimalDirectoryPage() {
           title="Animal Directory"
           description="Explore and manage the animal directory."
         />
-        <div className="w-fit">
-          <ButtonComp
-            type={"dark"}
-            text="Add New Animal"
-            clickEvent={() => router.push("/home/animal-directory/new")}
-            beforeIcon={<Plus className="h-4 w-4" />}
-          />
-        </div>
       </div>
 
       <div className="flex flex-col sm:flex-row gap-2">
@@ -191,128 +239,152 @@ export default function AnimalDirectoryPage() {
           </Select>
         </div>
       </div>
+      <Card>
+        <CardHeader>
+          <div className="md:flex gap-3 justify-between items-end mb-2 w-full">
+            <CardIntro
+              title="Wildlife Management"
+              description="Manage all animals throughout the zoos."
+            />
 
-      <Tabs
-        value={activeTab}
-        onValueChange={setActiveTab}
-        className="space-y-4"
-      >
-        <TabsList>
-          <TabsTrigger value="all">All Animals</TabsTrigger>
-          <TabsTrigger value="mammals">Mammals</TabsTrigger>
-          <TabsTrigger value="birds">Birds</TabsTrigger>
-          <TabsTrigger value="reptiles">Reptiles</TabsTrigger>
-          <TabsTrigger value="endangered">Endangered</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value={activeTab} className="space-y-4">
-          {filteredAnimals.length > 0 ? (
-            <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {filteredAnimals.map((animal) => (
-                <Card
-                  key={animal.id}
-                  className="overflow-hidden flex flex-col justify-between"
-                >
-                  <div className="relative h-48">
-                    <Image
-                      src={animal.image || "/placeholder.svg"}
-                      alt={animal.name}
-                      fill
-                      className="object-cover"
-                    />
-                    {/* <div
-                      className={`absolute top-2 right-2 px-2 py-1 rounded-full text-xs font-medium ${
-                        animal.conservationStatus === "Endangered" ||
-                        animal.conservationStatus === "Critically Endangered"
-                          ? "bg-red-100 text-red-800"
-                          : animal.conservationStatus === "Vulnerable"
-                          ? "bg-amber-100 text-amber-800"
-                          : animal.conservationStatus === "Near Threatened"
-                          ? "bg-yellow-100 text-yellow-800"
-                          : "bg-green-100 text-green-800"
-                      }`}
-                    >
-                      {animal.conservationStatus}
-                    </div> */}
-                  </div>
-                  <CardHeader className="pb-2">
-                    <CardTitle>
-                      <Subheading text={animal.name} />
-                    </CardTitle>
-                    <CardDescription className="italic font-syne">
-                      {animal.scientificName}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="pb-2 font-syne">
-                    <div className="space-y-1 text-sm">
-                      <div className="flex gap-1">
-                        <span className="text-muted-foreground">Category:</span>
-                        <span>{animal.category}</span>
-                      </div>
-                      <div className="flex gap-1">
-                        <span className="text-muted-foreground">Location:</span>
-                        <span>
-                          {/* {animal.location.length} Zoo
-                          {animal.location.length !== 1 ? "s" : ""} */}
-                          {animal.location.join(", ")}
-                        </span>
-                      </div>
-                      <div className="flex items-center text-sm mt-2">
-                        {/* <Clock className="h-4 w-4 mr-2 text-muted-foreground" /> */}
-                        <div className="flex gap-2">
-                          <span className="text-muted-foreground">
-                            Feeding Time:{" "}
-                          </span>
-                          <span>2:00 PM</span>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                  <CardFooter className="flex items-center gap-1">
-                    <Button
-                      variant="outline"
-                      size="sm"
+            <div className="w-fit">
+              <ButtonComp
+                type={"dark"}
+                clickEvent={() => {
+                  router.push("/home/animal-directory/new");
+                }}
+                text="Add Animal"
+                beforeIcon={<Plus className=" h-4 w-4" />}
+              />
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="border rounded-md">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-main-frostyBlue/5">
+                  <TableHead>
+                    <div
+                      className="flex items-center gap-1 cursor-pointer"
                       onClick={() =>
-                        router.push(`/home/animal-directory/${animal.id}`)
+                        setSortOrder(
+                          sortOrder === "name-asc" ? "name-desc" : "name-asc"
+                        )
                       }
                     >
-                      <Eye className="mr-1 h-4 w-4" /> View
-                    </Button>
-                    <div className="flex space-x-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                          router.push(
-                            `/home/animal-directory/${animal.id}?edit=true`
-                          )
-                        }
-                      >
-                        <Edit className="mr-1 h-4 w-4" /> Edit
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="text-red-500 hover:text-red-600"
-                        onClick={() => setAnimalToDelete(animal.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                      Name
+                      <ArrowUpDown className="h-4 w-4" />
                     </div>
-                  </CardFooter>
-                </Card>
-              ))}
-            </div>
-          ) : (
-            <Card className="p-8 text-center">
-              <p className="text-muted-foreground">
-                No animals found matching your criteria.
-              </p>
-            </Card>
-          )}
-        </TabsContent>
-      </Tabs>
+                  </TableHead>
+                  <TableHead>Category</TableHead>
+                  <TableHead>Enclosure</TableHead>
+                  <TableHead>Zoo</TableHead>
+                  <TableHead className="text-center text-main-darkFadedBlue">
+                    Actions
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody className="!text-sm">
+                {currentPosts.length > 0 ? (
+                  currentPosts.map((animal: any, index: number) => (
+                    <TableRow key={index}>
+                      <TableCell>{animal.name}</TableCell>
+                      <TableCell>{animal.category}</TableCell>
+                      <TableCell>{animal.enclosure}</TableCell>
+                      <TableCell>{animal.location.join(", ")}</TableCell>
+                      <TableCell className="text-right flex justify-end">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            router.push(`/home/animal-directory/${animal.id}`);
+                          }}
+                        >
+                          <Eye className="text-black h-4 w-4 cursor-pointer" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            router.push(
+                              `/home/animal-directory/${animal.id}?edit=true`
+                            );
+                          }}
+                        >
+                          <Edit className="text-black h-4 w-4 cursor-pointer" />
+                        </Button>
 
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setAnimalToDelete(animal.id);
+                          }}
+                          className="text-destructive hover:text-destructive"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell
+                      colSpan={5}
+                      className="h-24 text-center text-main-gray"
+                    >
+                      No animals found.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+          <div className="mt-4">
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious
+                    onClick={() => {
+                      if (currentPage != 1) {
+                        setCurrentPage(currentPage - 1);
+                      }
+                    }}
+                    aria-disabled={currentPage == 1}
+                    className="text-main-darkFadedBlue cursor-pointer"
+                  />
+                </PaginationItem>
+                {paginationLabels.map((label: number) => (
+                  <PaginationItem key={label}>
+                    <PaginationLink
+                      onClick={() => {
+                        setCurrentPage(label);
+                      }}
+                      className={`${
+                        currentPage == label && "bg-main-gray"
+                      }  text-main-secondaryText cursor-pointer`}
+                    >
+                      {label}
+                    </PaginationLink>
+                  </PaginationItem>
+                ))}
+                <PaginationItem>
+                  <PaginationNext
+                    onClick={() => {
+                      if (currentPage != totalPages) {
+                        setCurrentPage(currentPage + 1);
+                      }
+                    }}
+                    aria-disabled={currentPage == totalPages}
+                    className="text-main-darkFadedBlue cursor-pointer"
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+        </CardContent>
+      </Card>
       <AnimalDeleteDialog
         open={!!animalToDelete}
         onOpenChange={(open) => !open && setAnimalToDelete(null)}

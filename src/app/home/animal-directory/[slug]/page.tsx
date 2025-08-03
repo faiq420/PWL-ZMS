@@ -14,6 +14,8 @@ import { MediaGallery } from "@/components/animal/media-gallery";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "@/components/ui/use-toast";
+import Paragraph from "@/components/utils/Headings/Paragraph";
+import Subheading from "@/components/utils/Headings/Subheading";
 
 // Mock data for demonstration
 const zoos = [
@@ -32,16 +34,20 @@ export default function AnimalDetailPage() {
 
   // Animal state
   const [animal, setAnimal] = useState<any>({
-    id: "",
-    name: "",
-    scientificName: "",
-    category: "Mammals",
-    conservationStatus: "Least Concern",
-    description: "",
-    habitat: "",
-    diet: "",
-    lifespan: "",
-    zooIds: [],
+    Id: "",
+    Name: "",
+    ScientificName: "",
+    Category: "Mammals",
+    CategoryId: 0,
+    ConservationStatus: "Least Concern",
+    ConservationStatusId: 0,
+    Description: "",
+    Habitat: "",
+    Enclosure: 0,
+    Diet: "",
+    Lifespan: "",
+    BirthDate: "",
+    ZooIds: [],
     media: {
       images: [],
       videos: [],
@@ -51,21 +57,21 @@ export default function AnimalDetailPage() {
 
   // Fetch animal data if not new
   useEffect(() => {
-    if (!isNewAnimal && animal.id == "") {
+    if (!isNewAnimal && animal.Id == "") {
       // In a real app, fetch from API
       // For demo, use mock data
       const mockAnimal = {
-        id: params.slug,
-        name: "Bengal Tiger",
-        scientificName: "Panthera tigris tigris",
-        category: "Mammals",
-        conservationStatus: "Endangered",
-        description:
+        Id: params.slug,
+        Name: "Bengal Tiger",
+        ScientificName: "Panthera tigris tigris",
+        Category: "Mammals",
+        ConservationStatus: "Endangered",
+        Description:
           "The Bengal tiger is the most numerous tiger subspecies. Its populations have been estimated at 2,500 in the wild.",
-        habitat: "Tropical and subtropical moist broadleaf forests",
-        diet: "Carnivore - primarily deer, wild boar, and other large mammals",
-        lifespan: "8-10 years in the wild, up to 20 in captivity",
-        zooIds: ["lahore-zoo", "bahawalpur-zoo"],
+        Habitat: "Tropical and subtropical moist broadleaf forests",
+        Diet: "Carnivore - primarily deer, wild boar, and other large mammals",
+        Lifespan: "8-10 years in the wild, up to 20 in captivity",
+        ZooIds: ["lahore-zoo", "bahawalpur-zoo"],
         media: {
           images: [
             {
@@ -108,7 +114,7 @@ export default function AnimalDetailPage() {
       // In a real app, save to API
       toast({
         title: isNewAnimal ? "Animal created" : "Animal updated",
-        description: `${animal.name} has been ${
+        description: `${animal.Name} has been ${
           isNewAnimal ? "added to" : "updated in"
         } the directory.`,
       });
@@ -116,9 +122,10 @@ export default function AnimalDetailPage() {
       if (isNewAnimal) {
         // Redirect to the new animal page
         router.push(
-          `/home/animal-directory/${animal.name
-            .toLowerCase()
-            .replace(/\s+/g, "-")}`
+          `/home/animal-directory/${animal.Name.toLowerCase().replace(
+            /\s+/g,
+            "-"
+          )}`
         );
       } else {
         setIsEditing(false);
@@ -198,9 +205,8 @@ export default function AnimalDetailPage() {
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <h2 className="text-3xl font-bold tracking-tight">
-            {isNewAnimal ? "Add New Animal" : animal.name}
-          </h2>
+          <Subheading text={isNewAnimal ? "Add New Animal" : animal.Name} />
+          
           {/* {!isNewAnimal && !isEditing && (
             <Badge
               variant={
@@ -261,11 +267,19 @@ export default function AnimalDetailPage() {
         onValueChange={setActiveTab}
         className="space-y-4"
       >
-        <TabsList>
-          <TabsTrigger value="details">Details</TabsTrigger>
-          <TabsTrigger value="images">Images</TabsTrigger>
-          <TabsTrigger value="videos">Videos</TabsTrigger>
-          <TabsTrigger value="ar-models">AR Models</TabsTrigger>
+        <TabsList className="w-full">
+          <TabsTrigger className="flex-1" value="details">
+            Details
+          </TabsTrigger>
+          <TabsTrigger className="flex-1" value="images">
+            Images
+          </TabsTrigger>
+          <TabsTrigger className="flex-1" value="videos">
+            Videos
+          </TabsTrigger>
+          <TabsTrigger className="flex-1" value="ar-models">
+            AR Models
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="details" className="space-y-4">
@@ -274,69 +288,92 @@ export default function AnimalDetailPage() {
           ) : (
             <Card>
               <CardContent className="pt-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <h3 className="text-lg font-semibold mb-2">
-                      Basic Information
-                    </h3>
-                    <div className="space-y-2">
-                      <div>
-                        <span className="font-medium">Scientific Name:</span>{" "}
-                        {animal.scientificName}
-                      </div>
-                      <div>
-                        <span className="font-medium">Category:</span>{" "}
-                        {animal.category}
-                      </div>
-                      <div>
-                        <span className="font-medium">
-                          Conservation Status:
-                        </span>{" "}
-                        {animal.conservationStatus}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-4">
+                    <div className="">
+                      <Paragraph
+                        text="Basic Information"
+                        className="font-semibold"
+                      />
+                      <div className="space-y-1 text-sm mt-3">
+                        <div className="text-muted-foreground">
+                          <span className="font-medium text-black">
+                            Scientific Name:
+                          </span>{" "}
+                          {animal.ScientificName}
+                        </div>
+                        <div className="text-muted-foreground">
+                          <span className="font-medium text-black">
+                            Category:
+                          </span>{" "}
+                          {animal.Category}
+                        </div>
+                        <div className="text-muted-foreground">
+                          <span className="font-medium text-black">
+                            Conservation Status:
+                          </span>{" "}
+                          {animal.ConservationStatus}
+                        </div>
                       </div>
                     </div>
-
-                    <h3 className="text-lg font-semibold mt-4 mb-2">
-                      Habitat & Diet
-                    </h3>
-                    <div className="space-y-2">
-                      <div>
-                        <span className="font-medium">Habitat:</span>{" "}
-                        {animal.habitat}
-                      </div>
-                      <div>
-                        <span className="font-medium">Diet:</span> {animal.diet}
-                      </div>
-                      <div>
-                        <span className="font-medium">Lifespan:</span>{" "}
-                        {animal.lifespan}
+                    <div className="">
+                      <Paragraph
+                        text="Habitat & Diet"
+                        className="font-semibold"
+                      />
+                      <div className="space-y-1 text-sm mt-3">
+                        <div className="text-muted-foreground">
+                          <span className="font-medium text-black">
+                            Habitat:
+                          </span>{" "}
+                          {animal.Habitat}
+                        </div>
+                        <div className="text-muted-foreground">
+                          <span className="font-medium text-black">Diet:</span>{" "}
+                          {animal.Diet}
+                        </div>
+                        <div className="text-muted-foreground">
+                          <span className="font-medium text-black">
+                            Lifespan:
+                          </span>{" "}
+                          {animal.Lifespan}
+                        </div>
                       </div>
                     </div>
                   </div>
 
                   <div>
-                    <h3 className="text-lg font-semibold mb-2">Description</h3>
-                    <p className="text-gray-700">{animal.description}</p>
-
-                    <h3 className="text-lg font-semibold mt-4 mb-2">
-                      Available at
-                    </h3>
-                    <div className="flex flex-wrap gap-2">
-                      {animal.zooIds.map((zooId: string) => {
-                        const zoo = zoos.find((z) => z.id === zooId);
-                        return zoo ? (
-                          <Badge
-                            key={zooId}
-                            variant="outline"
-                            className="cursor-pointer"
-                            onClick={() =>
-                              router.push(`/home/zoo-profiles/${zooId}`)
-                            }
-                          >
-                            {zoo.name}
-                          </Badge>
-                        ) : null;
-                      })}
+                    <div className="">
+                      <Paragraph
+                        text="Description"
+                        className="font-semibold "
+                      />
+                      <p className="text-muted-foreground text-sm mt-3">
+                        {animal.Description}
+                      </p>
+                    </div>
+                    <div className="">
+                      <h3 className="text-lg font-semibold mt-4 mb-2"></h3>
+                      <Paragraph
+                        text="Available At"
+                        className="font-semibold "
+                      />
+                      <div className="flex flex-wrap gap-2 mt-3">
+                        {animal.ZooIds.map((zooId: string) => {
+                          const zoo = zoos.find((z) => z.id === zooId);
+                          return zoo ? (
+                            <p
+                              key={zooId}
+                              className="cursor-pointer bg-white px-2 py-1 text-xs shadow rounded-full border"
+                              onClick={() =>
+                                router.push(`/home/zoo-profiles/${zooId}`)
+                              }
+                            >
+                              {zoo.name}
+                            </p>
+                          ) : null;
+                        })}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -472,7 +509,7 @@ export default function AnimalDetailPage() {
         open={showDeleteDialog}
         onOpenChange={setShowDeleteDialog}
         onConfirm={handleDelete}
-        animalName={animal.name}
+        animalName={animal.Name}
       />
     </div>
   );

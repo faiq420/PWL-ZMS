@@ -213,9 +213,9 @@ export default function EnclosurePage() {
                       <ArrowUpDown className="h-4 w-4" />
                     </TableHead>
                     <TableHead>Type</TableHead>
-                    <TableHead>Capacity</TableHead>
-                    <TableHead>Inhabitants</TableHead>
+                    <TableHead>Inhabitants/Capacity</TableHead>
                     <TableHead>Status</TableHead>
+                    <TableHead>Zoo</TableHead>
                     <TableHead>Location</TableHead>
                     <TableHead className="text-center">Actions</TableHead>
                   </TableRow>
@@ -237,9 +237,11 @@ export default function EnclosurePage() {
                           {enclosure.name}
                         </TableCell>
                         <TableCell>{enclosure.type}</TableCell>
-                        <TableCell>{enclosure.capacity}</TableCell>
-                        <TableCell>{enclosure.currentAnimals}</TableCell>
+                        <TableCell className="text-center">
+                          {enclosure.currentAnimals} / {enclosure.capacity}
+                        </TableCell>
                         <TableCell>{enclosure.status}</TableCell>
+                        <TableCell>{enclosure.zoo}</TableCell>
                         <TableCell>{enclosure.location}</TableCell>
                         <TableCell className="text-right flex justify-end">
                           <Button

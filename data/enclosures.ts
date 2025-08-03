@@ -6,6 +6,7 @@ export interface Enclosure {
   location: string;
   status: string;
   type: "Open" | "Caged" | "Aquatic" | "Aviary";
+  zoo: string;
 }
 
 /**
@@ -21,6 +22,7 @@ export const mockEnclosures: Enclosure[] = [
     currentAnimals: 4,
     type: "Open",
     status: "Operational",
+    zoo: "Lahore Zoo",
   },
   {
     id: 2,
@@ -30,6 +32,7 @@ export const mockEnclosures: Enclosure[] = [
     currentAnimals: 2,
     type: "Open",
     status: "Operational",
+    zoo: "Lahore Zoo",
   },
   {
     id: 3,
@@ -39,6 +42,7 @@ export const mockEnclosures: Enclosure[] = [
     currentAnimals: 12,
     type: "Aquatic",
     status: "Under Renovation",
+    zoo: "Lahore Safari Park",
   },
   {
     id: 4,
@@ -48,6 +52,7 @@ export const mockEnclosures: Enclosure[] = [
     currentAnimals: 1,
     type: "Aquatic",
     status: "Under Construction",
+    zoo: "Lahore Safari Park",
   },
   {
     id: 5,
@@ -57,6 +62,7 @@ export const mockEnclosures: Enclosure[] = [
     currentAnimals: 2,
     type: "Open",
     status: "Operational",
+    zoo: "Lahore Zoo",
   },
   {
     id: 6,
@@ -66,5 +72,6 @@ export const mockEnclosures: Enclosure[] = [
     currentAnimals: 8,
     type: "Aviary",
     status: "Closed to Public",
+    zoo: "Bahawalpur Zoo",
   },
 ];
