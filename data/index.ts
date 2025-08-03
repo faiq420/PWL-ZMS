@@ -28,3 +28,12 @@ export const enclosureTypes = [
   { value: 4, label: "Aviary" },
   { value: 5, label: "Other" },
 ];
+
+export const animalGroups = [
+  { value: 1, label: "Mammals" },
+  { value: 2, label: "Birds" },
+  { value: 3, label: "Fish" },
+  { value: 4, label: "Amphibians" },
+  { value: 5, label: "Reptiles" },
+  { value: 5, label: "Invertebrates" },
+];

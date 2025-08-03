@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Trash2, Edit, Plus, ArrowUpDown } from "lucide-react";
+import { Trash2, Edit, Plus, ArrowUpDown, Eye } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -242,6 +242,17 @@ export default function EnclosurePage() {
                         <TableCell>{enclosure.status}</TableCell>
                         <TableCell>{enclosure.location}</TableCell>
                         <TableCell className="text-right flex justify-end">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              router.push(
+                                `/home/enclosure-management/View?id=${enclosure.id}`
+                              );
+                            }}
+                          >
+                            <Eye className="text-black h-4 w-4 cursor-pointer" />
+                          </Button>
                           <Button
                             variant="ghost"
                             size="sm"
