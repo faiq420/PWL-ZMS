@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -27,8 +27,11 @@ const zoos = [
 export default function AnimalDetailPage() {
   const router = useRouter();
   const params = useParams();
+  const searchParams = useSearchParams();
   const isNewAnimal = params.slug === "new";
-  const [isEditing, setIsEditing] = useState(isNewAnimal);
+  const [isEditing, setIsEditing] = useState(
+    isNewAnimal || searchParams.get("edit") ? true : false
+  );
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [activeTab, setActiveTab] = useState("details");
 
@@ -206,7 +209,7 @@ export default function AnimalDetailPage() {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <Subheading text={isNewAnimal ? "Add New Animal" : animal.Name} />
-          
+
           {/* {!isNewAnimal && !isEditing && (
             <Badge
               variant={

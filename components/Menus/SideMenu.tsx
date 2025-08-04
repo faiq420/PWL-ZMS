@@ -2,48 +2,51 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { createPortal } from "react-dom";
 import {
   Building,
   Calendar,
-  FileText,
   Home,
   Info,
-  Map,
   MapPin,
   Menu,
   PawPrintIcon as Paw,
-  Settings,
   Stethoscope,
   X,
-  LogOutIcon,
   LogOut,
-  ChevronLeft,
-  ChevronRight,
   User,
   TowerControl,
   UserCog,
-  PanelLeftOpen,
-  PanelRightOpen,
   Logs,
   HomeIcon,
   Clock,
+  ArrowRight,
+  ArrowLeft,
 } from "lucide-react";
-import { useState } from "react";
+import { RefObject, useRef, useState } from "react";
 import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import {
   DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@radix-ui/react-dropdown-menu";
-import typographyIcon from "@/public/assets/logos/sidemenu_typography.svg";
+import typographyIcon from "@/public/assets/logos/sidemenu_typography.png";
+import collapsedIcon from "@/public//assets/logos/sidemenu_icon.png";
+
+type TooltipState = {
+  index: number | null;
+  position: { top: number; left: number } | null;
+};
 
 export function SideMenu() {
   const pathname = usePathname();
+  const iconRef = useRef<HTMLDivElement | null>(null);
+  const [tooltip, setTooltip] = useState<TooltipState>({
+    index: null,
+    position: null,
+  });
+
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const sidebarItems = [
@@ -122,6 +125,24 @@ export function SideMenu() {
       icon: <Logs className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />,
     },
   ];
+
+  const handleMouseEnter = (
+    index: number,
+    ref: RefObject<HTMLAnchorElement>
+  ) => {
+    if (!isCollapsed || !ref.current) return;
+
+    const rect = ref.current.getBoundingClientRect();
+    setTooltip({
+      index,
+      position: {
+        top: rect.top + window.scrollY + rect.height / 2 - 12, // center vertically
+        left: rect.right + 8, // small gap to right
+      },
+    });
+  };
+
+  const handleMouseLeave = () => setTooltip({ index: null, position: null });
 
   return (
     <>
@@ -245,7 +266,7 @@ export function SideMenu() {
       >
         <div className="flex h-full max-h-screen flex-col gap-2">
           <div
-            className={`flex border-b border-b-main-borderColor ${
+            className={`flex relative border-b border-b-main-borderColor ${
               //
               isCollapsed ? "flex-col" : "flex-row-reverse"
             } h-14 items-center px-4 justify-between`}
@@ -258,56 +279,74 @@ export function SideMenu() {
                   isCollapsed ? (window.innerWidth >= 768 ? "83" : "85") : "5"
                 );
               }}
-              className="p-1 rounded-full hover:bg-gray-100"
+              style={{ boxShadow: "inset 0 2px 4px rgba(0,0,0,0.2)" }}
+              className="p-1 rounded-full border absolute top-11 -right-3 bg-main-background"
             >
-              {!isCollapsed ? (
-                <PanelRightOpen size={20} color="#737373" />
+              {isCollapsed ? (
+                <ArrowRight size={12} color="#737373" />
               ) : (
-                <PanelLeftOpen size={20} color="#737373" />
+                <ArrowLeft size={12} color="#737373" />
               )}
             </button>
             <Link
               href="/home"
-              className="flex items-center gap-2 font-semibold"
+              className="flex items-center gap-2 font-semibold h-full"
             >
-              {isCollapsed && (
-                <Image
-                  src={"/assets/logos/sidemenu_icon.svg"}
-                  height={30}
-                  width={30}
-                  alt="Logo"
-                />
-              )}
-              {!isCollapsed && (
-                // <span className="uppercase text-4xl leading-5 font-montserrat font-semibold">
-                //   ZMS
-                // </span>
+              {isCollapsed ? (
+                <Image src={collapsedIcon} alt="Logo" />
+              ) : (
                 <Image
                   src={typographyIcon}
-                  className="w-[60%] xl:w-[40%]"
+                  // className="w-[50%] xl:w-[30%]"
                   alt="Logo"
                 />
               )}
             </Link>
           </div>
-          <div className="flex-1 overflow-auto flex flex-col py-2">
-            <nav className="grid gap-1 px-2">
-              {sidebarItems.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={cn(
-                    "flex items-center h-fit gap-3 rounded-lg px-3 py-2 text-xs transition-all hover:text-black/70",
-                    pathname === item.href
-                      ? "bg-[#CBE88C] font-medium text-black"
-                      : "text-muted-foreground",
-                    isCollapsed ? "justify-center" : ""
-                  )}
-                >
-                  {item.icon}
-                  {!isCollapsed && item.title}
-                </Link>
-              ))}
+          <div className="flex-1 flex flex-col py-2">
+            <nav className="grid overflow-auto gap-1 px-2">
+              {sidebarItems.map((item, index) => {
+                const iconRef = useRef<any>(null);
+                const isActive = tooltip.index === index;
+                return (
+                  <div key={index}>
+                    <Link
+                      ref={iconRef}
+                      href={item.href}
+                      onMouseEnter={() => {
+                        if (iconRef.current) handleMouseEnter(index, iconRef);
+                      }}
+                      onMouseLeave={handleMouseLeave}
+                      className={cn(
+                        "flex relative group items-center h-fit gap-3 rounded-lg px-3 py-2 text-xs transition-all hover:text-black/70",
+                        pathname === item.href
+                          ? "bg-[#CBE88C] font-medium text-black"
+                          : "text-muted-foreground",
+                        isCollapsed ? "justify-center" : ""
+                      )}
+                    >
+                      {item.icon}
+                      {!isCollapsed && item.title}
+                    </Link>
+                    {isCollapsed &&
+                      isActive &&
+                      tooltip.position &&
+                      createPortal(
+                        <div
+                          className="fixed bg-[#CBE88C] text-black px-2 py-1 rounded z-[1001] text-xs font-medium shadow-xl whitespace-nowrap"
+                          style={{
+                            top: tooltip.position.top,
+                            left: tooltip.position.left,
+                          }}
+                        >
+                          {item.title}
+                          <div className="absolute left-[-6px] top-1/2 -translate-y-1/2 w-0 h-0 border-y-8 border-y-transparent border-r-8 border-r-[#CBE88C]" />
+                        </div>,
+                        document.body
+                      )}
+                  </div>
+                );
+              })}
             </nav>
           </div>
         </div>
