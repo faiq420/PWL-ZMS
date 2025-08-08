@@ -6,6 +6,7 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import ButtonComp from "@/components/utils/Button";
 import Dropdown from "@/components/utils/FormElements/Dropdown";
 import InputTag from "@/components/utils/FormElements/InputTag";
@@ -16,7 +17,7 @@ import { enclosureTypes, servicesStatus } from "@/data";
 import { zoos } from "@/data/users";
 import useHelper from "@/Helper/helper";
 import { OPTION } from "@/types/utils";
-import { ArrowLeft, Save, Trash2, Upload, X } from "lucide-react";
+import { ArrowLeft, Plus, Save, Trash2, Upload, X } from "lucide-react";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -59,7 +60,7 @@ const Page = () => {
     Lighting: "",
     WaterFeatures: "",
   });
-
+  const [features, setFeatures] = useState<string[]>([]);
   useEffect(() => {
     if (slug) {
       if (slug != "new" && isNaN(Number(slug))) {
@@ -115,6 +116,13 @@ const Page = () => {
   };
   const addImageFiles = () => {
     document.getElementById("file-upload")?.click();
+  };
+
+  const AddFeature = () => {
+    setFeatures([...features, ""]);
+  };
+  const RemoveFeature = (index: number) => {
+    setFeatures(features.filter((_, i) => i !== index));
   };
 
   return (
@@ -189,7 +197,7 @@ const Page = () => {
               </div>
             </div>
           </div>
-          <hr />
+          <Separator />
           <div className="space-y-3">
             <Paragraph text="Environment Controls" />
             <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-2 gap-y-3">
@@ -223,7 +231,55 @@ const Page = () => {
               />
             </div>
           </div>
-          <hr />
+          <Separator />
+          <div className="space-y-3">
+            <div className="flex justify-between items-center">
+              <Paragraph text="Features" />
+              <div className="w-fit">
+                <ButtonComp
+                  clickEvent={AddFeature}
+                  type={"white"}
+                  text="Add Feature"
+                  beforeIcon={<Plus size={14} />}
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              {features.length > 0 ? (
+                features.map((feature, index) => (
+                  <div key={index} className="flex items-center space-x-2">
+                    <InputTag
+                      name={`Feature`}
+                      placeHolder="Enter feature"
+                      value={feature}
+                      setter={(n, v) => {
+                        setFeatures((prev) => {
+                          const updated = [...prev];
+                          updated[index] = v;
+                          return updated;
+                        });
+                      }}
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => RemoveFeature(index)}
+                      // disabled={features.length === 1}
+                    >
+                      <X className="h-4 w-4" />
+                      <span className="sr-only">Remove</span>
+                    </Button>
+                  </div>
+                ))
+              ) : (
+                <div className="text-muted-foreground text-sm italic">
+                  No features added yet.
+                </div>
+              )}
+            </div>
+          </div>
+          <Separator />
           <div className="space-y-3">
             <Paragraph text="Graphic Visuals" />
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">

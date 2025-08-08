@@ -49,3 +49,10 @@ export const conservationStatus = [
   { value: 8, label: "Not Evaluated" },
   { value: 9, label: "Critically Endangered" },
 ];
+
+export const inspectionStatus = [
+  { value: 1, label: "Scheduled" },
+  { value: 2, label: "Completed" },
+  { value: 3, label: "Overdue" },
+  { value: 4, label: "Cancelled" },
+];

@@ -304,7 +304,7 @@ export function SideMenu() {
             </Link>
           </div>
           <div className="flex-1 flex flex-col py-2">
-            <nav className="grid overflow-auto gap-1 px-2">
+            <nav className="grid overflow-auto max-h-[calc(100vh-90px)] gap-1 px-2">
               {sidebarItems.map((item, index) => {
                 const iconRef = useRef<any>(null);
                 const isActive = tooltip.index === index;

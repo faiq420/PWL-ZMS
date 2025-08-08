@@ -24,7 +24,7 @@ const TextArea = ({
   subfield,
 }: Props) => {
   return (
-    <div className={`${styles.inputGroup} space-y-[6px] h-full`}>
+    <div className={`${styles.inputGroup} space-y-[6px]`}>
       {label && (
         <Label htmlFor={name}>
           {label}
