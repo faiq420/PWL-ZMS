@@ -245,7 +245,12 @@ const Enclosures = () => {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => {}}
+                          onClick={() => {
+                            router.push(
+                              "/home/veterinary-inspection/enclosure-inspection?id=" +
+                                enc.Id
+                            );
+                          }}
                           className=""
                         >
                           <Stethoscope className="h-4 w-4" />
