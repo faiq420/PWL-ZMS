@@ -16,6 +16,9 @@ import { Separator } from "@/components/ui/separator";
 import { toast } from "@/components/ui/use-toast";
 import Paragraph from "@/components/utils/Headings/Paragraph";
 import Subheading from "@/components/utils/Headings/Subheading";
+import useHelper from "@/Helper/helper";
+import Checkbox from "@/components/utils/FormElements/Checkbox";
+import { Message } from "@/Helper/ToastMessages";
 
 // Mock data for demonstration
 const zoos = [
@@ -24,9 +27,18 @@ const zoos = [
   { id: "bahawalpur-zoo", name: "Bahawalpur Zoo" },
 ];
 
+type AnimalFiles = {
+  Fileid: number;
+  file: File | null;
+  Docpath?: string;
+  IsTileImage?: boolean;
+  AnimalId: number;
+};
+
 export default function AnimalDetailPage() {
   const router = useRouter();
   const params = useParams();
+  const helper = useHelper();
   const searchParams = useSearchParams();
   const isNewAnimal = params.slug === "new";
   const [isEditing, setIsEditing] = useState(
@@ -37,7 +49,7 @@ export default function AnimalDetailPage() {
 
   // Animal state
   const [animal, setAnimal] = useState<any>({
-    Id: "",
+    Id: 0,
     Name: "",
     ScientificName: "",
     Category: "Mammals",
@@ -57,6 +69,8 @@ export default function AnimalDetailPage() {
       arModels: [],
     },
   });
+  const [animalImages, setAnimalImages] = useState<AnimalFiles[]>([]);
+  const [animalVideos, setAnimalVideos] = useState<AnimalFiles[]>([]);
 
   // Fetch animal data if not new
   useEffect(() => {
@@ -159,27 +173,34 @@ export default function AnimalDetailPage() {
     }
   };
 
-  const handleFileUpload = (
-    files: File[],
-    mediaType: "images" | "videos" | "arModels"
-  ) => {
-    // In a real app, upload files to storage
-    // For demo, create URL objects
-    const newFiles = Array.from(files).map((file) => ({
-      id: `new-${Date.now()}-${file.name}`,
-      name: file.name,
-      url: URL.createObjectURL(file),
-      type: file.type,
-      file: file, // Keep reference to file for actual upload
-    }));
-
-    setAnimal((prev: any) => ({
-      ...prev,
-      media: {
-        ...prev.media,
-        [mediaType]: [...prev.media[mediaType], ...newFiles],
-      },
-    }));
+  const handleFileUpload = (files: File[], mediaType: "images" | "videos") => {
+    // const newFiles = Array.from(files).map((file) => ({
+    //   id: `new-${Date.now()}-${file.name}`,
+    //   name: file.name,
+    //   url: URL.createObjectURL(file),
+    //   type: file.type,
+    //   file: file,
+    // }));
+    const temp = files.map((f) => {
+      return {
+        Fileid: 0,
+        file: f,
+        IsTileImage: false,
+        AnimalId: animal.Id,
+      };
+    });
+    if (mediaType === "images") {
+      setAnimalImages([...animalImages, ...temp]);
+    } else if (mediaType === "videos") {
+      setAnimalVideos([...animalVideos, ...temp]);
+    }
+    // setAnimal((prev: any) => ({
+    //   ...prev,
+    //   media: {
+    //     ...prev.media,
+    //     [mediaType]: [...prev.media[mediaType], ...newFiles],
+    //   },
+    // }));
   };
 
   const removeFile = (
@@ -196,6 +217,52 @@ export default function AnimalDetailPage() {
       },
     }));
   };
+
+  const removeAnimalVideo = (index: number) => {
+    setAnimalVideos(animalVideos.filter((_, i) => i !== index));
+  };
+
+  const DeleteAnimalVideo = (id: number, index: number) => {
+    helper.xhr
+      .Post("/Animal/DeleteAnimalVideo", helper.ConvertToFormData({ id }))
+      .then((res) => {
+        Message("success", "File removed.");
+        setAnimalVideos(animalVideos.filter((_, i) => i !== index));
+      });
+  };
+
+  function AddNewAnimalFile(
+    productId: number,
+    file: File,
+    IsTileImage?: boolean,
+    index?: number,
+    type?: "image" | "video"
+  ) {
+    const formData = new FormData();
+    formData.append("id", String(productId));
+    formData.append("file", file);
+    formData.append("IsTileImage", String(IsTileImage));
+    const path =
+      type === "image"
+        ? "/Animal/UploadAnimalImage"
+        : "/Animal/UploadAnimalVideo";
+    helper.xhr
+      .Post(path, formData)
+      .then((res) => {
+        console.log(res);
+        Message("success", `File saved.`);
+        if (index) {
+          const files =
+            type === "image" ? [...animalImages] : [...animalVideos];
+          files[index] = res;
+          type == "image" ? setAnimalImages(files) : setAnimalVideos(files);
+        }
+      })
+      .catch((e) => {
+        console.log(e);
+      })
+      .finally(() => {});
+  }
 
   return (
     <div className="flex-1 space-y-4">
@@ -279,9 +346,6 @@ export default function AnimalDetailPage() {
           </TabsTrigger>
           <TabsTrigger className="flex-1" value="videos">
             Videos
-          </TabsTrigger>
-          <TabsTrigger className="flex-1" value="ar-models">
-            AR Models
           </TabsTrigger>
         </TabsList>
 
@@ -390,7 +454,7 @@ export default function AnimalDetailPage() {
             <div className="space-y-4">
               <FileUploader
                 onUpload={(files) => handleFileUpload(files, "images")}
-                accept="image/*"
+                accept=".jpg, .jpeg"
                 multiple={true}
                 label="Upload Images"
               />
@@ -435,75 +499,83 @@ export default function AnimalDetailPage() {
               />
               <Separator />
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                {animal.media.videos.map((video: any) => (
-                  <div key={video.id} className="relative group">
-                    <div className="aspect-video relative overflow-hidden rounded-md border bg-gray-100 flex items-center justify-center">
-                      {/* Video thumbnail or placeholder */}
-                      <Image
-                        src={video.url || "/placeholder.svg"}
-                        alt={video.name}
-                        fill
-                        className="object-cover"
-                      />
+                {animalVideos.map((video, index) => (
+                  <div key={index} className="space-y-2">
+                    <div className="relative aspect-square rounded-md border border-main-gray/30 overflow-hidden">
+                      {video.file && video.file.type.startsWith("video/") ? (
+                        <video
+                          src={
+                            video.Fileid == 0
+                              ? URL.createObjectURL(video.file)
+                              : helper.GetDocument(video.Docpath || "")
+                          }
+                          controls
+                          className="object-cover"
+                          style={{ width: "100%", height: "100%" }}
+                        />
+                      ) : (
+                        <Image
+                          src={
+                            video.file
+                              ? URL.createObjectURL(video.file)
+                              : helper.GetDocument(video.Docpath || "")
+                          }
+                          alt={`Animal video ${index + 1}`}
+                          fill
+                          unoptimized
+                          className="object-cover"
+                        />
+                      )}
+                      {video.Fileid == 0 &&
+                        animal.Id != 0 &&
+                        animalVideos.length > 0 && (
+                          <Button
+                            // variant="success"
+                            size="icon"
+                            className="absolute top-1 left-1 h-6 w-6 rounded-full"
+                            onClick={() =>
+                              video.file &&
+                              AddNewAnimalFile(
+                                animal.Id,
+                                video.file,
+                                video.IsTileImage,
+                                index,
+                                "video"
+                              )
+                            }
+                          >
+                            <Save className="h-3 w-3" />
+                            <span className="sr-only">Remove image</span>
+                          </Button>
+                        )}
+                      {video.Fileid != 0 ? (
+                        <Button
+                          variant="destructive"
+                          size="icon"
+                          className="absolute top-1 right-1 h-6 w-6 rounded-full"
+                          onClick={() => DeleteAnimalVideo(video.Fileid, index)}
+                        >
+                          <Trash2 className="h-3 w-3" />
+                          <span className="sr-only">Remove image</span>
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="destructive"
+                          size="icon"
+                          className="absolute top-1 right-1 h-6 w-6 rounded-full"
+                          onClick={() => removeAnimalVideo(index)}
+                        >
+                          <X className="h-3 w-3" />
+                          <span className="sr-only">Remove image</span>
+                        </Button>
+                      )}
                     </div>
-                    <Button
-                      variant="destructive"
-                      size="icon"
-                      className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                      onClick={() => removeFile(video.id, "videos")}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                    <p className="text-sm mt-1 truncate">{video.name}</p>
                   </div>
                 ))}
               </div>
             </div>
           ) : (
             <MediaGallery media={animal.media.videos} type="videos" />
-          )}
-        </TabsContent>
-
-        <TabsContent value="ar-models" className="space-y-4">
-          {isEditing || isNewAnimal ? (
-            <div className="space-y-4">
-              <FileUploader
-                onUpload={(files) => handleFileUpload(files, "arModels")}
-                accept=".glb,.gltf"
-                multiple={true}
-                label="Upload AR Models (GLB/GLTF)"
-              />
-              <Separator />
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                {animal.media.arModels.map((model: any) => (
-                  <div key={model.id} className="relative group">
-                    <div className="aspect-square relative overflow-hidden rounded-md border bg-gray-100 flex items-center justify-center">
-                      {/* Model thumbnail or placeholder */}
-                      <Image
-                        src={model.url || "/placeholder.svg"}
-                        alt={model.name}
-                        fill
-                        className="object-cover"
-                      />
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <Badge>3D Model</Badge>
-                      </div>
-                    </div>
-                    <Button
-                      variant="destructive"
-                      size="icon"
-                      className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                      onClick={() => removeFile(model.id, "arModels")}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                    <p className="text-sm mt-1 truncate">{model.name}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ) : (
-            <MediaGallery media={animal.media.arModels} type="arModels" />
           )}
         </TabsContent>
       </Tabs>

@@ -58,7 +58,7 @@ const Page = () => {
     Temperature: "",
     Humidity: "",
     Lighting: "",
-    WaterFeatures: "",
+    // WaterFeatures: "",
   });
   const [features, setFeatures] = useState<string[]>([]);
   useEffect(() => {
@@ -222,13 +222,13 @@ const Page = () => {
                 label="Lighting"
                 placeHolder="Simulated daylight cycle"
               />
-              <InputTag
+              {/* <InputTag
                 value={obj.WaterFeatures}
                 name="WaterFeatures"
                 setter={handleChange}
                 label="Water Features"
                 placeHolder="Waterfall and pond"
-              />
+              /> */}
             </div>
           </div>
           <Separator />

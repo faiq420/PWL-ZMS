@@ -16,7 +16,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { StaticImport } from "next/dist/shared/lib/get-img-props";
 import Image from "next/image";
-import { Edit, Plus, PlusCircle } from "lucide-react";
+import { Edit, Plus, PlusCircle, SaveIcon } from "lucide-react";
 
 interface HistoryModalProps {
   isOpen: boolean;
@@ -36,9 +36,13 @@ export function HistoryModal({
   mode,
 }: HistoryModalProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
-
+  const fileSaveRef = useRef<HTMLInputElement>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const handleFileClick = () => {
     fileInputRef.current?.click();
+  };
+  const handleFileSaveClick = () => {
+    fileSaveRef.current?.click();
   };
   const [formData, setFormData] = useState<any>({
     history: history,
@@ -51,6 +55,8 @@ export function HistoryModal({
   };
 
   const isViewOnly = mode === "view";
+
+  const handleImageUpdate = () => {};
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -72,7 +78,13 @@ export function HistoryModal({
                 height={500}
                 width={500}
                 className="object-cover h-full w-full"
-                src={formData.image}
+                src={
+                  imageFile
+                    ? URL.createObjectURL(imageFile)
+                    : formData.image != ""
+                    ? formData.image
+                    : "/placeholder.svg"
+                }
                 alt="ZOO-IMG"
               />
               {mode === "edit" && (
@@ -85,17 +97,23 @@ export function HistoryModal({
                       const target: any = e.target as HTMLInputElement;
                       const objectURL = URL.createObjectURL(target.files[0]);
                       if (target.files && target.files[0]) {
-                        setFormData((prev: any) => ({
-                          ...prev,
-                          image: objectURL,
-                        }));
+                        setImageFile(target.files[0]);
                       }
                     }}
                     ref={fileInputRef}
                     className="hidden"
                     type="file"
+                    accept=".jpg, .jpeg"
                   />
                   <Edit size={12} />
+                </div>
+              )}
+              {imageFile && (
+                <div
+                  onClick={handleImageUpdate}
+                  className="absolute right-[52px] top-4 flex items-center justify-center p-2 rounded-full bg-white/50 border w-max cursor-pointer"
+                >
+                  <SaveIcon size={12} />
                 </div>
               )}
             </div>

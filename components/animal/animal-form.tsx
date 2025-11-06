@@ -109,13 +109,6 @@ export function AnimalForm({ animal, setAnimal, zoos }: AnimalFormProps) {
               placeHolder="Average lifespan"
               isRequired
             />
-            <InputTag
-              value={animal.BirthDate}
-              name="BirthDate"
-              type="date"
-              setter={handleChange}
-              label="Birth Date"
-            />
           </div>
 
           <div className="space-y-4 flex flex-col">

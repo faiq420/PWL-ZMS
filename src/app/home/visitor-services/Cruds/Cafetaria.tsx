@@ -185,7 +185,7 @@ const Cafetaria = ({ mode = "create", id = "0", tab }: Props) => {
         <CardHeader></CardHeader>
         <CardContent className="space-y-10">
           <div className="space-y-2">
-            <Paragraph text="Event Details" className="tracking-normal" />
+            <Paragraph text="Details" className="tracking-normal" />
             <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-2 gap-y-3">
               <InputTag
                 name="Name"

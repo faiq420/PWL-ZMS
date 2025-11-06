@@ -39,7 +39,7 @@ const Events = ({ mode = "create", id = "0", tab }: Props) => {
   const helper = useHelper();
   const router = useRouter();
   const [zooLocations, setZooLocations] = useState([
-    { value: "other", label: "Select from Map" },
+    // { value: "other", label: "Select from Map" },
     {
       value: 1,
       label: "Monkey Sanctuary",

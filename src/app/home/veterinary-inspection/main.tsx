@@ -53,8 +53,8 @@ export default function VeterinaryInspectionPage() {
       <Tabs defaultValue="inspections" className="space-y-4">
         <TabsList>
           <TabsTrigger value="inspections">Inspections</TabsTrigger>
-          <TabsTrigger value="health">Health Records</TabsTrigger>
-          <TabsTrigger value="enclosures">Enclosures</TabsTrigger>
+          {/* <TabsTrigger value="health">Health Records</TabsTrigger> */}
+          {/* <TabsTrigger value="enclosures">Enclosures</TabsTrigger> */}
           {/* <TabsTrigger value="reports">Reports</TabsTrigger> */}
         </TabsList>
 

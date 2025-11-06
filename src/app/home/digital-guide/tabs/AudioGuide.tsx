@@ -37,6 +37,68 @@ const AudioGuide = ({ mode = "create", id = "0", tab }: Props) => {
       return { value: z.value, label: z.label };
     })
   );
+  const [zooLocations, setZooLocations] = useState([
+    {
+      value: 1,
+      label: "Monkey Sanctuary",
+      longitude: 74.32546921639374,
+      latitude: 31.5572786835129,
+    },
+    {
+      value: 2,
+      label: "Tiger In The House",
+      longitude: 74.32584338457282,
+      latitude: 31.556155325486166,
+    },
+    {
+      value: 3,
+      label: "Birds",
+      longitude: 74.32634787940268,
+      latitude: 31.55606468096269,
+    },
+    {
+      value: 4,
+      label: "Camel Ride",
+      longitude: 74.3266816874634,
+      latitude: 31.555885940210754,
+    },
+    {
+      value: 5,
+      label: "Reptile House",
+      longitude: 74.32689595614303,
+      latitude: 31.555983959369627,
+    },
+    {
+      value: 6,
+      label: "Peacock House",
+      longitude: 74.32641779865259,
+      latitude: 31.55624726522889,
+    },
+    {
+      value: 7,
+      label: "Fish Aquarium World",
+      longitude: 74.3268079932071,
+      latitude: 31.556450990423535,
+    },
+    {
+      value: 8,
+      label: "Rhinoceros House",
+      longitude: 74.32491566234476,
+      latitude: 31.556589369547982,
+    },
+    {
+      value: 9,
+      label: "Jungle Cafeteria",
+      longitude: 74.32634717635591,
+      latitude: 31.555398044924946,
+    },
+    {
+      value: 10,
+      label: "Masjid Of Zoo",
+      longitude: 74.32603141197542,
+      latitude: 31.555198161353267,
+    },
+  ]);
   const [file, setFile] = useState<File | null>(null);
   const [audioFile, setAudioFile] = useState<File | null>(null);
   const [audioURL, setAudioURL] = useState<string | null>(null);
@@ -104,11 +166,22 @@ const AudioGuide = ({ mode = "create", id = "0", tab }: Props) => {
               label="Guide Title"
             />
             <Dropdown
-              name="Location"
+              name="ZooId"
+              activeId={obj.ZooId}
+              handleDropdownChange={handleChange}
+              label="Zoo"
+              options={zooLists}
+            />
+            <Dropdown
+              name="LocationId"
               activeId={obj.LocationId}
               handleDropdownChange={handleChange}
-              label="Guide Location"
-              options={zooLists}
+              label="Location"
+              options={zooLocations}
+            />
+            <CustomAudioInput
+              initialUrl="" // replace with actual backend audio URL if any
+              onFileChange={handleFileChange}
             />
             <InputTag
               name="Duration"
@@ -116,10 +189,6 @@ const AudioGuide = ({ mode = "create", id = "0", tab }: Props) => {
               setter={handleChange}
               disabled
               label="Guide Duration"
-            />
-            <CustomAudioInput
-              initialUrl="" // replace with actual backend audio URL if any
-              onFileChange={handleFileChange}
             />
           </div>
         </CardContent>

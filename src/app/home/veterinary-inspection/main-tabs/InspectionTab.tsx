@@ -272,7 +272,6 @@ const InspectionTab = () => {
                     </div>
                   </TableHead>
                   <TableHead>Animal</TableHead>
-                  <TableHead>Species</TableHead>
                   <TableHead>Inspector</TableHead>
                   <TableHead>Date</TableHead>
                   <TableHead>Status</TableHead>
@@ -295,7 +294,6 @@ const InspectionTab = () => {
                         />
                       </TableCell>
                       <TableCell>{inspection.Id}</TableCell>
-                      <TableCell>{inspection.Animal}</TableCell>
                       <TableCell>{inspection.Species}</TableCell>
                       <TableCell>{inspection.Inspector}</TableCell>
                       <TableCell>

@@ -39,6 +39,7 @@ import { Slider } from "@/components/ui/slider";
 import SectionIntro from "@/components/utils/Headings/SectionIntro";
 import ScanLearnTable from "./windows/ScanLearnTable";
 import AudioGuideTable from "./windows/AudioGuideTable";
+import CardIntro from "@/components/utils/Headings/CardIntro";
 
 export default function DigitalGuidePage() {
   const { toast } = useToast();
@@ -319,12 +320,12 @@ export default function DigitalGuidePage() {
         <TabsContent value="featured" className="space-y-4">
           <Card>
             <CardHeader>
-              <div className="flex justify-between items-center">
+              <div className="flex justify-between items-center border-b pb-2">
                 <div>
-                  <CardTitle>Featured Animals</CardTitle>
-                  <CardDescription>
-                    Manage featured animals and special highlights
-                  </CardDescription>
+                  <CardIntro
+                    title="Featured Animals"
+                    description="Manage featured animals and special highlights"
+                  />
                 </div>
                 <Button
                   className="bg-green-700 hover:bg-green-800"
@@ -338,9 +339,9 @@ export default function DigitalGuidePage() {
                 </Button>
               </div>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-4 mt-4">
               <div className="flex justify-between items-center">
-                <h3 className="text-lg font-medium">Animal of the Day</h3>
+                <h3 className="text-sm font-poppins font-medium">Animal of the Day</h3>
                 <Button
                   variant="outline"
                   onClick={() => {
@@ -496,10 +497,10 @@ export default function DigitalGuidePage() {
             <CardHeader>
               <div className="flex justify-between items-center">
                 <div>
-                  <CardTitle>Daily Schedule</CardTitle>
-                  <CardDescription>
-                    Manage and display daily activities and events
-                  </CardDescription>
+                  <CardIntro
+                    title="Daily Schedule"
+                    description="Manage and display daily activities and events"
+                  />
                 </div>
                 <Button
                   className="bg-green-700 hover:bg-green-800"
@@ -509,13 +510,15 @@ export default function DigitalGuidePage() {
                     setScheduleModalOpen(true);
                   }}
                 >
-                  <PlusCircle className="mr-2 h-4 w-4" /> Add Event
+                  <PlusCircle className="mr-2 h-4 w-4" /> Add Schedule
                 </Button>
               </div>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-4 mt-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-medium">Today's Schedule</h3>
+                <h3 className="text-sm font-poppins font-medium">
+                  Today's Schedule
+                </h3>
                 {/* <div className="flex items-center gap-2">
                   <Button variant="outline" size="sm">
                     <Calendar className="h-4 w-4 mr-2" /> Change Date
@@ -576,15 +579,6 @@ export default function DigitalGuidePage() {
                         }}
                       >
                         <Edit className="h-4 w-4 mr-2" /> Edit
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => sendNotification(event.id)}
-                        disabled={event.notificationSent}
-                      >
-                        <Bell className="h-4 w-4 mr-2" />{" "}
-                        {event.notificationSent ? "Notified" : "Notify"}
                       </Button>
                       <Button
                         variant="outline"

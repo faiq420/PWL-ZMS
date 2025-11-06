@@ -57,7 +57,7 @@ export default function VeterinaryInspectionPage() {
         <TabsList>
           <TabsTrigger value="inspections">Inspections</TabsTrigger>
           <TabsTrigger value="health">Health Records</TabsTrigger>
-          <TabsTrigger value="enclosures">Enclosures</TabsTrigger>
+          {/* <TabsTrigger value="enclosures">Enclosures</TabsTrigger> */}
           {/* <TabsTrigger value="reports">Reports</TabsTrigger> */}
         </TabsList>
 
