@@ -24,6 +24,7 @@ import InputTag from "@/components/utils/FormElements/InputTag";
 import PasswordInputTag from "@/components/utils/FormElements/PasswordInputTag";
 import ButtonComp from "@/components/utils/Button";
 import useHelper from "@/Helper/helper";
+import { getTokenCookie, setTokenCookie } from "@/lib/cookieToken";
 
 export default function LoginPage() {
   const helper = useHelper();
@@ -41,9 +42,11 @@ export default function LoginPage() {
     e.preventDefault();
     setIsLoading(true);
     setError("");
-
-    if (email === "" || password === "") { setError("Email And Password is required"); setIsLoading(false); return; }
-
+    if (email === "" || password === "") {
+      setError("Email And Password is required");
+      setIsLoading(false);
+      return;
+    }
     helper.xhr
       .Post(
         "/Auth/Login",
@@ -53,11 +56,10 @@ export default function LoginPage() {
         })
       )
       .then((res) => {
-        console.log(res);
         if (res.Message) {
           setError(res.Message);
         } else {
-          helper.storeData("token", res.token);
+          setTokenCookie(res.token, 7);
           router.push("/home");
         }
       })

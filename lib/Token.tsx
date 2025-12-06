@@ -1,5 +1,6 @@
 export interface Token {
-  userId: number;
+  userId: string;
+  roleId: string;
   nbf: string;
   exp: number;
   iat: number;
@@ -8,10 +9,13 @@ export interface Token {
 }
 
 export const defaultTokenObject: Token = {
-  userId:-1,
+  userId: "",
+  roleId: "",
   nbf: "",
   iss: "",
   iat: -1,
   exp: -1,
   aud: "",
 };
+
+export const TOKEN_KEY = "auth_token";

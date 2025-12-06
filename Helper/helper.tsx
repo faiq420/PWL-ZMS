@@ -1,3 +1,4 @@
+import { getTokenCookie } from "@/lib/cookieToken";
 import { defaultTokenObject, Token } from "@/lib/Token";
 import { usePathname, useRouter } from "next/navigation";
 
@@ -7,60 +8,10 @@ const useHelper = () => {
   const API: string =
     process.env.NODE_ENV === "development"
       ? "https://localhost:44383"
-      : "https://pwlzoo.runasp.net"
-      // : "https://zms.com";
+      : "https://pwlzoo.runasp.net";
   const headers: Headers = new Headers({
-    Authorization: "Bearer " + getData("token"),
+    Authorization: "Bearer " + getTokenCookie(),
   });
-
-  const chars =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
-  const Base64 = {
-    btoa: (input: string = "") => {
-      let str = input;
-      let output = "";
-
-      for (
-        let block = 0, charCode, i = 0, map = chars;
-        str.charAt(i | 0) || ((map = "="), i % 1);
-        output += map.charAt(63 & (block >> (8 - (i % 1) * 8)))
-      ) {
-        charCode = str.charCodeAt((i += 3 / 4));
-
-        if (charCode > 0xff) {
-          throw new Error(
-            "'btoa' failed: The string to be encoded contains characters outside of the Latin1 range."
-          );
-        }
-
-        block = (block << 8) | charCode;
-      }
-
-      return output;
-    },
-
-    atob: (input: string = "") => {
-      let str = input.replace(/=+$/, "");
-      let output = "";
-
-      if (str.length % 4 == 1) {
-        throw new Error(
-          "'atob' failed: The string to be decoded is not correctly encoded."
-        );
-      }
-      for (
-        let bc = 0, bs = 0, buffer, i = 0;
-        (buffer = str.charAt(i++));
-        ~buffer && ((bs = bc % 4 ? bs * 64 + buffer : buffer), bc++ % 4)
-          ? (output += String.fromCharCode(255 & (bs >> ((-2 * bc) & 6))))
-          : 0
-      ) {
-        buffer = chars.indexOf(buffer);
-      }
-
-      return output;
-    },
-  };
 
   const storeData = (key: string, value: string) => {
     try {
@@ -208,10 +159,9 @@ const useHelper = () => {
   };
 
   function GetToken(): Token {
-    const token = getData("token");
-    if (token !== "") {
-      var parsedToken = JSON.parse(Base64.atob(token?.split(".")[1])) as Token;
-      return parsedToken;
+    const token = getTokenCookie(); // reads from cookie and handles expiry internally
+    if (token && token.userId !== "") {
+      return token;
     }
     return defaultTokenObject;
   }
@@ -223,7 +173,6 @@ const useHelper = () => {
   return {
     storeData,
     getData,
-    Base64,
     ConvertToFormData,
     GetURLParamString,
     xhr,
