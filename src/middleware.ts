@@ -42,7 +42,7 @@ export async function middleware(req: NextRequest) {
   }
 
   if (decoded.exp && decoded.exp * 1000 < Date.now()) {
-    return NextResponse.redirect(`${origin}/unauthorized`);
+    return NextResponse.redirect(`${origin}`);
   }
 
   const role = Number(decoded.roleId);

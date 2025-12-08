@@ -1,16 +1,14 @@
-import { getTokenCookie } from "@/lib/cookieToken";
+import { getTokenCookie, getTokenString } from "@/lib/cookieToken";
 import { defaultTokenObject, Token } from "@/lib/Token";
 import { usePathname, useRouter } from "next/navigation";
 
 const useHelper = () => {
-  const pathname = usePathname();
-  const router = useRouter();
   const API: string =
     process.env.NODE_ENV === "development"
       ? "https://localhost:44383"
       : "https://pwlzoo.runasp.net";
   const headers: Headers = new Headers({
-    Authorization: "Bearer " + getTokenCookie(),
+    Authorization: "Bearer " + getTokenString(),
   });
 
   const storeData = (key: string, value: string) => {
@@ -108,15 +106,15 @@ const useHelper = () => {
 
   const xhr = {
     Post: async (endpoint: string, formData: FormData): Promise<any> => {
-      console.clear();
+      // console.clear();
       const response = await fetch(API + endpoint, {
         method: "POST",
         body: formData,
         headers: new Headers({
-          Authorization: "Bearer " + getData("token"),
+          Authorization: "Bearer " + getTokenString(),
         }),
       });
-      console.clear();
+      // console.clear();
       if (response.ok) {
         const data = await response.json();
         return data;

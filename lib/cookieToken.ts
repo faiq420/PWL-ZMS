@@ -61,14 +61,30 @@ const Base64 = {
 };
 
 export const setTokenCookie = (token: string, days: number) => {
-  console.log("Setting token cookie:", token);
   Cookies.set("auth_token", token, {
     expires: days,
     secure: window.location.protocol === "https:",
     sameSite: "Strict",
     path: "/",
   });
-  console.log(getTokenCookie(), "calling");
+};
+
+export const setCookieKey = (key: string, value: string) => {
+  Cookies.set(key, value, {
+    secure: window.location.protocol === "https:",
+    sameSite: "Strict",
+    path: "/",
+  });
+};
+export const getCookieKey = (key: string) => {
+  return Cookies.get(key);
+};
+export const removeCookieKey = (key: string) => {
+  return Cookies.remove(key);
+};
+
+export const getTokenString = (): string => {
+  return Cookies.get(TOKEN_KEY) || "";
 };
 
 /**
@@ -76,7 +92,6 @@ export const setTokenCookie = (token: string, days: number) => {
  */
 export const getTokenCookie = (): Token => {
   const cookie = Cookies.get(TOKEN_KEY);
-  console.log(cookie, "cookie");
   if (!cookie) return { ...defaultTokenObject };
 
   try {

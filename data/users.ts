@@ -25,22 +25,6 @@ export const zoos: Zoo[] = [
     location: "Bahawalpur",
     city: "Bahawalpur",
   },
-  {
-    id: "4",
-    value: 4,
-    label: "Karachi Zoo",
-    name: "Karachi Zoo",
-    location: "Karachi",
-    city: "Karachi",
-  },
-  {
-    id: "5",
-    value: 5,
-    label: "Islamabad Zoo",
-    name: "Islamabad Zoo",
-    location: "Islamabad",
-    city: "Islamabad",
-  },
 ];
 
 export const permissions: Permission[] = [

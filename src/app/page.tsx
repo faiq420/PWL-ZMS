@@ -24,7 +24,11 @@ import InputTag from "@/components/utils/FormElements/InputTag";
 import PasswordInputTag from "@/components/utils/FormElements/PasswordInputTag";
 import ButtonComp from "@/components/utils/Button";
 import useHelper from "@/Helper/helper";
-import { getTokenCookie, setTokenCookie } from "@/lib/cookieToken";
+import {
+  getTokenCookie,
+  setCookieKey,
+  setTokenCookie,
+} from "@/lib/cookieToken";
 
 export default function LoginPage() {
   const helper = useHelper();
@@ -56,10 +60,20 @@ export default function LoginPage() {
         })
       )
       .then((res) => {
+        console.log(res);
         if (res.Message) {
           setError(res.Message);
         } else {
           setTokenCookie(res.token, 7);
+          const userDetails = {
+            UserId: res.user.UserId,
+            UserEmail: res.user.UserEmail,
+            RoleId: res.user.RoleId,
+            UserCnic: res.user.UserCnic,
+            UserPhone: res.user.UserPhone,
+            UserName: res.user.UserName,
+          };
+          setCookieKey("userDetails", JSON.stringify(userDetails));
           router.push("/home");
         }
       })
