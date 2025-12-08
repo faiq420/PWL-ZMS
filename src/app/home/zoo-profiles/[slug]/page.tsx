@@ -3,15 +3,17 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect } from "react";
 import ZooProfilePage from "./main";
 import Location from "./Cruds/Location";
+import ZooCrud from "./Cruds/Zoo";
 
 const Page = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const params = useParams();
   const slug = params.slug;
-  const tabs = ["locations", "history", "shows", "animals", "details"];
+  const tabs = ["locations", "edit"];
   const crudModes = ["create", "edit", "view"];
   const activeTab = searchParams.get("tab");
+  const zooId = params.slug as string;
   const id = searchParams.get("id") || undefined;
   const mode = searchParams.get("mode") || undefined;
 
@@ -31,6 +33,8 @@ const Page = () => {
       tab={activeTab}
       id={id}
     />
+  ) : activeTab === "edit" ? (
+    <ZooCrud ZooId={zooId ? parseInt(zooId) : undefined} />
   ) : (
     <p>Invalid tab.</p>
   );

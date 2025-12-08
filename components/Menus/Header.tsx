@@ -12,12 +12,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { LogOut, UserCog } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { removeTokenCookie } from "@/lib/cookieToken";
 
 const Header = () => {
   const router = useRouter();
   const [userName, setUserName] = useState("Admin User");
 
   const Logout = () => {
+    removeTokenCookie();
     router.push("/");
   };
 
@@ -46,16 +48,22 @@ const Header = () => {
           </div>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="font-roboto text-[6px]">
-          <DropdownMenuLabel className="text-xs font-medium text-center uppercase truncate">{userName}</DropdownMenuLabel>
+          <DropdownMenuLabel className="text-xs font-medium text-center uppercase truncate">
+            {userName}
+          </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => router.push("/home/change-password")}>
+          <DropdownMenuItem
+            onClick={() => router.push("/home/change-password")}
+          >
             <UserCog className="mr-2 h-3 w-3" />
             <span className="text-xs">Change Password</span>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
             className="text-red-500 focus:text-red-500"
-            onClick={Logout}
+            onClick={() => {
+              Logout();
+            }}
           >
             <LogOut className="mr-2 h-3 w-3" />
             <span className="text-xs">Log out</span>

@@ -40,21 +40,6 @@ const ZooProfileCard = ({ zoo }: Props) => {
           fill
           className="object-cover"
         />
-        {/* <div
-                className={`absolute top-2 right-2 px-2 py-1 rounded-full text-xs font-medium ${
-                  zoo.status === "active"
-                    ? "bg-green-100 text-green-800"
-                    : zoo.status === "seasonal"
-                    ? "bg-blue-100 text-blue-800"
-                    : "bg-amber-100 text-amber-800"
-                }`}
-              >
-                {zoo.status === "active"
-                  ? "Active"
-                  : zoo.status === "seasonal"
-                  ? "Seasonal"
-                  : "Maintenance"}
-              </div> */}
       </div>
       <CardHeader className="space-y-0.5">
         <CardTitle>
@@ -63,10 +48,6 @@ const ZooProfileCard = ({ zoo }: Props) => {
             text={zoo.name}
           />
         </CardTitle>
-        <CardDescription className="flex text-xs items-center font-faustina">
-          <MapPin className="h-3 w-3 mr-1" />
-          <span>{zoo.location}</span>
-        </CardDescription>
       </CardHeader>
       {/* <CardContent>
               <div className="space-y-2 font-syne">

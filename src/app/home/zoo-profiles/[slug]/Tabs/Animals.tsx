@@ -33,7 +33,15 @@ import MetricsCard from "../../_components/MetricsCard";
 import { DeleteConfirmation } from "@/components/modals/delete-confirmation";
 
 interface Props {
-  data: { name: string; animals: any };
+  data: {
+    name: string;
+    animals: {
+      AnimalId: number;
+      AnimalName: string;
+      CategoryName: string;
+      Count: number;
+    }[];
+  };
 }
 
 const Animals = ({ data }: Props) => {
@@ -150,14 +158,14 @@ const Animals = ({ data }: Props) => {
               {categories.map((cat: string, index: number) => (
                 <MetricsCard
                   MetricCount={zooData.animals
-                    .filter((a: any) => a.category === cat)
+                    .filter((a: any) => a.CategoryName === cat)
                     .reduce(
-                      (sum: number, animal: any) => sum + animal.count,
+                      (sum: number, animal: any) => sum + animal.Count,
                       0
                     )}
                   Title={cat}
                   Description={`${
-                    zooData.animals.filter((a: any) => a.category === cat)
+                    zooData.animals.filter((a: any) => a.CategoryName === cat)
                       .length
                   }
                       species`}
@@ -179,15 +187,15 @@ const Animals = ({ data }: Props) => {
                   <TableBody>
                     {currentPosts.map((animal: any, index: number) => (
                       <TableRow key={index}>
-                        <TableCell>{animal.name}</TableCell>
-                        <TableCell>{animal.category}</TableCell>
-                        <TableCell>{animal.count}</TableCell>
+                        <TableCell>{animal.AnimalName}</TableCell>
+                        <TableCell>{animal.CategoryName}</TableCell>
+                        <TableCell>{animal.Count}</TableCell>
                         <TableCell className="flex justify-center items-center space-x-2">
                           <Eye
                             className="text-black h-4 w-4 cursor-pointer"
                             onClick={() => {
                               router.push(
-                                "/home/animal-directory/bengal-tiger"
+                                `/home/animal-directory/${animal.AnimalId}`
                               );
                             }}
                           />

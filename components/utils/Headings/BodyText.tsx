@@ -8,7 +8,7 @@ interface Props {
 const BodyText = ({ text, className }: Props) => {
   return (
     <h1
-      className={`text-sm font-syne font-normal ${className}`}
+      className={`text-xs font-poppins font-normal ${className}`}
     >
       {text}
     </h1>

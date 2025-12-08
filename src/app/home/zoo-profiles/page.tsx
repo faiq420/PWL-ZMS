@@ -27,15 +27,45 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import ZooProfileCard from "./_components/ZooProfileCard";
 import SectionIntro from "@/components/utils/Headings/SectionIntro";
+import { useEffect, useState } from "react";
+import useHelper from "@/Helper/helper";
 
 export default function ZooProfilesPage() {
   const router = useRouter();
+  const helper = useHelper();
+  const [zooProfiles, setZooProfiles] = useState<
+    {
+      ZooId: number;
+      ZooTitle: string;
+      ZooDescription: string;
+      CoverImageFilepath: string;
+      ZooOpeningTime: string;
+      ZooClosingTime: string;
+    }[]
+  >([]);
+
+  useEffect(() => {
+    helper.xhr.Get("/Zoo/GetAllZoo").then((res) => {
+      console.log(res);
+    });
+  }, []);
+
   return (
     <div className="flex-1 space-y-4">
-      <SectionIntro
-        title="Zoo Profiles"
-        description="Manage and view zoo profiles."
-      />
+      <div className="md:flex justify-between items-end">
+        <SectionIntro
+          title="Zoo Profiles"
+          description="Manage and view zoo profiles."
+        />
+        <div className="w-fit">
+          <ButtonComp
+            type="dark"
+            text="Add New Zoo"
+            beforeIcon={<Plus />}
+            clickEvent={() => router.push("/home/zoo-profiles/new")}
+          />
+        </div>
+      </div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {[
           {

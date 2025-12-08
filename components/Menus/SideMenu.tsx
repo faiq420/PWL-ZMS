@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { createPortal } from "react-dom";
 import {
   Building,
@@ -31,8 +31,9 @@ import {
   DropdownMenu,
   DropdownMenuTrigger,
 } from "@radix-ui/react-dropdown-menu";
-import typographyIcon from "@/public/assets/logos/sidemenu_typography.png";
+import typographyIcon from "@/public/assets/logos/Punjab_wildlife_logo.svg";
 import collapsedIcon from "@/public//assets/logos/sidemenu_icon.png";
+import { removeTokenCookie } from "@/lib/cookieToken";
 
 type TooltipState = {
   index: number | null;
@@ -40,6 +41,7 @@ type TooltipState = {
 };
 
 export function SideMenu() {
+  const router = useRouter();
   const pathname = usePathname();
   const iconRef = useRef<HTMLDivElement | null>(null);
   const [tooltip, setTooltip] = useState<TooltipState>({
@@ -146,7 +148,7 @@ export function SideMenu() {
 
   return (
     <>
-      <div className="md:hidden flex items-center h-16 px-4 z-10 font-roboto bg-main-background">
+      <div className="md:hidden flex items-center h-16 px-4 z-10 font-roboto bg-transparent">
         <Button
           variant="ghost"
           size="icon"
@@ -161,9 +163,9 @@ export function SideMenu() {
 
       {/* Mobile Sidebar */}
       {sidebarOpen && (
-        <div className="fixed inset-0 z-[1000] bg-background/80 backdrop-blur-sm md:hidden font-roboto">
+        <div className="fixed inset-0 z-[1000] bg-white/80 backdrop-blur-sm md:hidden font-roboto">
           <div className="isolate">
-            <div className="fixed inset-y-0 left-0 z-[1000] w-3/4 max-w-xs bg-background shadow-lg flex flex-col">
+            <div className="fixed inset-y-0 left-0 z-[1000] w-3/4 max-w-xs bg-transparent shadow-lg flex flex-col">
               <div className="flex items-center justify-between h-16 px-6 border-b">
                 <h2 className="font-semibold">Navigation</h2>
                 <Button
@@ -183,9 +185,9 @@ export function SideMenu() {
                       href={item.href}
                       onClick={() => setSidebarOpen(false)}
                       className={cn(
-                        "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all hover:text-main-jungleGreen",
+                        "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all hover:text-main-darkOrange",
                         pathname.startsWith(item.href.replace(/\/$/, ""))
-                          ? "bg-main-jungleGreen/10 font-medium text-main-jungleGreen"
+                          ? "bg-main-darkOrange/10 font-medium text-main-darkOrange"
                           : "text-muted-foreground"
                       )}
                     >
@@ -242,15 +244,18 @@ export function SideMenu() {
                   <UserCog className={`h-3 w-3`} />
                   <span>Change Password</span>
                 </Link>
-                <Link
-                  href={"/"}
+                <div
+                  onClick={() => {
+                    removeTokenCookie();
+                    router.push("/");
+                  }}
                   className={
                     "flex-1 flex items-end gap-3 rounded-lg px-5 py-2 text-xs transition-all hover:text-gray-900 text-muted-foreground space-x-3"
                   }
                 >
                   <LogOut className={`h-3 w-3`} />
                   <span>Logout</span>
-                </Link>
+                </div>
               </div>
             </div>
           </div>
@@ -259,7 +264,7 @@ export function SideMenu() {
 
       {/* Desktop Sidebar */}
       <div
-        className={`h-full hidden rounded-md bg-main-background md:block border border-main-borderColor ${
+        className={`h-full hidden rounded-md bg-transparent border border-main-borderColor md:block ${
           //
           isCollapsed ? "md:w-[5vw]" : "md:w-[17vw] xl:w-[15vw]"
         } font-roboto transition-all duration-300 ease-in-out`}
@@ -280,7 +285,7 @@ export function SideMenu() {
                 );
               }}
               style={{ boxShadow: "inset 0 2px 4px rgba(0,0,0,0.2)" }}
-              className="p-1 rounded-full border absolute top-11 -right-3 bg-main-background"
+              className="p-1 rounded-full border absolute top-11 -right-3 bg-transparent"
             >
               {isCollapsed ? (
                 <ArrowRight size={12} color="#737373" />
@@ -318,10 +323,10 @@ export function SideMenu() {
                       }}
                       onMouseLeave={handleMouseLeave}
                       className={cn(
-                        "flex relative group items-center h-fit gap-3 rounded-lg px-3 py-2 text-xs transition-all hover:text-black/70",
+                        "flex relative group items-center h-fit gap-3 rounded-lg px-3 py-2 text-xs transition-all",
                         pathname === item.href
                           ? "bg-[#CBE88C] font-medium text-black"
-                          : "text-muted-foreground",
+                          : "text-muted-foreground hover:text-black/70",
                         isCollapsed ? "justify-center" : ""
                       )}
                     >

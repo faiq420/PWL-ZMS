@@ -24,8 +24,9 @@ import {
 } from "@/components/ui/table";
 import ButtonComp from "@/components/utils/Button";
 import BodyText from "@/components/utils/Headings/BodyText";
+import CardIntro from "@/components/utils/Headings/CardIntro";
 import Paragraph from "@/components/utils/Headings/Paragraph";
-import { Edit, Eye, Plus, Trash2 } from "lucide-react";
+import { Edit, EditIcon, Eye, Pen, Plus, Trash2 } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
@@ -37,6 +38,7 @@ const BoundarySelectorModal = dynamic(
 interface Props {
   id: number;
   name: string;
+  locations: Records[];
 }
 
 type Records = {
@@ -51,78 +53,11 @@ type Coordinates = {
   longitude: number;
 };
 
-const Locations = ({ id, name }: Props) => {
+const Locations = ({ id, name, locations }: Props) => {
   const router = useRouter();
   const [coordinates, setCoordinates] = useState<Coordinates[]>([]);
   const [showCoordinatesModal, setShowCoordinatesModal] = useState(false);
-  const [tableData, setTableData] = useState<Records[]>([
-    {
-      LocationId: 1,
-      LocationName: "Monkey Sanctuary",
-      Type: "Sanctuary",
-      Status: "Open",
-    },
-    {
-      LocationId: 2,
-      LocationName: "Tiger In The House",
-      Type: "Sanctuary",
-      Status: "Open",
-    },
-    {
-      LocationId: 3,
-      LocationName: "Birds",
-      Type: "Sanctuary",
-      Status: "Open",
-    },
-    {
-      LocationId: 4,
-      LocationName: "Camel Ride",
-      Type: "Sanctuary",
-      Status: "Open",
-    },
-    {
-      LocationId: 5,
-      LocationName: "Reptile House",
-      Type: "Sanctuary",
-      Status: "Open",
-    },
-    {
-      LocationId: 6,
-      LocationName: "Peacock House",
-      Type: "Sanctuary",
-      Status: "Closed",
-    },
-    {
-      LocationId: 7,
-      LocationName: "Fish Aquarium World",
-      Type: "Sanctuary",
-      Status: "Under-construstion",
-    },
-    {
-      LocationId: 8,
-      LocationName: "Rhinoceros House",
-      Type: "Sanctuary",
-      Status: "Open",
-    },
-    {
-      LocationId: 9,
-      LocationName: "Jungle Cafeteria",
-      Type: "Dining",
-      Status: "Renovating",
-    },
-    {
-      LocationId: 10,
-      LocationName: "Masjid Of Zoo",
-      Type: "Prayer Area",
-      Status: "Open",
-    },
-    {
-      LocationId: 11,
-      LocationName: "Clinic",
-      Type: "Facility",
-      Status: "Open",
-    },
-  ]);
+  const [tableData, setTableData] = useState<Records[]>(locations);
   const [deleteConfirmation, setDeleteConfirmation] = useState({
     isOpen: false,
     type: "",
@@ -199,15 +134,10 @@ const Locations = ({ id, name }: Props) => {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>
-                <Paragraph
-                  text={`Location's Directory`}
-                  className="font-semibold tracking-normal"
-                />
-              </CardTitle>
-              <CardDescription>
-                <BodyText text={`Complete list of locations at ${name}`} />
-              </CardDescription>
+              <CardIntro
+                title="Location's Directory"
+                description={`Complete list of locations at ${name}`}
+              />
             </div>
             <div className="flex space-x-2">
               <div className="w-fit">
@@ -253,7 +183,7 @@ const Locations = ({ id, name }: Props) => {
                         <TableCell>{loc.Type}</TableCell>
                         <TableCell>{loc.Status}</TableCell>
                         <TableCell className="flex justify-center items-center space-x-2">
-                          <Eye
+                          <EditIcon
                             className="text-black h-4 w-4 cursor-pointer"
                             onClick={() => {
                               NavigateToRecord(
@@ -264,7 +194,7 @@ const Locations = ({ id, name }: Props) => {
                             }}
                           />
 
-                          <Trash2
+                          {/* <Trash2
                             className="text-red-500 h-4 w-4 cursor-pointer"
                             onClick={() => {
                               setDeleteConfirmation({
@@ -275,7 +205,7 @@ const Locations = ({ id, name }: Props) => {
                                 description: `Are you sure you want to delete ${loc.LocationName} from the location directory? This action cannot be undone.`,
                               });
                             }}
-                          />
+                          /> */}
                         </TableCell>
                       </TableRow>
                     ))}

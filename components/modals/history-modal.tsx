@@ -21,8 +21,8 @@ import { Edit, Plus, PlusCircle, SaveIcon } from "lucide-react";
 interface HistoryModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (historyAndImagePath: any) => void;
-  history: string;
+  onSave: (descriptionAndImagePath: any) => void;
+  description: string;
   image?: StaticImport | string;
   mode: "edit" | "view";
 }
@@ -31,7 +31,7 @@ export function HistoryModal({
   isOpen,
   onClose,
   onSave,
-  history,
+  description,
   image,
   mode,
 }: HistoryModalProps) {

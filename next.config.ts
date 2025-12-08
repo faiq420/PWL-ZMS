@@ -20,21 +20,6 @@ const nextConfig = {
         port: "3000",
         pathname: "/**", // This allows all image paths
       },
-      {
-        protocol: "https",
-        hostname: "kapraywagera.com",
-        pathname: "/**",
-      },
-      {
-        protocol: "https",
-        hostname: "th.bing.com",
-        pathname: "/**",
-      },
-            {
-        protocol: "https",
-        hostname: "zameenblog.s3.amazonaws.com",
-        pathname: "/**",
-      },
     ],
     formats: ["image/avif", "image/webp"],
     unoptimized: true,
