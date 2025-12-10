@@ -14,6 +14,7 @@ import React, { useState } from "react";
 import { HistoryModal } from "@/components/modals/history-modal";
 import CardIntro from "@/components/utils/Headings/CardIntro";
 import { useRouter } from "next/navigation";
+import useHelper from "@/Helper/helper";
 
 type objType = {
   name: string;
@@ -29,34 +30,16 @@ interface Props {
 
 const DetailsTab = ({ data }: Props) => {
   const router = useRouter();
+  const helper = useHelper();
   const [historyModal, setHistoryModal] = useState({
     isOpen: false,
     mode: "edit" as "edit" | "view",
   });
-  const [zooData, setZooData] = useState({
-    ...data,
-  });
 
-  const handleUpdateHistory = (data: any) => {
-    setZooData((prev: any) => ({
-      ...prev,
-      history: data.history,
-      imagePath: data.image,
-    }));
-    setHistoryModal({ isOpen: false, mode: "edit" });
-  };
+  console.log(data);
 
   return (
     <>
-      <HistoryModal
-        isOpen={historyModal.isOpen}
-        mode={historyModal.mode}
-        description={zooData.description}
-        image={zooData.imagePath}
-        onClose={() => setHistoryModal({ isOpen: false, mode: "edit" })}
-        onSave={handleUpdateHistory}
-      />
-
       <Card>
         <CardHeader className="flex flex-row items-center justify-between mb-2">
           <div>
@@ -81,30 +64,36 @@ const DetailsTab = ({ data }: Props) => {
         <CardContent className="space-y-4">
           <div className="relative h-64 w-full rounded-lg overflow-hidden">
             <Image
-              src={zooData.imagePath}
-              alt={`${zooData.name} Historical Photo`}
+              src={
+                data.imagePath != ""
+                  ? helper.GetDocument(data.imagePath)
+                  : "/placeholder.svg"
+              }
+              alt={`${data.name} Historical Photo`}
               fill
               unoptimized
               className="object-cover"
             />
           </div>
 
-          <BodyText text={zooData.description} />
+          <BodyText text={data.description} />
 
           {/* 🔥 Add Zoo Images Below */}
-          {zooData.zooImages?.length > 0 && (
+          {data.zooImages?.length > 0 && (
             <div className="space-y-3">
               <BodyText text="More Images" />
 
               {/* Horizontal scroll strip */}
               <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 pb-2">
-                {zooData.zooImages.map((img, idx) => (
+                {data.zooImages.map((img, idx) => (
                   <div
                     key={idx}
                     className="relative h-[120px] rounded-lg overflow-hidden shadow-sm hover:scale-[1.02] transition-transform"
                   >
                     <Image
-                      src={img}
+                      src={
+                        img != "" ? helper.GetDocument(img) : "/placeholder.svg"
+                      }
                       alt={`Image ${idx + 1}`}
                       fill
                       className="object-cover"

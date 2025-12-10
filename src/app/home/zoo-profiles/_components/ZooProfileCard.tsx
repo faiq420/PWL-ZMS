@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/card";
 import ButtonComp from "@/components/utils/Button";
 import Paragraph from "@/components/utils/Headings/Paragraph";
+import useHelper from "@/Helper/helper";
 import { MapPin } from "lucide-react";
 import Image, { StaticImageData } from "next/image";
 import Link from "next/link";
@@ -20,23 +21,23 @@ interface Props {
 }
 
 type ZooType = {
-  name: string;
-  location: string;
-  type: string;
-  image: string | StaticImageData;
-  status: string;
-  slug: string;
-  description: string;
+  ZooId: number;
+  ZooTitle: string;
+  ZooDescription: string;
+  CoverImageFilepath: string;
+  ZooOpeningTime: string;
+  ZooClosingTime: string;
 };
 
 const ZooProfileCard = ({ zoo }: Props) => {
+  const helper = useHelper();
   const router = useRouter();
   return (
     <Card className="overflow-hidden">
       <div className="relative h-48">
         <Image
-          src={zoo.image || "/placeholder.svg"}
-          alt={zoo.name}
+          src={helper.GetDocument(zoo.CoverImageFilepath) || "/placeholder.svg"}
+          alt={zoo.ZooTitle}
           fill
           className="object-cover"
         />
@@ -45,7 +46,7 @@ const ZooProfileCard = ({ zoo }: Props) => {
         <CardTitle>
           <Paragraph
             className="font-semibold !text-base uppercase font-poppins"
-            text={zoo.name}
+            text={zoo.ZooTitle}
           />
         </CardTitle>
       </CardHeader>
@@ -68,7 +69,7 @@ const ZooProfileCard = ({ zoo }: Props) => {
       <CardFooter className="flex justify-end mt-2">
         <ButtonComp
           clickEvent={() => {
-            router.push(`/home/zoo-profiles/${zoo.slug}`);
+            router.push(`/home/zoo-profiles/${zoo.ZooId}`);
           }}
           text="View Details"
           type={"white"}

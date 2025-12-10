@@ -20,13 +20,14 @@ import {
   Upload,
   X,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import React, { use, useEffect, useState } from "react";
 import MapLocationModal from "../../../visit-planning/components/MapLocationPickerModal";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import useHelper from "@/Helper/helper";
 import { servicesStatus } from "@/data";
+import { useToast } from "@/components/ui/use-toast";
 
 interface Props {
   mode?: string;
@@ -43,16 +44,22 @@ type ImagesFiles = {
 
 const Location = ({ mode = "create", id = "0", tab }: Props) => {
   const helper = useHelper();
+  const { toast } = useToast();
   const router = useRouter();
+  const params = useParams();
+  const slug = params.slug as string;
+  const [isCruding, setIsCruding] = useState(false);
   const [obj, setObj] = useState({
-    Id: 0,
-    Name: "",
+    LocationId: 0,
+    LocationName: "",
     Description: "",
-    Status: 0,
-    Type: 0,
-    Lat: 0,
-    Long: 0,
-    MapFilePath: "",
+    OperationalStatusId: 1,
+    BuildingTypeId: 0,
+    Latitude: "",
+    Longitude: "",
+    ImagePath: "",
+    ZooId: Number(slug),
+    IsActive: true,
   });
   const [selectedZooCoordinates, setSelectedZooCoordinates] = useState({
     center: { lat: 31.556430166645494, long: 74.3259238508059 },
@@ -139,15 +146,15 @@ const Location = ({ mode = "create", id = "0", tab }: Props) => {
     useState(false);
   const [imageFiles, setImageFiles] = useState<ImagesFiles[]>([]);
   const [mapPinFile, setMapPinFile] = useState<File | null>(null);
-  const [status, setStatus] = useState(servicesStatus);
+  const [status, setStatus] = useState([]);
   const [buildingType, setBuildingType] = useState([
-    { value: 1, label: "Sanctuary" },
-    { value: 2, label: "Prayer Area" },
-    { value: 3, label: "Facility" },
-    { value: 4, label: "Office" },
-    { value: 5, label: "Cafeteria" },
-    { value: 6, label: "Gate" },
-    { value: 7, label: "Ticket Booth" },
+    // { value: 1, label: "Sanctuary" },
+    // { value: 2, label: "Prayer Area" },
+    // { value: 3, label: "Facility" },
+    // { value: 4, label: "Office" },
+    // { value: 5, label: "Cafeteria" },
+    // { value: 6, label: "Gate" },
+    // { value: 7, label: "Ticket Booth" },
   ]);
   const capitalize = (value: string, space = " ") => {
     const words = String(value).split(space);
@@ -159,7 +166,7 @@ const Location = ({ mode = "create", id = "0", tab }: Props) => {
 
   function GetHeading() {
     return `${capitalize(mode)} - ${capitalize(String(tab), "-")} ${
-      id != "0" ? `for ${obj.Name}` : ""
+      id != "0" ? `for ${obj.LocationName}` : ""
     }`;
   }
 
@@ -167,7 +174,61 @@ const Location = ({ mode = "create", id = "0", tab }: Props) => {
     setObj({ ...obj, [n]: v });
   }
 
-  function HandleSubmit() {}
+  const verify = () => {
+    const toastObj = { title: "Validation Error", description: "" };
+    if (obj.LocationName == "") {
+      toastObj.description = "Location Name is required.";
+    } else if (obj.BuildingTypeId == 0) {
+      toastObj.description = "Building Type is required.";
+    } else if (obj.Latitude == "" || obj.Longitude == "") {
+      toastObj.description = "Latitude and Longitude are required.";
+    }
+    if (toastObj.description !== "") {
+      toast(toastObj);
+      return false;
+    }
+    return true;
+  };
+
+  function HandleSubmit() {
+    if (verify()) {
+      setIsCruding(true);
+      helper.xhr
+        .Post(
+          `/Location/${
+            obj.LocationId !== 0 ? "UpdateLocation" : "AddLocation"
+          }`,
+          helper.ConvertToFormData({
+            obj,
+            locationImage: mapPinFile,
+          })
+        )
+        .then((response) => {
+          if (response) {
+            toast({
+              title: `Location ${
+                obj.LocationId !== 0 ? "updated" : "created"
+              } successfully`,
+              variant: "success",
+            });
+            setIsCruding(false);
+            setTimeout(() => {
+              router.back();
+            }, 3000);
+          }
+        })
+        .catch((error) => {
+          toast({
+            title: `Location not ${
+              obj.LocationId !== 0 ? "updated" : "created"
+            }`,
+            description: error.message,
+            variant: "danger",
+          });
+          setIsCruding(false);
+        });
+    }
+  }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -176,10 +237,10 @@ const Location = ({ mode = "create", id = "0", tab }: Props) => {
         return {
           FileId: 0,
           file: f,
-          LocationId: obj.Id,
+          LocationId: obj.LocationId,
         };
       });
-      console.log(temp)
+      console.log(temp);
       setImageFiles([...imageFiles, ...temp]);
     }
   };
@@ -214,20 +275,54 @@ const Location = ({ mode = "create", id = "0", tab }: Props) => {
     document.getElementById("mappin-upload")?.click();
   };
 
-  const removeProductImage = (index: number) => {
+  const removeLocationImage = (index: number) => {
     setImageFiles(imageFiles.filter((_, i) => i !== index));
   };
 
-  const DeleteProductImage = (id: number, index: number) => {
+  const DeleteLocationImage = (id: number, index: number) => {
     helper.xhr
-      .Post("/Product/DeleteProductImage", helper.ConvertToFormData({ id }))
+      .Post("/Location/DeleteLocationImage", helper.ConvertToFormData({ id }))
       .then((res) => {
         // Message("success", "File removed.");
         setImageFiles(imageFiles.filter((_, i) => i !== index));
       });
   };
 
-  function AddNewProductFile(productId: number, file: File, index?: number) {}
+  function AddNewLocationFile(locationId: number, file: File, index?: number) {}
+
+  useEffect(() => {
+    helper.xhr.Get("/List/GetBuildingTypes").then((res) => {
+      setBuildingType(
+        res.map((r: any) => {
+          return { value: r.BuildingTypeId, label: r.Type };
+        })
+      );
+    });
+    helper.xhr.Get("/List/GetOperationalStatus").then((res) => {
+      setStatus(
+        res.map((r: any) => {
+          return { value: r.OperationalStatusId, label: r.Status };
+        })
+      );
+    });
+  }, []);
+
+  useEffect(() => {
+    if (id != "0") {
+      helper.xhr
+        .Get(
+          "/Location/GetLocationById",
+          helper.GetURLParamString({ locationId: Number(id) }).toString()
+        )
+        .then((res) => {
+          console.log(res);
+          setObj(res);
+        })
+        .catch((e) => {
+          console.error(e);
+        });
+    }
+  }, [id]);
 
   return (
     <>
@@ -236,7 +331,7 @@ const Location = ({ mode = "create", id = "0", tab }: Props) => {
           isOpen={showLocationSelectionModal}
           onClose={() => setShowLocationSelectionModal(false)}
           onSave={(lat, lng) => {
-            setObj({ ...obj, Lat: lat, Long: lng });
+            setObj({ ...obj, Latitude: String(lat), Longitude: String(lng) });
           }}
           center={[
             selectedZooCoordinates.center.lat,
@@ -272,25 +367,25 @@ const Location = ({ mode = "create", id = "0", tab }: Props) => {
               />
               <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-2 gap-y-3">
                 <InputTag
-                  name="Name"
+                  name="LocationName"
                   setter={handleChange}
                   label="Location Name"
-                  value={obj.Name}
+                  value={obj.LocationName}
                   placeHolder="Lion's Den"
                 />
                 <Dropdown
                   options={buildingType}
-                  name="Type"
+                  name="BuildingTypeId"
                   handleDropdownChange={handleChange}
                   label="Building Type"
-                  activeId={obj.Type}
+                  activeId={obj.BuildingTypeId}
                 />
                 <Dropdown
                   options={status}
-                  name="Status"
+                  name="OperationalStatusId"
                   handleDropdownChange={handleChange}
                   label="Status"
-                  activeId={obj.Status}
+                  activeId={obj.OperationalStatusId}
                 />
                 <div className="col-span-1 md:col-span-2">
                   <TextArea
@@ -301,8 +396,8 @@ const Location = ({ mode = "create", id = "0", tab }: Props) => {
                     placeHolder="Write details about this location here..."
                   />
                 </div>
-                <div className="relative">
-                  <div className="w-full flex justify-end">
+                <div className="relative space-y-3">
+                  {/* <div className="w-full flex justify-end">
                     <MapPin
                       className="h-4 w-4 text-main-softRed !cursor-pointer"
                       onClick={() => {
@@ -315,46 +410,52 @@ const Location = ({ mode = "create", id = "0", tab }: Props) => {
                     setter={handleChange}
                     label="Location's Coordinates"
                     disabled
-                    value={obj.Lat != 0 ? obj.Lat + ", " + obj.Long : ""}
+                    value={
+                      obj.Latitude != 0
+                        ? obj.Latitude + ", " + obj.Longitude
+                        : ""
+                    }
+                  /> */}
+                  <InputTag
+                    name="Latitude"
+                    setter={handleChange}
+                    label="Latitude"
+                    value={obj.Latitude}
+                    placeHolder="0.0000"
+                  />
+                  <InputTag
+                    name="Longitude"
+                    setter={handleChange}
+                    label="Longitude"
+                    value={obj.Longitude}
+                    placeHolder="0.0000"
                   />
                 </div>
               </div>
               <div className="md:-mt-2 space-y-2 w-full md:w-1/3">
                 <Label>Map Pin Image</Label>
-                {mapPinFile != null || obj?.MapFilePath != "" ? (
+                {mapPinFile != null ||
+                (obj?.ImagePath != "" && obj.ImagePath != null) ? (
                   <div className="relative aspect-video rounded-md border border-main-gray/30 overflow-hidden w-full">
                     <Image
                       src={
-                        obj?.MapFilePath && obj?.MapFilePath != ""
-                          ? helper.GetDocument(obj.MapFilePath)
+                        obj?.ImagePath && obj?.ImagePath != ""
+                          ? helper.GetDocument(obj.ImagePath)
                           : mapPinFile
                           ? URL.createObjectURL(mapPinFile)
                           : "/placeholder.svg"
                       }
-                      alt="Category image"
+                      alt="Pin image"
                       fill
-                      className="object-cover"
+                      className="object-contain"
                       unoptimized
                     />
-                    {mapPinFile != null && obj.Id != 0 && (
-                      <Button
-                        variant="default"
-                        size="icon"
-                        className="absolute top-1 left-1 h-6 w-6 rounded-full"
-                        onClick={() => {
-                          UpdateFile(obj.Id, mapPinFile);
-                        }}
-                      >
-                        <SaveIcon className="h-3 w-3" />
-                        <span className="sr-only">Update image</span>
-                      </Button>
-                    )}
                     <Button
                       variant="destructive"
                       size="icon"
                       className="absolute top-1 right-1 h-6 w-6 rounded-full"
                       onClick={() => {
-                        setObj({ ...obj, MapFilePath: "" });
+                        setObj({ ...obj, ImagePath: "" });
                         setMapPinFile(null);
                       }}
                     >
@@ -408,7 +509,7 @@ const Location = ({ mode = "create", id = "0", tab }: Props) => {
                                 ? URL.createObjectURL(image.file)
                                 : helper.GetDocument(image.Docpath || "")
                             }
-                            alt={`Product image ${index + 1}`}
+                            alt={`Location image ${index + 1}`}
                             fill
                             unoptimized
                             className="object-cover"
@@ -423,7 +524,7 @@ const Location = ({ mode = "create", id = "0", tab }: Props) => {
                               className="absolute top-1 left-1 h-6 w-6 rounded-full"
                               onClick={() =>
                                 image.file &&
-                                AddNewProductFile(obj.Id, image.file, index)
+                                AddNewLocationFile(obj.Id, image.file, index)
                               }
                             >
                               <Save className="h-3 w-3" />
@@ -436,7 +537,7 @@ const Location = ({ mode = "create", id = "0", tab }: Props) => {
                             size="icon"
                             className="absolute top-1 right-1 h-6 w-6 rounded-full"
                             onClick={() =>
-                              DeleteProductImage(image.FileId, index)
+                              DeleteLocationImage(image.FileId, index)
                             }
                           >
                             <Trash2 className="h-3 w-3" />
@@ -447,7 +548,7 @@ const Location = ({ mode = "create", id = "0", tab }: Props) => {
                             variant="destructive"
                             size="icon"
                             className="absolute top-1 right-1 h-6 w-6 rounded-full"
-                            onClick={() => removeProductImage(index)}
+                            onClick={() => removeLocationImage(index)}
                           >
                             <X className="h-3 w-3" />
                             <span className="sr-only">Remove image</span>

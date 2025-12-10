@@ -14,7 +14,7 @@ import Paragraph from "@/components/utils/Headings/Paragraph";
 import Subheading from "@/components/utils/Headings/Subheading";
 import { ArrowLeft, Save, SaveIcon, Trash2, Upload, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import useHelper from "@/Helper/helper";
@@ -39,20 +39,20 @@ interface Props {
 }
 
 const ZooCrud = ({ ZooId }: Props) => {
-  console.log("ZooId:", ZooId);
   const { toast } = useToast();
   const helper = useHelper();
   const router = useRouter();
   const [obj, setObj] = useState({
     ZooId: 0,
     ZooTitle: "",
-    ZooLatitude: "31.3843391",
-    ZooLongitude: "74.2069777",
+    ZooLatitude: "",
+    ZooLongitude: "",
     ZooOpeningTime: "",
     ZooClosingTime: "",
     ZooDescription: "",
-    IconImage: "",
+    ZooLogoFilepath: "",
     CoverImageFilepath: "",
+    IsActive: true,
   });
   const [isCruding, setIsCruding] = useState(false);
   const [iconImageSrc, setIconImageSrc] = useState<File | null>(null);
@@ -152,6 +152,15 @@ const ZooCrud = ({ ZooId }: Props) => {
 
   const handleSubmit = () => {
     if (verify()) {
+      const formData = helper.ConvertToFormData({
+        obj,
+        boundaries: coordinatePolygon,
+        zooCoverImage: bannerImageSrc,
+        zooImages: zooImages.map((x) => {
+          return x.file;
+        }),
+        ZooLogo: iconImageSrc,
+      });
       setIsCruding(true);
       helper.xhr
         .Post(
@@ -160,6 +169,10 @@ const ZooCrud = ({ ZooId }: Props) => {
             obj,
             boundaries: coordinatePolygon,
             zooCoverImage: bannerImageSrc,
+            zooImages: zooImages.map((x) => {
+              return x.file;
+            }),
+            ZooLogo: iconImageSrc,
           })
         )
         .then((response) => {
@@ -182,6 +195,33 @@ const ZooCrud = ({ ZooId }: Props) => {
         });
     }
   };
+
+  useEffect(() => {
+    if (!isNaN(Number(ZooId))) {
+      helper.xhr
+        .Get(
+          "/Zoo/GetZooById",
+          helper.GetURLParamString({ zooId: Number(ZooId) }).toString()
+        )
+        .then((res) => {
+          console.log(res);
+          setObj({
+            ...res.zoo_details,
+          });
+          setZooImages(
+            res.zoo_details.zooFiles.map((file: any) => {
+              return {
+                Fileid: file.ZooFileId,
+                file: null,
+                Docpath: file.ZooFilepath,
+                ZooId: res.zoo_details.ZooId,
+              };
+            })
+          );
+          setCoordinatePolygon(res.boundary);
+        });
+    }
+  }, [ZooId]);
 
   return (
     <div className="flex-1 space-y-4">
@@ -292,7 +332,7 @@ const ZooCrud = ({ ZooId }: Props) => {
                 <MapContainer
                   center={[Number(obj.ZooLatitude), Number(obj.ZooLongitude)]}
                   zoom={14}
-                  style={{ height: "300px", width: "100%" }}
+                  style={{ height: "300px", width: "100%", zIndex: 50 }}
                   scrollWheelZoom
                 >
                   <TileLayer
@@ -316,12 +356,12 @@ const ZooCrud = ({ ZooId }: Props) => {
               <div className="md:flex gap-2">
                 <div className="w-full md:w-1/3">
                   <Label>Map Pin Image</Label>
-                  {iconImageSrc != null || obj?.IconImage != "" ? (
+                  {iconImageSrc != null || obj?.ZooLogoFilepath != "" ? (
                     <div className="relative aspect-video rounded-md border border-main-gray/30 overflow-hidden w-full">
                       <Image
                         src={
-                          obj?.IconImage && obj?.IconImage != ""
-                            ? helper.GetDocument(obj.IconImage)
+                          obj?.ZooLogoFilepath && obj?.ZooLogoFilepath != ""
+                            ? helper.GetDocument(obj.ZooLogoFilepath)
                             : iconImageSrc
                             ? URL.createObjectURL(iconImageSrc)
                             : "/placeholder.svg"
@@ -349,7 +389,7 @@ const ZooCrud = ({ ZooId }: Props) => {
                         size="icon"
                         className="absolute top-1 right-1 h-6 w-6 rounded-full"
                         onClick={() => {
-                          setObj({ ...obj, IconImage: "" });
+                          setObj({ ...obj, ZooLogoFilepath: "" });
                           setIconImageSrc(null);
                         }}
                       >
@@ -387,7 +427,8 @@ const ZooCrud = ({ ZooId }: Props) => {
                     <div className="relative aspect-video rounded-md border border-main-gray/30 overflow-hidden w-full">
                       <Image
                         src={
-                          obj?.CoverImageFilepath && obj?.CoverImageFilepath != ""
+                          obj?.CoverImageFilepath &&
+                          obj?.CoverImageFilepath != ""
                             ? helper.GetDocument(obj.CoverImageFilepath)
                             : bannerImageSrc
                             ? URL.createObjectURL(bannerImageSrc)
