@@ -1,5 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
-import { MapContainer, TileLayer, FeatureGroup, GeoJSON, useMap } from "react-leaflet";
+import {
+  MapContainer,
+  TileLayer,
+  FeatureGroup,
+  GeoJSON,
+  useMap,
+} from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet-draw/dist/leaflet.draw.css";
 import L from "leaflet";
@@ -13,9 +19,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
-import markerIcon from 'leaflet/dist/images/marker-icon.png';
-import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
+import markerIcon from "leaflet/dist/images/marker-icon.png";
+import markerShadow from "leaflet/dist/images/marker-shadow.png";
 
 // Patch default icon
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -57,7 +63,7 @@ const DrawControl: React.FC<{
       draw: {
         polygon: {
           shapeOptions: {
-            color: '#FF5733',
+            color: "#FF5733",
             weight: 4,
             opacity: 0.8,
             fillOpacity: 0.2,
@@ -76,7 +82,7 @@ const DrawControl: React.FC<{
     map.addControl(drawControl);
     const polygonOptions = {
       shapeOptions: {
-        color: '#FF5733',
+        color: "#FF5733",
         weight: 4,
         opacity: 0.8,
         fillOpacity: 0.2,
@@ -118,7 +124,7 @@ const BoundarySelectorModal: React.FC<BoundarySelectorModalProps> = ({
 }) => {
   const [polygon, setPolygon] = useState<LatLng[]>(initialCoordinates || []);
   const featureGroupRef = useRef<L.FeatureGroup | null>(null);
-
+  console.log(initialCoordinates  );
   const handleReselect = () => {
     const group = featureGroupRef.current;
     if (group) group.clearLayers();
@@ -139,16 +145,17 @@ const BoundarySelectorModal: React.FC<BoundarySelectorModalProps> = ({
 
   const centerPosition = [center.latitude, center.longitude];
 
-  const geoJsonData = polygon.length > 0
-    ? {
-        type: "Feature",
-        geometry: {
-          type: "Polygon",
-          coordinates: [[...polygon.map(p => [p.longitude, p.latitude])]],
-        },
-        properties: {},
-      }
-    : null;
+  const geoJsonData =
+    polygon.length > 0
+      ? {
+          type: "Feature",
+          geometry: {
+            type: "Polygon",
+            coordinates: [[...polygon.map((p) => [p.longitude, p.latitude])]],
+          },
+          properties: {},
+        }
+      : null;
 
   return (
     <Dialog open onOpenChange={onClose}>
@@ -173,7 +180,11 @@ const BoundarySelectorModal: React.FC<BoundarySelectorModalProps> = ({
             <FeatureGroup ref={featureGroupRef as any}>
               {geoJsonData && <GeoJSON data={geoJsonData as any} />}
             </FeatureGroup>
-            <DrawControl polygon={polygon} setPolygon={setPolygon} featureGroupRef={featureGroupRef} />
+            <DrawControl
+              polygon={polygon}
+              setPolygon={setPolygon}
+              featureGroupRef={featureGroupRef}
+            />
           </MapContainer>
         </div>
 

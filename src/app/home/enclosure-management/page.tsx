@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Trash2, Edit, Plus, ArrowUpDown, Eye } from "lucide-react";
@@ -37,24 +37,37 @@ import {
 } from "@/components/ui/pagination";
 import { changeDateFormat } from "@/Helper/DateFormats";
 import Checkbox from "@/components/utils/FormElements/Checkbox";
-import { Enclosure, mockEnclosures } from "@/data/enclosures";
+// import { Enclosure, mockEnclosures } from "@/data/enclosures";
+import useHelper from "@/Helper/helper";
+import { useToast } from "@/components/ui/use-toast";
+
+type Enclosure = {
+  EnclosureId: number;
+  EnclosureName: string;
+  Type: string;
+  Capacity: string;
+  Status: string;
+  ZooTitle: string;
+  LocationName: string;
+};
 
 export default function EnclosurePage() {
+  const { toast } = useToast();
   const router = useRouter();
+  const helper = useHelper();
   const [searchQuery, setSearchQuery] = useState("");
-  const [enclosures, setEnclosures] = useState<Enclosure[]>([
-    ...mockEnclosures,
-  ]);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [enclosures, setEnclosures] = useState<Enclosure[]>([]);
   const [selectedEnclosures, setSelectedEnclosures] = useState<number[]>([]);
   const [sortOrder, setSortOrder] = useState("name-asc");
   const [deleteEnclosuresDialog, setDeleteEnclosuresDialog] = useState(false);
   const [enclosureToDelete, setEnclosuresToDelete] = useState<any>(null);
 
-  const toggleSelectEnclosure = (bookingId: number) => {
+  const toggleSelectEnclosure = (enclosureId: number) => {
     setSelectedEnclosures((prev) =>
-      prev.includes(bookingId)
-        ? prev.filter((id) => id !== bookingId)
-        : [...prev, bookingId]
+      prev.includes(enclosureId)
+        ? prev.filter((id) => id !== enclosureId)
+        : [...prev, enclosureId]
     );
   };
 
@@ -63,15 +76,15 @@ export default function EnclosurePage() {
       setSelectedEnclosures([]);
     } else {
       setSelectedEnclosures(
-        filteredEnclosures.map((booking: any) => booking.id)
+        filteredEnclosures.map((enclosure: any) => enclosure.EnclosureId)
       );
     }
   };
 
   const filteredEnclosures = enclosures.filter((enclosure) => {
-    const matchesSearch = enclosure.name
-      .toLowerCase()
-      .includes(searchQuery.toLowerCase());
+    const matchesSearch = enclosure.EnclosureName.toLowerCase().includes(
+      searchQuery.toLowerCase()
+    );
 
     return matchesSearch;
   });
@@ -80,9 +93,9 @@ export default function EnclosurePage() {
   const sortedEnclosures = [...filteredEnclosures].sort((a, b) => {
     switch (sortOrder) {
       case "name-asc":
-        return a.name.localeCompare(b.name);
+        return a.EnclosureName.localeCompare(b.EnclosureName);
       case "name-desc":
-        return b.name.localeCompare(a.name);
+        return b.EnclosureName.localeCompare(a.EnclosureName);
       default:
         return 0;
     }
@@ -105,14 +118,40 @@ export default function EnclosurePage() {
 
   const handleDeleteEnclosures = () => {
     if (enclosureToDelete) {
-      const updatedSafeties = enclosures.filter(
-        (enclosure: any) => enclosure.id !== enclosureToDelete.id
-      );
-      setEnclosures(updatedSafeties);
-      setDeleteEnclosuresDialog(false);
-      setEnclosuresToDelete(null);
+      setIsDeleting(true);
+      helper.xhr
+        .Post(
+          "/Enclosure/DeleteEnclosure",
+          helper.ConvertToFormData({
+            enclosureId: enclosureToDelete.EnclosureId,
+          })
+        )
+        .then((res) => {
+          if (res == "Enclosure deleted successfully.") {
+            const updatedSafeties = enclosures.filter(
+              (enclosure: any) =>
+                enclosure.EnclosureId !== enclosureToDelete.EnclosureId
+            );
+            setEnclosures(updatedSafeties);
+            setDeleteEnclosuresDialog(false);
+            setEnclosuresToDelete(null);
+            toast({ title: "Operation", description: res });
+          }
+        })
+        .catch((e) => {
+          toast({ title: "Operation", description: e });
+        })
+        .finally(() => {
+          setIsDeleting(false);
+        });
     }
   };
+
+  useEffect(() => {
+    helper.xhr.Get("/Enclosure/GetEnclosureList").then((res) => {
+      setEnclosures(res);
+    });
+  }, []);
 
   return (
     <>
@@ -125,7 +164,7 @@ export default function EnclosurePage() {
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
               This will permanently delete the enclosure "
-              {enclosureToDelete?.animalName}
+              {enclosureToDelete?.EnclosureName}
               ". This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -133,9 +172,10 @@ export default function EnclosurePage() {
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteEnclosures}
+              disabled={isDeleting}
               className="bg-destructive text-destructive-foreground"
             >
-              Delete
+              {isDeleting ? "Deleting..." : "Delete"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -209,7 +249,7 @@ export default function EnclosurePage() {
                         )
                       }
                     >
-                      Animal
+                      Enclosure
                       <ArrowUpDown className="h-4 w-4" />
                     </TableHead>
                     <TableHead>Type</TableHead>
@@ -223,44 +263,46 @@ export default function EnclosurePage() {
                 <TableBody>
                   {currentPosts.length > 0 ? (
                     currentPosts.map((enclosure) => (
-                      <TableRow key={enclosure.id}>
+                      <TableRow key={enclosure.EnclosureId}>
                         <TableCell>
                           <Checkbox
-                            value={selectedEnclosures.includes(enclosure.id)}
+                            value={selectedEnclosures.includes(
+                              enclosure.EnclosureId
+                            )}
                             setter={(n, v) =>
-                              toggleSelectEnclosure(enclosure.id)
+                              toggleSelectEnclosure(enclosure.EnclosureId)
                             }
                             name="id"
                           />
                         </TableCell>
                         <TableCell className="font-medium">
-                          {enclosure.name}
+                          {enclosure.EnclosureName}
                         </TableCell>
-                        <TableCell>{enclosure.type}</TableCell>
+                        <TableCell>{enclosure.Type}</TableCell>
                         <TableCell className="text-center">
-                          {enclosure.currentAnimals} / {enclosure.capacity}
+                          {enclosure.Capacity}
                         </TableCell>
-                        <TableCell>{enclosure.status}</TableCell>
-                        <TableCell>{enclosure.zoo}</TableCell>
-                        <TableCell>{enclosure.location}</TableCell>
+                        <TableCell>{enclosure.Status}</TableCell>
+                        <TableCell>{enclosure.ZooTitle}</TableCell>
+                        <TableCell>{enclosure.LocationName}</TableCell>
                         <TableCell className="text-right flex justify-end">
-                          <Button
+                          {/* <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => {
                               router.push(
-                                `/home/enclosure-management/View?id=${enclosure.id}`
+                                `/home/enclosure-management/View?id=${enclosure.EnclosureId}`
                               );
                             }}
                           >
                             <Eye className="text-black h-4 w-4 cursor-pointer" />
-                          </Button>
+                          </Button> */}
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => {
                               router.push(
-                                `/home/enclosure-management/${enclosure.id}`
+                                `/home/enclosure-management/${enclosure.EnclosureId}`
                               );
                             }}
                           >

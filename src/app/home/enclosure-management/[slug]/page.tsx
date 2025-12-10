@@ -7,6 +7,7 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { useToast } from "@/components/ui/use-toast";
 import ButtonComp from "@/components/utils/Button";
 import Dropdown from "@/components/utils/FormElements/Dropdown";
 import InputTag from "@/components/utils/FormElements/InputTag";
@@ -26,41 +27,94 @@ type ImagesFiles = {
   FileId: number;
   file: File | null;
   Docpath?: string;
-  LocationId: number;
 };
 
 const Page = () => {
+  const { toast } = useToast();
   const helper = useHelper();
   const router = useRouter();
   const params = useParams();
+  const [isCruding, setIsCruding] = useState(false);
   const slug = params.slug as string;
-  const [zooList, setZooList] = useState<OPTION[]>(
-    zoos.map((z: any) => {
-      return {
-        value: z.value,
-        label: z.label,
-      };
-    })
-  );
+  const [zooList, setZooList] = useState<OPTION[]>([]);
+  const [deletedFileIds, setDeletedFileIds] = useState<number[]>([]);
   const [imageFiles, setImageFiles] = useState<ImagesFiles[]>([]);
   const [locations, setLocations] = useState<OPTION[]>([]);
-  const [types, setTypes] = useState<OPTION[]>(enclosureTypes);
-  const [statuses, setStatuses] = useState<OPTION[]>(servicesStatus);
+  const [types, setTypes] = useState<OPTION[]>([]);
+  const [statuses, setStatuses] = useState<OPTION[]>([]);
   const [obj, setObj] = useState({
-    Id: 0,
-    Name: "",
+    EnclosureId: 0,
+    EnclosureName: "",
+    EnclosureDescription: "",
     ZooId: 0,
     LocationId: 0,
     Capacity: 0,
-    Status: 0,
-    TypeId: 0,
-    Description: "",
+    OperationalStatusId: 1,
+    EnclosureTypeId: 1,
     Temperature: "",
     Humidity: "",
     Lighting: "",
-    // WaterFeatures: "",
+    IsActive: true,
+    Latitute: "",
+    Longitude: "",
   });
   const [features, setFeatures] = useState<string[]>([]);
+
+  useEffect(() => {
+    helper.xhr.Get("/List/GetZooList").then((res) => {
+      setZooList(
+        res.map((z: any) => {
+          return {
+            value: z.ZooId,
+            label: z.ZooTitle,
+          };
+        })
+      );
+    });
+    helper.xhr.Get("/List/GetEnclosureTypes").then((res) => {
+      setTypes(
+        res.map((z: any) => {
+          return {
+            value: z.EnclosureTypeId,
+            label: z.Type,
+          };
+        })
+      );
+    });
+    helper.xhr.Get("/List/GetOperationalStatus").then((res) => {
+      setStatuses(
+        res.map((z: any) => {
+          return {
+            value: z.OperationalStatusId,
+            label: z.Status,
+          };
+        })
+      );
+    });
+  }, []);
+
+  useEffect(() => {
+    helper.xhr
+      .Get(
+        "/List/GetLocationsByZooId",
+        helper
+          .GetURLParamString({
+            zooId: obj.ZooId,
+          })
+          .toString()
+      )
+      .then((res) => {
+        setLocations(
+          res.map((z: any) => {
+            return {
+              value: z.LocationId,
+              label: z.LocationName,
+            };
+          })
+        );
+      });
+  }, [obj.ZooId]);
+
   useEffect(() => {
     if (slug) {
       if (slug != "new" && isNaN(Number(slug))) {
@@ -80,14 +134,74 @@ const Page = () => {
   function GetHeading() {
     return `${capitalize(slug == "new" ? "create" : "edit")} - ${capitalize(
       "Enclosure"
-    )} ${slug != "new" ? `for ${obj.Name}` : ""}`;
+    )} ${slug != "new" ? `for ${obj.EnclosureName}` : ""}`;
   }
 
   function handleChange(n: string, v: string | boolean | number) {
     setObj({ ...obj, [n]: v });
   }
 
-  function HandleSubmit() {}
+  const verify = () => {
+    const toastObj = { title: "Validation Error", description: "" };
+    if (obj.EnclosureName == "") {
+      toastObj.description = "Enclosure Name is required.";
+    } else if (obj.ZooId == 0 || obj.LocationId == 0) {
+      toastObj.description = "Zoo and Location are required.";
+    }
+    if (toastObj.description !== "") {
+      toast(toastObj);
+      return false;
+    }
+    return true;
+  };
+
+  const HandleSubmit = () => {
+    if (verify()) {
+      setIsCruding(true);
+      const createObject = {
+        obj,
+        features,
+        Files: imageFiles.map((img) => img.file),
+      };
+      const editObject = {
+        obj,
+        features,
+        newFiles: imageFiles
+          .filter((img) => img.file !== null)
+          .map((img) => img.file),
+        deleteFileIds: deletedFileIds,
+      };
+      helper.xhr
+        .Post(
+          `/Enclosure/${slug == "new" ? "AddEnclosure" : "UpdateEnclosure"}`,
+          helper.ConvertToFormData(
+            obj.EnclosureId == 0 ? createObject : editObject
+          )
+        )
+        .then((response) => {
+          toast({
+            title: `Enclosure ${
+              slug == "new" ? "created" : "updated"
+            } successfully`,
+            variant: "success",
+          });
+          setIsCruding(false);
+          setTimeout(() => {
+            router.back();
+          }, 3000);
+        })
+        .catch((error) => {
+          toast({
+            title: `Enclosure not ${
+              slug == "new" ? "created" : "updated"
+            } successfully`,
+            description: error.message,
+            variant: "danger",
+          });
+          setIsCruding(false);
+        });
+    }
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -96,7 +210,6 @@ const Page = () => {
         return {
           FileId: 0,
           file: f,
-          LocationId: obj.Id,
         };
       });
       setImageFiles([...imageFiles, ...temp]);
@@ -104,15 +217,14 @@ const Page = () => {
   };
 
   function AddNewFile(productId: number, file: File, index?: number) {}
+
   const removeImage = (index: number) => {
     setImageFiles(imageFiles.filter((_, i) => i !== index));
   };
 
   const DeleteImage = (id: number, index: number) => {
-    helper.xhr.Post("/", helper.ConvertToFormData({ id })).then((res) => {
-      // Message("success", "File removed.");
-      setImageFiles(imageFiles.filter((_, i) => i !== index));
-    });
+    setDeletedFileIds([...deletedFileIds, id]);
+    removeImage(index);
   };
   const addImageFiles = () => {
     document.getElementById("file-upload")?.click();
@@ -124,6 +236,27 @@ const Page = () => {
   const RemoveFeature = (index: number) => {
     setFeatures(features.filter((_, i) => i !== index));
   };
+
+  useEffect(() => {
+    if (!isNaN(Number(slug))) {
+      helper.xhr
+        .Get(
+          "/Enclosure/GetEnclosureForEdit",
+          helper.GetURLParamString({ EnclosureId: Number(slug) }).toString()
+        )
+        .then((res) => {
+          setObj(res);
+          setFeatures(res.features);
+          setImageFiles(
+            res.enclosureFiles.map((file: any) => ({
+              FileId: file.EnclosureFileId,
+              file: null,
+              Docpath: file.EnclosureFilepath,
+            }))
+          );
+        });
+    }
+  }, [slug]);
 
   return (
     <div className="flex-1 space-y-4">
@@ -146,8 +279,8 @@ const Page = () => {
             <Paragraph text="Details" />
             <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-2 gap-y-3">
               <InputTag
-                value={obj.Name}
-                name="Name"
+                value={obj.EnclosureName}
+                name="EnclosureName"
                 setter={handleChange}
                 label="Enclosure Name"
               />
@@ -166,15 +299,15 @@ const Page = () => {
                 label="Location"
               />
               <Dropdown
-                activeId={obj.TypeId}
-                name="TypeId"
+                activeId={obj.EnclosureTypeId}
+                name="EnclosureTypeId"
                 options={types}
                 handleDropdownChange={handleChange}
                 label="Type"
               />
               <Dropdown
-                activeId={obj.Status}
-                name="Status"
+                activeId={obj.OperationalStatusId}
+                name="OperationalStatusId"
                 options={statuses}
                 handleDropdownChange={handleChange}
                 label="Status"
@@ -188,8 +321,8 @@ const Page = () => {
               />
               <div className="col-span-1 md:col-span-2">
                 <TextArea
-                  value={obj.Description}
-                  name="Description"
+                  value={obj.EnclosureDescription}
+                  name="EnclosureDescription"
                   setter={handleChange}
                   label="Description"
                   placeHolder="Write description here..."
@@ -197,8 +330,8 @@ const Page = () => {
               </div>
             </div>
           </div>
-          <Separator />
-          <div className="space-y-3">
+          {/* <Separator /> */}
+          <div className="space-y-3 hidden">
             <Paragraph text="Environment Controls" />
             <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-2 gap-y-3">
               <InputTag
@@ -231,8 +364,8 @@ const Page = () => {
               /> */}
             </div>
           </div>
-          <Separator />
-          <div className="space-y-3">
+          {/* <Separator /> */}
+          <div className="space-y-3 hidden">
             <div className="flex justify-between items-center">
               <Paragraph text="Features" />
               <div className="w-fit">
@@ -265,7 +398,6 @@ const Page = () => {
                       variant="ghost"
                       size="icon"
                       onClick={() => RemoveFeature(index)}
-                      // disabled={features.length === 1}
                     >
                       <X className="h-4 w-4" />
                       <span className="sr-only">Remove</span>
@@ -310,8 +442,8 @@ const Page = () => {
                         className="object-cover"
                       />
                     )}
-                    {image.FileId == 0 &&
-                      obj.Id != 0 &&
+                    {/* {image.FileId == 0 &&
+                      obj.EnclosureId != 0 &&
                       imageFiles.length > 0 && (
                         <Button
                           variant="outline"
@@ -324,7 +456,7 @@ const Page = () => {
                           <Save className="h-3 w-3" />
                           <span className="sr-only">Remove image</span>
                         </Button>
-                      )}
+                      )} */}
                     {image.FileId != 0 ? (
                       <Button
                         variant="destructive"
