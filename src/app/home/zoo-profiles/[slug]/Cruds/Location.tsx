@@ -596,6 +596,7 @@ const Location = ({ mode = "create", id = "0", tab }: Props) => {
                 <ButtonComp
                   text={mode == "edit" ? "Save" : "Create"}
                   clickEvent={HandleSubmit}
+                  isCruding={isCruding}
                   beforeIcon={<Save className="h-4 w-4" />}
                 />
               </div>

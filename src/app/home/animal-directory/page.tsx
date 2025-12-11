@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
@@ -55,131 +55,65 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import CardIntro from "@/components/utils/Headings/CardIntro";
+import useHelper from "@/Helper/helper";
 
 export default function AnimalDirectoryPage() {
   const router = useRouter();
+  const helper = useHelper();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [activeTab, setActiveTab] = useState("all");
-  const [animalToDelete, setAnimalToDelete] = useState<string | null>(null);
+  const [animalToDelete, setAnimalToDelete] = useState<number | null>(null);
   const [sortOrder, setSortOrder] = useState("name-asc");
-  const [zoos, setZoos] = useState([
-    { value: "lahore-zoo", label: "Lahore Zoo" },
-    { value: "lahore-safari-park", label: "Lahore Safari Park" },
-    { value: "bahawalpur-zoo", label: "Bahawalpur Zoo" },
-  ]);
-  const [animals, setAnimals] = useState([
+  const [zoos, setZoos] = useState([]);
+  const [animals, setAnimals] = useState<
     {
-      id: "african-elephant",
-      name: "African Elephant",
-      scientificName: "Loxodonta africana",
-      category: "Mammals",
-      conservationStatus: "Vulnerable",
-      location: ["lahore-zoo", "bahawalpur-zoo"],
-      enclosure: "Elephant Savannah",
-      image: "/placeholder.svg?height=200&width=200",
-    },
-    {
-      id: "bengal-tiger",
-      name: "Bengal Tiger",
-      scientificName: "Panthera tigris tigris",
-      category: "Mammals",
-      conservationStatus: "Endangered",
-      location: ["lahore-safari-park"],
-      enclosure: "Tiger's Den",
-      image: "/placeholder.svg?height=200&width=200",
-    },
-    {
-      id: "giant-panda",
-      name: "Giant Panda",
-      scientificName: "Ailuropoda melanoleuca",
-      category: "Mammals",
-      conservationStatus: "Vulnerable",
-      location: ["lahore-zoo"],
-      enclosure: "Bamboo Forest",
-      image: "/placeholder.svg?height=200&width=200",
-    },
-    {
-      id: "komodo-dragon",
-      name: "Komodo Dragon",
-      scientificName: "Varanus komodoensis",
-      category: "Reptiles",
-      conservationStatus: "Endangered",
-      location: ["bahawalpur-zoo"],
-      enclosure: "The Grassland",
-      image: "/placeholder.svg?height=200&width=200",
-    },
-    {
-      id: "blue-poison-dart-frog",
-      name: "Blue Poison Dart Frog",
-      scientificName: "Dendrobates azureus",
-      category: "Amphibians",
-      conservationStatus: "Least Concern",
-      location: ["lahore-zoo"],
-      enclosure: "Eye Pond",
-      image: "/placeholder.svg?height=200&width=200",
-    },
-    {
-      id: "scarlet-macaw",
-      name: "Scarlet Macaw",
-      scientificName: "Ara macao",
-      category: "Birds",
-      conservationStatus: "Least Concern",
-      location: ["lahore-safari-park"],
-      enclosure: "Bird's Sanctuary",
-      image: "/placeholder.svg?height=200&width=200",
-    },
-    {
-      id: "emperor-penguin",
-      name: "Emperor Penguin",
-      scientificName: "Aptenodytes forsteri",
-      category: "Birds",
-      conservationStatus: "Near Threatened",
-      location: ["lahore-zoo"],
-      enclosure: "Iceland",
-      image: "/placeholder.svg?height=200&width=200",
-    },
-    {
-      id: "saltwater-crocodile",
-      name: "Saltwater Crocodile",
-      scientificName: "Crocodylus porosus",
-      category: "Reptiles",
-      conservationStatus: "Least Concern",
-      location: ["bahawalpur-zoo"],
-      enclosure: "The Nile",
-      image: "/placeholder.svg?height=200&width=200",
-    },
-  ]);
+      AnimalId: number;
+      AnimalName: string;
+      CoverImageFilepath: string;
+      CategoryName: string;
+      Status: string;
+      enclosureList: string[];
+      zooList: string[];
+    }[]
+  >([]);
+
+  useEffect(() => {
+    helper.xhr.Get("/Animal/GetAnimalsList").then((res) => {
+      console.log(res);
+      setAnimals(
+        res.map((animal: any) => ({
+          ...animal,
+          enclosureList: animal.animalMapping.flatMap(
+            (x: any) => x.EnclosureName
+          ),
+          zooList: animal.animalMapping.flatMap((x: any) => x.ZooTitle),
+        }))
+      );
+    });
+  }, []);
+
   const filteredAnimals = animals.filter((animal) => {
-    const matchesSearch =
-      animal.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      animal.scientificName.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = animal.AnimalName.toLowerCase().includes(
+      searchTerm.toLowerCase()
+    );
 
     const matchesCategory =
       activeTab === "all" ||
-      animal.category.toLowerCase() === activeTab.toLowerCase();
-
-    const matchesEndangered =
-      activeTab === "endangered"
-        ? ["Endangered", "Critically Endangered"].includes(
-            animal.conservationStatus
-          )
-        : true;
+      animal.CategoryName.toLowerCase() === activeTab.toLowerCase();
 
     const matchesLocation =
       selectedCategory == "all" ||
-      animal.location.some((location) => selectedCategory == location);
-    return (
-      matchesSearch && matchesCategory && matchesEndangered && matchesLocation
-    );
+      animal.zooList.some((location) => selectedCategory == location);
+    return matchesSearch && matchesCategory && matchesLocation;
   });
 
   const sortedAnimals = [...filteredAnimals].sort((a, b) => {
     switch (sortOrder) {
       case "name-asc":
-        return a.name.localeCompare(b.name);
+        return a.AnimalName.localeCompare(b.AnimalName);
       case "name-desc":
-        return b.name.localeCompare(a.name);
+        return b.AnimalName.localeCompare(a.AnimalName);
       default:
         return 0;
     }
@@ -197,16 +131,31 @@ export default function AnimalDirectoryPage() {
 
   /////////////////////////////////////
 
-  const handleDelete = (animalId: string) => {
+  const handleDelete = (animalId: number) => {
     // In a real app, delete from API
-    setAnimals(animals.filter((x) => x.id != animalId));
+    setAnimals(animals.filter((x) => x.AnimalId != animalId));
     toast({
       title: "Animal deleted",
       description: `The animal has been removed from the directory.`,
     });
     setAnimalToDelete(null);
-    // Would refresh data here
   };
+
+  useEffect(() => {
+    helper.xhr.Get("/Animal/GetAnimalsList").then((res) => {
+      console.log(res);
+    });
+    helper.xhr.Get("/List/GetZooList").then((res) => {
+      setZoos(
+        res.map((z: any) => {
+          return {
+            value: z.ZooId,
+            label: z.ZooTitle,
+          };
+        })
+      );
+    });
+  }, []);
 
   return (
     <div className="flex-1 space-y-4">
@@ -289,16 +238,18 @@ export default function AnimalDirectoryPage() {
                 {currentPosts.length > 0 ? (
                   currentPosts.map((animal: any, index: number) => (
                     <TableRow key={index}>
-                      <TableCell>{animal.name}</TableCell>
-                      <TableCell>{animal.category}</TableCell>
-                      <TableCell>{animal.enclosure}</TableCell>
-                      <TableCell>{animal.location.join(", ")}</TableCell>
+                      <TableCell>{animal.AnimalName}</TableCell>
+                      <TableCell>{animal.CategoryName}</TableCell>
+                      <TableCell>{animal.enclosureList.join(", ")}</TableCell>
+                      <TableCell>{animal.zooList.join(", ")}</TableCell>
                       <TableCell className="text-right flex justify-end">
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => {
-                            router.push(`/home/animal-directory/${animal.id}`);
+                            router.push(
+                              `/home/animal-directory/${animal.AnimalId}`
+                            );
                           }}
                         >
                           <Eye className="text-black h-4 w-4 cursor-pointer" />
@@ -308,7 +259,7 @@ export default function AnimalDirectoryPage() {
                           size="sm"
                           onClick={() => {
                             router.push(
-                              `/home/animal-directory/${animal.id}?edit=true`
+                              `/home/animal-directory/${animal.AnimalId}?edit=true`
                             );
                           }}
                         >
@@ -319,7 +270,7 @@ export default function AnimalDirectoryPage() {
                           variant="ghost"
                           size="sm"
                           onClick={() => {
-                            setAnimalToDelete(animal.id);
+                            setAnimalToDelete(animal.AnimalId);
                           }}
                           className="text-destructive hover:text-destructive"
                         >
@@ -391,7 +342,8 @@ export default function AnimalDirectoryPage() {
         onConfirm={() => animalToDelete && handleDelete(animalToDelete)}
         animalName={
           animalToDelete
-            ? animals.find((a) => a.id === animalToDelete)?.name || ""
+            ? animals.find((a) => a.AnimalId === animalToDelete)?.AnimalName ||
+              ""
             : ""
         }
       />

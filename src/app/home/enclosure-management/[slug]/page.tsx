@@ -48,7 +48,7 @@ const Page = () => {
     EnclosureDescription: "",
     ZooId: 0,
     LocationId: 0,
-    Capacity: 0,
+    Capacity: null,
     OperationalStatusId: 1,
     EnclosureTypeId: 1,
     Temperature: "",
@@ -159,12 +159,12 @@ const Page = () => {
     if (verify()) {
       setIsCruding(true);
       const createObject = {
-        obj,
+        obj: { ...obj, Capacity: obj.Capacity == 0 ? null : obj.Capacity },
         features,
         Files: imageFiles.map((img) => img.file),
       };
       const editObject = {
-        obj,
+        obj: { ...obj, Capacity: obj.Capacity == 0 ? null : obj.Capacity },
         features,
         newFiles: imageFiles
           .filter((img) => img.file !== null)
@@ -313,10 +313,13 @@ const Page = () => {
                 label="Status"
               />
               <InputTag
-                type="number"
                 value={obj.Capacity}
                 name="Capacity"
-                setter={handleChange}
+                setter={(n, v) => {
+                  if (!isNaN(Number(v))) {
+                    handleChange(n, v == 0 ? null : v);
+                  }
+                }}
                 label="Capacity"
               />
               <div className="col-span-1 md:col-span-2">
@@ -411,8 +414,8 @@ const Page = () => {
               )}
             </div>
           </div>
-          <Separator />
-          <div className="space-y-3">
+          {/* <Separator /> */}
+          <div className="space-y-3 hidden">
             <Paragraph text="Graphic Visuals" />
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
               {imageFiles.map((image, index) => (
@@ -512,6 +515,7 @@ const Page = () => {
               <ButtonComp
                 text={slug !== "new" ? "Save" : "Create"}
                 clickEvent={HandleSubmit}
+                isCruding={isCruding}
                 beforeIcon={<Save className="h-4 w-4" />}
               />
             </div>

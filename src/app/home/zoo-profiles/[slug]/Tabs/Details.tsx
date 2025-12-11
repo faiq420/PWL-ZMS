@@ -36,8 +36,6 @@ const DetailsTab = ({ data }: Props) => {
     mode: "edit" as "edit" | "view",
   });
 
-  console.log(data);
-
   return (
     <>
       <Card>

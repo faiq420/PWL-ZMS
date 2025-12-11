@@ -58,7 +58,7 @@ const InputTag = ({
         className={`${styles.input} ${error !== "" && "!border-red-600"}`}
         id={name}
         name={name}
-        value={value}
+        value={value ?? ""}
         type={type ?? "text"}
         placeholder={placeHolder}
         disabled={disabled}

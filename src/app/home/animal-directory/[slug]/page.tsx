@@ -19,20 +19,14 @@ import Subheading from "@/components/utils/Headings/Subheading";
 import useHelper from "@/Helper/helper";
 import Checkbox from "@/components/utils/FormElements/Checkbox";
 import { Message } from "@/Helper/ToastMessages";
-
-// Mock data for demonstration
-const zoos = [
-  { id: "lahore-zoo", name: "Lahore Zoo" },
-  { id: "lahore-safari-park", name: "Lahore Safari Park" },
-  { id: "bahawalpur-zoo", name: "Bahawalpur Zoo" },
-];
+import { OPTION } from "@/types/utils";
+import { zoos } from "@/data/users";
+import ButtonComp from "@/components/utils/Button";
 
 type AnimalFiles = {
-  Fileid: number;
+  AnimalFileId: number;
   file: File | null;
   Docpath?: string;
-  IsTileImage?: boolean;
-  AnimalId: number;
 };
 
 export default function AnimalDetailPage() {
@@ -40,6 +34,7 @@ export default function AnimalDetailPage() {
   const params = useParams();
   const helper = useHelper();
   const searchParams = useSearchParams();
+  const [zooList, setZooList] = useState([]);
   const isNewAnimal = params.slug === "new";
   const [isEditing, setIsEditing] = useState(
     isNewAnimal || searchParams.get("edit") ? true : false
@@ -47,121 +42,202 @@ export default function AnimalDetailPage() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [activeTab, setActiveTab] = useState("details");
 
-  // Animal state
-  const [animal, setAnimal] = useState<any>({
-    Id: 0,
-    Name: "",
-    ScientificName: "",
-    Category: "Mammals",
-    CategoryId: 0,
-    ConservationStatus: "Least Concern",
+  const [animal, setAnimal] = useState<{
+    AnimalId: number;
+    AnimalName: string;
+    AnimalScientificName: string;
+    AnimalCategoryId: number;
+    AnimalCategoryName?: string;
+    ConservationStatusId: number;
+    ConservationStatusName?: string;
+    AnimalDescription: string;
+    Habitat: string;
+    HealthStatusId: number;
+    HealthStatusName?: string;
+    Diet: string;
+    LifeSpan: string;
+    CoverImageFilepath: string;
+    IsAvailable: boolean;
+  }>({
+    AnimalId: 0,
+    AnimalName: "",
+    AnimalScientificName: "",
+    AnimalCategoryId: 0,
     ConservationStatusId: 0,
-    Description: "",
+    AnimalDescription: "",
     Habitat: "",
-    Enclosure: 0,
+    HealthStatusId: 0,
     Diet: "",
-    Lifespan: "",
-    BirthDate: "",
-    ZooIds: [],
-    media: {
-      images: [],
-      videos: [],
-      arModels: [],
-    },
+    LifeSpan: "",
+    CoverImageFilepath: "",
+    IsAvailable: true,
   });
+  const [activeAnimalCategory, setActiveAnimalCategory] = useState("");
+  const [activeAnimalConservation, setActiveAnimalConservation] = useState("");
+  const [zooEnclosureMapping, setZooEnclosureMapping] = useState<
+    {
+      ZooId: number;
+      EnclosureId: number;
+      Count: number;
+    }[]
+  >([]);
+  const [isCruding, setIsCruding] = useState(false);
+  const [coverImage, setCoverImage] = useState<File | null>(null);
   const [animalImages, setAnimalImages] = useState<AnimalFiles[]>([]);
+  const [deletedImages, setDeletedImages] = useState<number[]>([]);
   const [animalVideos, setAnimalVideos] = useState<AnimalFiles[]>([]);
-
-  // Fetch animal data if not new
+  const [enclosuresByZoo, setEnclosuresByZoo] = useState<{
+    [key: number]: any[];
+  }>({});
   useEffect(() => {
-    if (!isNewAnimal && animal.Id == "") {
-      // In a real app, fetch from API
-      // For demo, use mock data
-      const mockAnimal = {
-        Id: params.slug,
-        Name: "Bengal Tiger",
-        ScientificName: "Panthera tigris tigris",
-        Category: "Mammals",
-        ConservationStatus: "Endangered",
-        Description:
-          "The Bengal tiger is the most numerous tiger subspecies. Its populations have been estimated at 2,500 in the wild.",
-        Habitat: "Tropical and subtropical moist broadleaf forests",
-        Diet: "Carnivore - primarily deer, wild boar, and other large mammals",
-        Lifespan: "8-10 years in the wild, up to 20 in captivity",
-        ZooIds: ["lahore-zoo", "bahawalpur-zoo"],
-        media: {
-          images: [
-            {
-              id: "img1",
-              name: "Tiger 1",
-              url: "/placeholder.svg?height=400&width=600",
-              type: "image/jpeg",
-            },
-            {
-              id: "img2",
-              name: "Tiger 2",
-              url: "/placeholder.svg?height=400&width=600",
-              type: "image/jpeg",
-            },
-          ],
-          videos: [
-            {
-              id: "vid1",
-              name: "Tiger in action",
-              url: "/placeholder.svg?height=400&width=600",
-              type: "video/mp4",
-            },
-          ],
-          arModels: [
-            {
-              id: "ar1",
-              name: "Tiger 3D Model",
-              url: "/placeholder.svg?height=400&width=600",
-              type: "model/gltf-binary",
-            },
-          ],
-        },
-      };
-      setAnimal(mockAnimal);
+    if (!isNewAnimal && animal.AnimalId == 0) {
+      helper.xhr
+        .Get(
+          "/Animal/GetAnimalById",
+          helper.GetURLParamString({ animalId: Number(params.slug) }).toString()
+        )
+        .then((res) => {
+          setAnimal({
+            ...animal,
+            AnimalId: res.animal.AnimalId,
+            AnimalName: res.animal.AnimalName,
+            AnimalDescription: res.animal.AnimalDescription,
+            AnimalScientificName: res.animal.AnimalScientificName,
+            AnimalCategoryId: res.animal.AnimalCategoryId,
+            ConservationStatusId: res.animal.ConservationStatusId,
+            Habitat: res.animal.Habitat,
+            Diet: res.animal.Diet,
+            LifeSpan: res.animal.LifeSpan,
+            CoverImageFilepath: res.animal.CoverImageFilepath,
+          });
+          setActiveAnimalCategory(res.animal.CategoryName);
+          setActiveAnimalConservation(res.animal.Status);
+          setAnimalImages(
+            res.animal.animalFiles.map((img: any) => ({
+              AnimalFileId: img.AnimalFileId,
+              file: null,
+              Docpath: img.AnimalFilepath,
+            }))
+          );
+          const mapping: {
+            ZooId: number;
+            EnclosureId: number;
+            Count: number;
+          }[] = res.animal.animalMapping.map((am: any) => {
+            return {
+              ...am,
+              Count: res.animal.count.find(
+                (y: any) => y.EnclosureId == am.EnclosureId
+              ).Count,
+            };
+          });
+
+          setZooEnclosureMapping(mapping);
+        });
     }
   }, [isNewAnimal, params.slug]);
 
-  const handleSave = async () => {
-    try {
-      // In a real app, save to API
-      toast({
-        title: isNewAnimal ? "Animal created" : "Animal updated",
-        description: `${animal.Name} has been ${
-          isNewAnimal ? "added to" : "updated in"
-        } the directory.`,
-      });
+  useEffect(() => {
+    helper.xhr.Get("/List/GetZooList").then((res) => {
+      console.log(res);
+      setZooList(
+        res.map((z: any) => {
+          return {
+            value: Number(z.ZooId),
+            label: z.ZooTitle,
+          };
+        })
+      );
+    });
+  }, []);
 
-      if (isNewAnimal) {
-        // Redirect to the new animal page
-        router.push(
-          `/home/animal-directory/${animal.Name.toLowerCase().replace(
-            /\s+/g,
-            "-"
-          )}`
-        );
-      } else {
-        setIsEditing(false);
-      }
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "There was a problem saving the animal data.",
-        variant: "destructive",
-      });
+  useEffect(() => {
+    helper.xhr.Get("/List/GetEnclosuresByZoo").then((res) => {
+      setEnclosuresByZoo(res);
+    });
+  }, []);
+
+  const verify = () => {
+    const toastObj = { title: "Validation Error", description: "" };
+    console.log(animal);
+    if (animal.AnimalName == "") {
+      toastObj.description = "Animal Name is required.";
+    } else if (animal.AnimalScientificName == "") {
+      toastObj.description = "Scientific Name is required.";
+    } else if (animal.AnimalCategoryId == 0) {
+      toastObj.description = "Animal Category is required.";
+    } else if (animal.ConservationStatusId == 0) {
+      toastObj.description = "Conservation Status is required.";
+    } else if (animal.Habitat == "") {
+      toastObj.description = "Habitat is required.";
+    } else if (animal.Diet == "") {
+      toastObj.description = "Diet is required.";
+    } else if (animal.LifeSpan == "") {
+      toastObj.description = "Life span is required.";
+    } else if (animal.CoverImageFilepath == "" && !coverImage) {
+      toastObj.description = "Cover image is required.";
+    } else if (animalImages.length < 8) {
+      toastObj.description = "At least 8 images are required.";
+    }
+    if (toastObj.description !== "") {
+      toast(toastObj);
+      return false;
+    }
+    return true;
+  };
+
+  const handleSave = () => {
+    if (verify()) {
+      setIsCruding(true);
+      const createObj = {
+        obj: animal,
+        images: animalImages.map((img) => img.file),
+        animalCoverImage: coverImage,
+        dto: zooEnclosureMapping,
+      };
+      const editObj = {
+        id: animal.AnimalId,
+        obj: animal,
+        images: animalImages.filter((img) => img.file).map((img) => img.file),
+        animalCoverImage: coverImage,
+        dto: zooEnclosureMapping,
+        deletedFileIds: deletedImages,
+      };
+      helper.xhr
+        .Post(
+          `/Animal/${isNewAnimal ? "CreateAnimal" : "UpdateAnimal"}`,
+          helper.ConvertToFormData(isNewAnimal ? createObj : editObj)
+        )
+        .then((res) => {
+          toast({
+            title: isNewAnimal ? "Animal created" : "Animal updated",
+            description: `${animal.AnimalName} has been ${
+              isNewAnimal ? "added to" : "updated in"
+            } the directory.`,
+          });
+          if (isNewAnimal) {
+            // Redirect to the new animal page
+            router.back();
+          } else {
+            setIsEditing(false);
+          }
+        })
+        .catch((e) => {
+          toast({
+            title: "Error",
+            description: "There was a problem saving the animal data.",
+            variant: "destructive",
+          });
+        })
+        .finally(() => setIsCruding(false));
     }
   };
 
   const handleDelete = async () => {
     try {
-      // In a real app, delete from API
       toast({
         title: "Animal deleted",
-        description: `${animal.name} has been removed from the directory.`,
+        description: `${animal.AnimalName} has been removed from the directory.`,
       });
       router.push("/home/animal-directory");
     } catch (error) {
@@ -174,19 +250,12 @@ export default function AnimalDetailPage() {
   };
 
   const handleFileUpload = (files: File[], mediaType: "images" | "videos") => {
-    // const newFiles = Array.from(files).map((file) => ({
-    //   id: `new-${Date.now()}-${file.name}`,
-    //   name: file.name,
-    //   url: URL.createObjectURL(file),
-    //   type: file.type,
-    //   file: file,
-    // }));
     const temp = files.map((f) => {
       return {
-        Fileid: 0,
+        AnimalFileId: 0,
         file: f,
         IsTileImage: false,
-        AnimalId: animal.Id,
+        AnimalId: animal.AnimalId,
       };
     });
     if (mediaType === "images") {
@@ -194,75 +263,16 @@ export default function AnimalDetailPage() {
     } else if (mediaType === "videos") {
       setAnimalVideos([...animalVideos, ...temp]);
     }
-    // setAnimal((prev: any) => ({
-    //   ...prev,
-    //   media: {
-    //     ...prev.media,
-    //     [mediaType]: [...prev.media[mediaType], ...newFiles],
-    //   },
-    // }));
   };
 
-  const removeFile = (
-    fileId: string,
-    mediaType: "images" | "videos" | "arModels"
-  ) => {
-    setAnimal((prev: any) => ({
-      ...prev,
-      media: {
-        ...prev.media,
-        [mediaType]: prev.media[mediaType].filter(
-          (file: any) => file.id !== fileId
-        ),
-      },
-    }));
+  const removeAnimalImage = (index: number) => {
+    setAnimalImages(animalImages.filter((_, i) => i !== index));
   };
 
-  const removeAnimalVideo = (index: number) => {
-    setAnimalVideos(animalVideos.filter((_, i) => i !== index));
+  const DeleteAnimalImage = (id: number, index: number) => {
+    setDeletedImages([...deletedImages, id]);
+    removeAnimalImage(index);
   };
-
-  const DeleteAnimalVideo = (id: number, index: number) => {
-    helper.xhr
-      .Post("/Animal/DeleteAnimalVideo", helper.ConvertToFormData({ id }))
-      .then((res) => {
-        Message("success", "File removed.");
-        setAnimalVideos(animalVideos.filter((_, i) => i !== index));
-      });
-  };
-
-  function AddNewAnimalFile(
-    productId: number,
-    file: File,
-    IsTileImage?: boolean,
-    index?: number,
-    type?: "image" | "video"
-  ) {
-    const formData = new FormData();
-    formData.append("id", String(productId));
-    formData.append("file", file);
-    formData.append("IsTileImage", String(IsTileImage));
-    const path =
-      type === "image"
-        ? "/Animal/UploadAnimalImage"
-        : "/Animal/UploadAnimalVideo";
-    helper.xhr
-      .Post(path, formData)
-      .then((res) => {
-        console.log(res);
-        Message("success", `File saved.`);
-        if (index) {
-          const files =
-            type === "image" ? [...animalImages] : [...animalVideos];
-          files[index] = res;
-          type == "image" ? setAnimalImages(files) : setAnimalVideos(files);
-        }
-      })
-      .catch((e) => {
-        console.log(e);
-      })
-      .finally(() => {});
-  }
 
   return (
     <div className="flex-1 space-y-4">
@@ -275,23 +285,9 @@ export default function AnimalDetailPage() {
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <Subheading text={isNewAnimal ? "Add New Animal" : animal.Name} />
-
-          {/* {!isNewAnimal && !isEditing && (
-            <Badge
-              variant={
-                animal.conservationStatus === "Endangered"
-                  ? "destructive"
-                  : animal.conservationStatus === "Vulnerable"
-                  ? "warning"
-                  : animal.conservationStatus === "Near Threatened"
-                  ? "outline"
-                  : "secondary"
-              }
-            >
-              {animal.conservationStatus}
-            </Badge>
-          )} */}
+          <Subheading
+            text={isNewAnimal ? "Add New Animal" : animal.AnimalName}
+          />
         </div>
         <div className="flex space-x-2">
           {!isNewAnimal && !isEditing && (
@@ -309,24 +305,23 @@ export default function AnimalDetailPage() {
           )}
           {(isNewAnimal || isEditing) && (
             <>
-              <Button
-                variant="outline"
-                onClick={() => {
+              <ButtonComp
+                clickEvent={() => {
                   if (isNewAnimal) {
                     router.push("/home/animal-directory");
                   } else {
                     setIsEditing(false);
                   }
                 }}
-              >
-                <X className="mr-2 h-4 w-4" /> Cancel
-              </Button>
-              <Button
-                className="bg-green-700 hover:bg-green-800"
-                onClick={handleSave}
-              >
-                <Save className="mr-2 h-4 w-4" /> Save
-              </Button>
+                beforeIcon={<X className="h-4 w-4" />}
+                text="Cancel"
+                type={"white"}
+              />
+              <ButtonComp
+                clickEvent={handleSave}
+                text="Save"
+                isCruding={isCruding}
+              />
             </>
           )}
         </div>
@@ -342,21 +337,30 @@ export default function AnimalDetailPage() {
             Details
           </TabsTrigger>
           <TabsTrigger className="flex-1" value="images">
-            Images
+            Graphics
           </TabsTrigger>
-          <TabsTrigger className="flex-1" value="videos">
+          {/* <TabsTrigger className="flex-1" value="videos">
             Videos
-          </TabsTrigger>
+          </TabsTrigger> */}
         </TabsList>
 
         <TabsContent value="details" className="space-y-4">
           {isEditing || isNewAnimal ? (
-            <AnimalForm animal={animal} setAnimal={setAnimal} zoos={zoos} />
+            <AnimalForm
+              zooEnclosureMapping={zooEnclosureMapping}
+              setZooEnclosureMapping={setZooEnclosureMapping}
+              animal={animal}
+              setAnimal={setAnimal}
+              zoos={zooList}
+              enclosuresByZoo={enclosuresByZoo}
+              coverImage={coverImage}
+              setCoverImage={setCoverImage}
+            />
           ) : (
             <Card>
               <CardContent className="pt-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-4">
+                  <div className="space-y-4 font-poppins">
                     <div className="">
                       <Paragraph
                         text="Basic Information"
@@ -367,19 +371,19 @@ export default function AnimalDetailPage() {
                           <span className="font-medium text-black">
                             Scientific Name:
                           </span>{" "}
-                          {animal.ScientificName}
+                          {animal.AnimalScientificName}
                         </div>
                         <div className="text-muted-foreground">
                           <span className="font-medium text-black">
                             Category:
                           </span>{" "}
-                          {animal.Category}
+                          {activeAnimalCategory}
                         </div>
                         <div className="text-muted-foreground">
                           <span className="font-medium text-black">
                             Conservation Status:
                           </span>{" "}
-                          {animal.ConservationStatus}
+                          {activeAnimalConservation}
                         </div>
                       </div>
                     </div>
@@ -403,7 +407,7 @@ export default function AnimalDetailPage() {
                           <span className="font-medium text-black">
                             Lifespan:
                           </span>{" "}
-                          {animal.Lifespan}
+                          {animal.LifeSpan}
                         </div>
                       </div>
                     </div>
@@ -416,7 +420,7 @@ export default function AnimalDetailPage() {
                         className="font-semibold "
                       />
                       <p className="text-muted-foreground text-sm mt-3">
-                        {animal.Description}
+                        {animal.AnimalDescription}
                       </p>
                     </div>
                     <div className="">
@@ -426,20 +430,24 @@ export default function AnimalDetailPage() {
                         className="font-semibold "
                       />
                       <div className="flex flex-wrap gap-2 mt-3">
-                        {animal.ZooIds.map((zooId: string) => {
-                          const zoo = zoos.find((z) => z.id === zooId);
-                          return zoo ? (
-                            <p
-                              key={zooId}
-                              className="cursor-pointer bg-white px-2 py-1 text-xs shadow rounded-full border"
-                              onClick={() =>
-                                router.push(`/home/zoo-profiles/${zooId}`)
-                              }
-                            >
-                              {zoo.name}
-                            </p>
-                          ) : null;
-                        })}
+                        {zooEnclosureMapping
+                          .flatMap((mapping) => mapping.ZooId)
+                          .map((zooId: number) => {
+                            const zoo = zooList.find(
+                              (z: OPTION) => z.value === zooId
+                            ) as OPTION | undefined;
+                            return zoo ? (
+                              <p
+                                key={zooId}
+                                className="cursor-pointer bg-white px-2 py-1 text-xs shadow rounded-full border"
+                                onClick={() =>
+                                  router.push(`/home/zoo-profiles/${zooId}`)
+                                }
+                              >
+                                {zoo.label}
+                              </p>
+                            ) : null;
+                          })}
                       </div>
                     </div>
                   </div>
@@ -460,35 +468,59 @@ export default function AnimalDetailPage() {
               />
               <Separator />
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {animal.media.images.map((image: any) => (
-                  <div key={image.id} className="relative group">
+                {animalImages.map((image: AnimalFiles, index: number) => (
+                  <div key={image.AnimalFileId} className="relative group">
                     <div className="aspect-square relative overflow-hidden rounded-md border">
                       <Image
-                        src={image.url || "/placeholder.svg"}
-                        alt={image.name}
+                        src={
+                          image.file
+                            ? URL.createObjectURL(image.file)
+                            : helper.GetDocument(image.Docpath || "")
+                        }
+                        alt={`Animal Image ${index + 1}`}
                         fill
                         className="object-cover"
                       />
                     </div>
-                    <Button
-                      variant="destructive"
-                      size="icon"
-                      className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                      onClick={() => removeFile(image.id, "images")}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                    <p className="text-sm mt-1 truncate">{image.name}</p>
+                    {image.AnimalFileId != 0 ? (
+                      <Button
+                        variant="destructive"
+                        size="icon"
+                        className="absolute top-1 right-1 h-6 w-6 rounded-full"
+                        onClick={() =>
+                          DeleteAnimalImage(image.AnimalFileId, index)
+                        }
+                      >
+                        <Trash2 className="h-3 w-3" />
+                        <span className="sr-only">Remove image</span>
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="destructive"
+                        size="icon"
+                        className="absolute top-1 right-1 h-6 w-6 rounded-full"
+                        onClick={() => removeAnimalImage(index)}
+                      >
+                        <X className="h-3 w-3" />
+                        <span className="sr-only">Remove image</span>
+                      </Button>
+                    )}
                   </div>
                 ))}
               </div>
             </div>
           ) : (
-            <MediaGallery media={animal.media.images} type="images" />
+            <MediaGallery
+              media={animalImages.map((image) => ({
+                AnimalFileId: image.AnimalFileId,
+                Docpath: image.Docpath || "/placeholder.svg",
+              }))}
+              type="images"
+            />
           )}
         </TabsContent>
 
-        <TabsContent value="videos" className="space-y-4">
+        {/* <TabsContent value="videos" className="space-y-4">
           {isEditing || isNewAnimal ? (
             <div className="space-y-4">
               <FileUploader
@@ -505,7 +537,7 @@ export default function AnimalDetailPage() {
                       {video.file && video.file.type.startsWith("video/") ? (
                         <video
                           src={
-                            video.Fileid == 0
+                            video.AnimalFileId == 0
                               ? URL.createObjectURL(video.file)
                               : helper.GetDocument(video.Docpath || "")
                           }
@@ -526,7 +558,7 @@ export default function AnimalDetailPage() {
                           className="object-cover"
                         />
                       )}
-                      {video.Fileid == 0 &&
+                      {video.AnimalFileId == 0 &&
                         animal.Id != 0 &&
                         animalVideos.length > 0 && (
                           <Button
@@ -548,12 +580,12 @@ export default function AnimalDetailPage() {
                             <span className="sr-only">Remove image</span>
                           </Button>
                         )}
-                      {video.Fileid != 0 ? (
+                      {video.AnimalFileId != 0 ? (
                         <Button
                           variant="destructive"
                           size="icon"
                           className="absolute top-1 right-1 h-6 w-6 rounded-full"
-                          onClick={() => DeleteAnimalVideo(video.Fileid, index)}
+                          onClick={() => DeleteAnimalVideo(video.AnimalFileId, index)}
                         >
                           <Trash2 className="h-3 w-3" />
                           <span className="sr-only">Remove image</span>
@@ -577,14 +609,14 @@ export default function AnimalDetailPage() {
           ) : (
             <MediaGallery media={animal.media.videos} type="videos" />
           )}
-        </TabsContent>
+        </TabsContent> */}
       </Tabs>
 
       <AnimalDeleteDialog
         open={showDeleteDialog}
         onOpenChange={setShowDeleteDialog}
         onConfirm={handleDelete}
-        animalName={animal.Name}
+        animalName={animal.AnimalName}
       />
     </div>
   );

@@ -10,12 +10,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
+import useHelper from "@/Helper/helper";
 
 interface MediaFile {
-  id: string;
-  name: string;
-  url: string;
-  type: string;
+  AnimalFileId: number;
+  // name: string;
+  Docpath: string;
 }
 
 interface MediaGalleryProps {
@@ -24,6 +24,7 @@ interface MediaGalleryProps {
 }
 
 export function MediaGallery({ media, type }: MediaGalleryProps) {
+  const helper = useHelper();
   const [selectedMedia, setSelectedMedia] = useState<MediaFile | null>(null);
 
   if (media.length === 0) {
@@ -41,14 +42,15 @@ export function MediaGallery({ media, type }: MediaGalleryProps) {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {media.map((item) => (
           <div
-            key={item.id}
+            key={item.AnimalFileId}
             className="cursor-pointer group"
             onClick={() => setSelectedMedia(item)}
           >
             <div className="aspect-square relative overflow-hidden rounded-md border">
               <Image
-                src={item.url || "/placeholder.svg"}
-                alt={item.name}
+                src={helper.GetDocument(item.Docpath) || "/placeholder.svg"}
+                // alt={item.name}
+                alt=""
                 fill
                 className="object-cover transition-transform group-hover:scale-105"
               />
@@ -58,7 +60,7 @@ export function MediaGallery({ media, type }: MediaGalleryProps) {
                 </div>
               )}
             </div>
-            <p className="text-sm mt-1 truncate">{item.name}dsds</p>
+            {/* <p className="text-sm mt-1 truncate">{item.name}</p> */}
           </div>
         ))}
       </div>
@@ -69,14 +71,15 @@ export function MediaGallery({ media, type }: MediaGalleryProps) {
       >
         <DialogContent className="max-w-4xl">
           <DialogHeader>
-            <DialogTitle>{selectedMedia?.name}</DialogTitle>
+            {/* <DialogTitle>{selectedMedia?.name}</DialogTitle> */}
           </DialogHeader>
           <div className="mt-4">
             {selectedMedia && type === "images" && (
               <div className="relative h-[60vh]">
                 <Image
-                  src={selectedMedia.url || "/placeholder.svg"}
-                  alt={selectedMedia.name}
+                  src={helper.GetDocument(selectedMedia.Docpath) || "/placeholder.svg"}
+                  // alt={selectedMedia.name}
+                  alt=""
                   fill
                   className="object-contain"
                 />
@@ -86,8 +89,9 @@ export function MediaGallery({ media, type }: MediaGalleryProps) {
               <div className="relative aspect-video">
                 {/* In a real app, this would be a video player */}
                 <Image
-                  src={selectedMedia.url || "/placeholder.svg"}
-                  alt={selectedMedia.name}
+                  src={selectedMedia.Docpath || "/placeholder.svg"}
+                  // alt={selectedMedia.name}
+                  alt=""
                   fill
                   className="object-cover"
                 />
