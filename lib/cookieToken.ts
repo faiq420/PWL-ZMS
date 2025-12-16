@@ -129,7 +129,7 @@ export const getTokenCookie = (): Token => {
 /**
  * Get individual keys
  */
-export const getTokenUserId = (): string => getTokenCookie().userId;
+export const getTokenUserId = (): string => getTokenCookie().sid;
 export const getTokenExp = (): number => getTokenCookie().exp;
 export const getTokenIat = (): number => getTokenCookie().iat;
 export const getTokenNbf = (): string => getTokenCookie().nbf;

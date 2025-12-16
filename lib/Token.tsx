@@ -1,5 +1,5 @@
 export interface Token {
-  userId: string;
+  sid: string;
   roleId: string;
   nbf: string;
   exp: number;
@@ -9,7 +9,7 @@ export interface Token {
 }
 
 export const defaultTokenObject: Token = {
-  userId: "",
+  sid: "",
   roleId: "",
   nbf: "",
   iss: "",

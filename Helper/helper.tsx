@@ -158,7 +158,7 @@ const useHelper = () => {
 
   function GetToken(): Token {
     const token = getTokenCookie(); // reads from cookie and handles expiry internally
-    if (token && token.userId !== "") {
+    if (token && token.sid !== "") {
       return token;
     }
     return defaultTokenObject;
