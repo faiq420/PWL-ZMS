@@ -52,13 +52,13 @@ export default function VeterinaryInspectionPage() {
           </Link>
         </Button> */}
       </div>
-
-      <Tabs defaultValue="inspections" className="space-y-4">
+      <InspectionTab />
+      {/* <Tabs defaultValue="inspections" className="space-y-4">
         <TabsList>
           <TabsTrigger value="inspections">Inspections</TabsTrigger>
           <TabsTrigger value="health">Health Records</TabsTrigger>
-          {/* <TabsTrigger value="enclosures">Enclosures</TabsTrigger> */}
-          {/* <TabsTrigger value="reports">Reports</TabsTrigger> */}
+          <TabsTrigger value="enclosures">Enclosures</TabsTrigger>
+          <TabsTrigger value="reports">Reports</TabsTrigger>
         </TabsList>
 
         <TabsContent value="inspections" className="space-y-4">
@@ -365,7 +365,7 @@ export default function VeterinaryInspectionPage() {
             </CardContent>
           </Card>
         </TabsContent>
-      </Tabs>
+      </Tabs> */}
     </div>
   );
 }

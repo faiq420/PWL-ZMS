@@ -131,6 +131,14 @@ const Page = () => {
               placeHolder="e.g. Daily, Mon-Fri, Everyday"
             />
             <InputTag
+              value={obj.Time}
+              type="time"
+              name="Time"
+              setter={handleChange}
+              label="Time"
+              placeHolder="e.g. Daily, Mon-Fri, Everyday"
+            />
+            <InputTag
               value={obj.StartDate}
               name="StartDate"
               setter={handleChange}

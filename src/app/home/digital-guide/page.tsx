@@ -1,23 +1,15 @@
 "use client";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { Suspense, useEffect } from "react";
-import VisitPlanningPage from "./main";
-import ScanLearnTable from "./windows/ScanLearnTable";
-import AudioGuideTable from "./windows/AudioGuideTable";
-import FeaturedAnimalsTable from "./windows/FeaturedAnimalsTable";
-import DailyScheduleTable from "./windows/DailyScheduleTable";
-import AudioGuide from "./tabs/AudioGuide";
+import DigitalGuidePage from "./Main";
+import FeaturedAnimals from "./windows/FeaturedAnimals";
+import DailySchedule from "./windows/DailySchedule";
 
 const PageContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const tabs = [
-    "scan_learn",
-    "audio",
-    "featured_animals",
-    "daily_schedule",
-  ];
+  const tabs = ["featuredAnimals", "dailySchedule"];
   const crudModes = ["create", "edit", "view"];
   const activeTab = searchParams.get("tab");
   const id = searchParams.get("id") || undefined;
@@ -30,7 +22,7 @@ const PageContent = () => {
   }, [activeTab]);
 
   if (!activeTab || !tabs.includes(activeTab)) {
-    return <VisitPlanningPage />;
+    return <DigitalGuidePage />;
   }
 
   const props = {
@@ -40,14 +32,10 @@ const PageContent = () => {
   };
 
   switch (activeTab) {
-    case "scan_learn":
-      return <ScanLearnTable />;
-    case "audio":
-      return <AudioGuide {...props} />;
-    case "featured_animals":
-      return <FeaturedAnimalsTable />;
-    case "daily_schedule":
-      return <DailyScheduleTable />;
+    case "featuredAnimals":
+      return <FeaturedAnimals {...props} />;
+    case "dailySchedule":
+      return <DailySchedule {...props} />;
     default:
       return <p>Invalid tab.</p>;
   }

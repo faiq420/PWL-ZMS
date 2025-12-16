@@ -2,641 +2,469 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { CalendarIcon } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
 import {
-  Bell,
-  Calendar,
-  Clock,
-  Headphones,
-  Info,
-  QrCode,
-  Search,
-  Volume2,
-  PlusCircle,
-  Edit,
-  Trash2,
-  Play,
-  Pause,
-} from "lucide-react";
-import Image from "next/image";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
-import { QrCodeModal } from "@/components/digital-guide/qr-code-modal";
-import { ExhibitModal } from "@/components/digital-guide/exhibit-modal";
-import { AudioGuideModal } from "@/components/digital-guide/audio-guide-modal";
-import { FeaturedAnimalModal } from "@/components/digital-guide/featured-animal-modal";
-import { ScheduleModal } from "@/components/digital-guide/schedule-modal";
-import { DeleteConfirmationDialog } from "@/components/digital-guide/delete-confirmation";
-import { Slider } from "@/components/ui/slider";
+import RouteModal from "@/components/visit-planning/route-modal";
+import { DeleteConfirmationDialog } from "@/components/visit-planning/delete-confirmation";
+import { useRouter } from "next/navigation";
+import Heading from "@/components/utils/Headings/Heading";
 import SectionIntro from "@/components/utils/Headings/SectionIntro";
-import ScanLearnTable from "./windows/ScanLearnTable";
-import AudioGuideTable from "./windows/AudioGuideTable";
-import CardIntro from "@/components/utils/Headings/CardIntro";
+import FeaturedAnimalsTable from "./tabs/FeaturedAnimalsTable";
+import DailyScheduleTable from "./tabs/DailyScheduleTable";
 
 export default function DigitalGuidePage() {
   const { toast } = useToast();
-
-  // State for content categories
-  const [contentCategories, setContentCategories] = useState([
-    { id: "scan", name: "Scan & Learn", icon: QrCode },
-    { id: "audio", name: "Audio Guide", icon: Headphones },
-    { id: "featured", name: "Featured Animals", icon: Info },
-    { id: "schedule", name: "Daily Schedule", icon: Calendar },
-  ]);
-
-  // State for active tab
-  const [activeTab, setActiveTab] = useState("scan");
-
-  // State for modals
-  const [audioGuideModalOpen, setAudioGuideModalOpen] = useState(false);
-  const [featuredAnimalModalOpen, setFeaturedAnimalModalOpen] = useState(false);
-  const [scheduleModalOpen, setScheduleModalOpen] = useState(false);
+  const router = useRouter();
+  const [date, setDate] = useState<Date | undefined>(new Date());
+  const [routeModalOpen, setRouteModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-
-  // State for modal mode (create, edit, view)
-  const [modalMode, setModalMode] = useState<"create" | "edit" | "view">(
-    "create"
-  );
-
-  // State for selected item
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [deleteType, setDeleteType] = useState<
-    "qrcode" | "audio" | "animal" | "schedule"
-  >("qrcode");
+    "event" | "group" | "route" | "booking"
+  >("event");
 
-  // State for audio playback
-
-  // Mock data for each tab
-  const [featuredAnimals, setFeaturedAnimals] = useState([
+  // Available zoos in the system - this would come from an API in a real application
+  const [availableZoos, setAvailableZoos] = useState([
     {
       id: 1,
-      name: "Sumatran Tiger",
-      scientificName: "Panthera tigris sumatrae",
-      image: "/placeholder.svg?height=400&width=600",
-      description:
-        "The Sumatran tiger is a rare tiger subspecies that inhabits the Indonesian island of Sumatra. They are the smallest of all tiger subspecies, with males weighing between 100-140 kg and females 75-110 kg.",
-      conservationStatus: "Critically Endangered",
-      location: "Asian Forest Zone - Exhibit 12",
-      feedingTimes: "11:00 AM & 3:30 PM",
-      keeperTalk: "2:00 PM (Tiger Conservation)",
-      featured: true,
-      featuredUntil: "2023-06-30",
+      name: "Lahore Zoo",
+      location: "Mall Road",
+      status: "active",
     },
     {
       id: 2,
-      name: "Red Panda",
-      scientificName: "Ailurus fulgens",
-      image: "/placeholder.svg?height=400&width=600",
-      description:
-        "The red panda is a small mammal native to the eastern Himalayas and southwestern China. It has reddish-brown fur, a long, shaggy tail, and a waddling gait due to its shorter front legs.",
-      conservationStatus: "Endangered",
-      location: "Asian Forest Zone - Exhibit 8",
-      feedingTimes: "10:30 AM & 4:00 PM",
-      keeperTalk: "1:00 PM (Red Panda Conservation)",
-      featured: true,
-      featuredUntil: "2023-06-15",
+      name: "Lahore Safari Park",
+      location: "Wildlife Park Road",
+      status: "active",
     },
     {
       id: 3,
-      name: "African Elephant",
-      scientificName: "Loxodonta africana",
-      image: "/placeholder.svg?height=400&width=600",
-      description:
-        "The African elephant is the largest living terrestrial animal. Males stand 3.2–4.0 m tall at the shoulder and weigh 4,700–6,048 kg, while females stand 2.2–2.6 m tall and weigh 2,160–3,232 kg.",
-      conservationStatus: "Vulnerable",
-      location: "African Savanna Zone - Exhibit 3",
-      feedingTimes: "9:00 AM & 2:00 PM",
-      keeperTalk: "11:30 AM (Elephant Conservation)",
-      featured: true,
-      featuredUntil: "2023-06-20",
+      name: "Bahawalpur Zoo",
+      location: "Circular Road",
+      status: "active", //maintenance
     },
   ]);
 
-  const [schedules, setSchedules] = useState([
+  // Mock data for events
+  const [events, setEvents] = useState([
     {
       id: 1,
-      time: "10:00 AM",
-      title: "Elephant Feeding",
-      location: "African Savanna Zone",
-      description: "Watch our elephants enjoy their morning meal",
-      status: "upcoming",
-      notificationSent: false,
-      notifyTime: "30min",
+      title: "School Visit",
+      date: "2023-05-15T14:00:00.000z",
+      attendees: 45,
+      status: "confirmed",
+      type: "education",
+      zoo: "Lahore Zoo",
     },
     {
       id: 2,
-      time: "11:00 AM",
-      title: "Tiger Feeding",
-      location: "Asian Forest Zone",
-      description: "See our tigers being fed by expert keepers",
-      status: "upcoming",
-      notificationSent: false,
-      notifyTime: "30min",
+      title: "Corporate Team Building",
+      date: "2023-05-16T14:00:00.000z",
+      attendees: 20,
+      status: "pending",
+      type: "corporate",
+      zoo: "Lahori Safari Park",
     },
     {
       id: 3,
-      time: "12:00 PM",
-      title: "Conservation Talk",
-      location: "Education Center",
-      description: "Learn about our wildlife conservation efforts",
-      status: "upcoming",
-      notificationSent: false,
-      notifyTime: "1hour",
+      title: "Birthday Party",
+      date: "2023-05-18T14:00:00.000z",
+      attendees: 15,
+      status: "confirmed",
+      type: "birthday",
+      zoo: "Lahore Zoo",
     },
     {
       id: 4,
-      time: "1:30 PM",
-      title: "Penguin Parade",
-      location: "Polar Zone",
-      description: "Watch our penguins parade around their habitat",
-      status: "upcoming",
-      notificationSent: false,
-      notifyTime: "1hour",
-    },
-    {
-      id: 5,
-      time: "2:30 PM",
-      title: "Reptile Encounter",
-      location: "Reptile House",
-      description: "Get up close with some fascinating reptiles",
-      status: "upcoming",
-      notificationSent: false,
-      notifyTime: "30min",
+      title: "Senior Center Visit",
+      date: "2023-05-20T14:00:00.000z",
+      attendees: 25,
+      status: "confirmed",
+      type: "community",
+      zoo: "Bahawalpur Zoo",
     },
   ]);
 
-  // CRUD operations for featured animals
-  const handleAddFeaturedAnimal = (animal: any) => {
-    const newAnimal = {
-      id: featuredAnimals.length + 1,
-      ...animal,
-      featured: true,
-      featuredUntil: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)
-        .toISOString()
-        .split("T")[0], // 2 weeks from now
-    };
-    setFeaturedAnimals([...featuredAnimals, newAnimal]);
-    toast({
-      title: "Featured Animal Created",
-      description: `"${animal.name}" has been added to featured animals.`,
-    });
-  };
+  // Mock data for group visits
+  const [groupVisits, setGroupVisits] = useState([
+    {
+      id: 1,
+      name: "Lincoln Elementary School",
+      date: "2023-05-22",
+      time: "9:30 AM",
+      groupSize: 60,
+      contactPerson: "Sarah Johnson",
+      contactEmail: "sjohnson@lincoln.edu",
+      contactPhone: "(555) 123-4567",
+      specialRequirements: "3 students require wheelchair access",
+      status: "confirmed",
+      zoo: "Central City Zoo",
+    },
+    {
+      id: 2,
+      name: "Tech Innovations Inc.",
+      date: "2023-05-25",
+      time: "1:00 PM",
+      groupSize: 35,
+      contactPerson: "Michael Chen",
+      contactEmail: "mchen@techinnovations.com",
+      contactPhone: "(555) 987-6543",
+      specialRequirements: "Vegetarian lunch options required",
+      status: "pending",
+      zoo: "Woodland Wildlife Park",
+    },
+    {
+      id: 3,
+      name: "Golden Years Retirement Community",
+      date: "2023-05-28",
+      time: "10:00 AM",
+      groupSize: 20,
+      contactPerson: "Robert Williams",
+      contactEmail: "rwilliams@goldenyears.org",
+      contactPhone: "(555) 456-7890",
+      specialRequirements: "Slow-paced tour, frequent rest stops needed",
+      status: "confirmed",
+      zoo: "Desert Oasis Zoo",
+    },
+  ]);
 
-  const handleEditFeaturedAnimal = (updatedAnimal: any) => {
-    setFeaturedAnimals(
-      featuredAnimals.map((animal) =>
-        animal.id === updatedAnimal.id ? updatedAnimal : animal
-      )
-    );
-    toast({
-      title: "Featured Animal Updated",
-      description: `"${updatedAnimal.name}" has been updated successfully.`,
-    });
-  };
+  // Mock data for suggested routes
+  const [routes, setRoutes] = useState([
+    {
+      id: 1,
+      name: "Family Adventure",
+      duration: "2 hours",
+      distance: "1.2 miles",
+      difficulty: "Easy",
+      highlights: ["Elephant Enclosure", "Penguin Pool", "Lion Territory"],
+      description:
+        "Perfect for families with children of all ages. This route covers the most popular exhibits with minimal walking.",
+      recommendedTimes: ["Morning", "Late Afternoon"],
+      zoo: "Central City Zoo",
+    },
+    {
+      id: 2,
+      name: "Conservation Trail",
+      duration: "3 hours",
+      distance: "2.5 miles",
+      difficulty: "Moderate",
+      highlights: [
+        "Endangered Species Center",
+        "Conservation Education Hub",
+        "Breeding Program Exhibits",
+      ],
+      description:
+        "Learn about our conservation efforts and see some of the world's most endangered species.",
+      recommendedTimes: ["Midday"],
+      zoo: "Woodland Wildlife Park",
+    },
+    {
+      id: 3,
+      name: "Marine Explorer",
+      duration: "1.5 hours",
+      distance: "0.8 miles",
+      difficulty: "Easy",
+      highlights: ["Dolphin Lagoon", "Shark Tunnel", "Coral Reef Display"],
+      description:
+        "Discover the wonders of marine life with this ocean-focused route.",
+      recommendedTimes: ["Afternoon"],
+      zoo: "Oceanview Marine World",
+    },
+  ]);
 
-  const handleDeleteFeaturedAnimal = () => {
+  // Mock data for bookings
+  const [bookings, setBookings] = useState([
+    {
+      id: 1,
+      visitorName: "John Smith",
+      visitDate: "2023-05-15",
+      ticketType: "Family Pass",
+      quantity: 4,
+      totalPrice: "120.00",
+      paymentStatus: "Paid",
+      bookingMethod: "Online",
+      zoo: "Lahore Zoo",
+    },
+    {
+      id: 2,
+      visitorName: "Emily Johnson",
+      visitDate: "2023-05-16",
+      ticketType: "Couple",
+      quantity: 2,
+      totalPrice: "50.00",
+      paymentStatus: "Paid",
+      bookingMethod: "Phone",
+      zoo: "Lahore Safari Park",
+    },
+    {
+      id: 3,
+      visitorName: "Martinez Family",
+      visitDate: "2023-05-18",
+      ticketType: "Family Pass",
+      quantity: 5,
+      totalPrice: "150.00",
+      paymentStatus: "Pending",
+      bookingMethod: "Online",
+      zoo: "Lahore Zoo",
+    },
+    {
+      id: 4,
+      visitorName: "David Wilson",
+      visitDate: "2023-05-20",
+      ticketType: "Solo",
+      quantity: 1,
+      totalPrice: "20.00",
+      paymentStatus: "Paid",
+      bookingMethod: "In Person",
+      zoo: "Bahalwalpur Zoo",
+    },
+  ]);
+
+  // // CRUD operations for events
+  // const handleAddEvent = (event: any) => {
+  //   const newEvent = {
+  //     id: events.length + 1,
+  //     ...event,
+  //     status: "pending",
+  //   };
+  //   setEvents([...events, newEvent]);
+  //   toast({
+  //     title: "Event Created",
+  //     description: `Event "${event.title}" has been created successfully.`,
+  //   });
+  // };
+
+  // const handleEditEvent = (updatedEvent: any) => {
+  //   setEvents(
+  //     events.map((event) =>
+  //       event.id === updatedEvent.id ? updatedEvent : event
+  //     )
+  //   );
+  //   toast({
+  //     title: "Event Updated",
+  //     description: `Event "${updatedEvent.title}" has been updated successfully.`,
+  //   });
+  // };
+
+  const handleDeleteEvent = () => {
     if (selectedItem) {
-      setFeaturedAnimals(
-        featuredAnimals.filter((animal) => animal.id !== selectedItem.id)
-      );
+      setEvents(events.filter((event) => event.id !== selectedItem.id));
       setDeleteModalOpen(false);
       toast({
-        title: "Featured Animal Removed",
-        description: `"${selectedItem.name}" has been removed from featured animals.`,
+        title: "Event Deleted",
+        description: `Event "${selectedItem.title}" has been deleted.`,
         variant: "destructive",
       });
     }
   };
 
-  // CRUD operations for schedules
-  const handleAddSchedule = (schedule: any) => {
-    const newSchedule = {
-      id: schedules.length + 1,
-      ...schedule,
-      status: "upcoming",
-      notificationSent: false,
-    };
-    setSchedules([...schedules, newSchedule]);
-    toast({
-      title: "Schedule Event Created",
-      description: `"${schedule.title}" has been added to the daily schedule.`,
-    });
-  };
+  // CRUD operations for group visits
+  // const handleAddGroupVisit = (groupVisit: any) => {
+  //   const newGroupVisit = {
+  //     id: groupVisits.length + 1,
+  //     ...groupVisit,
+  //     status: "pending",
+  //   };
+  //   setGroupVisits([...groupVisits, newGroupVisit]);
+  //   toast({
+  //     title: "Group Visit Created",
+  //     description: `Group visit for "${groupVisit.name}" has been created successfully.`,
+  //   });
+  // };
 
-  const handleEditSchedule = (updatedSchedule: any) => {
-    setSchedules(
-      schedules.map((schedule) =>
-        schedule.id === updatedSchedule.id ? updatedSchedule : schedule
-      )
-    );
-    toast({
-      title: "Schedule Event Updated",
-      description: `"${updatedSchedule.title}" has been updated successfully.`,
-    });
-  };
+  // const handleEditGroupVisit = (updatedGroupVisit: any) => {
+  //   setGroupVisits(
+  //     groupVisits.map((visit) =>
+  //       visit.id === updatedGroupVisit.id ? updatedGroupVisit : visit
+  //     )
+  //   );
+  //   toast({
+  //     title: "Group Visit Updated",
+  //     description: `Group visit for "${updatedGroupVisit.name}" has been updated successfully.`,
+  //   });
+  // };
 
-  const handleDeleteSchedule = () => {
+  const handleDeleteGroupVisit = () => {
     if (selectedItem) {
-      setSchedules(
-        schedules.filter((schedule) => schedule.id !== selectedItem.id)
+      setGroupVisits(
+        groupVisits.filter((visit) => visit.id !== selectedItem.id)
       );
       setDeleteModalOpen(false);
       toast({
-        title: "Schedule Event Removed",
-        description: `"${selectedItem.title}" has been removed from the daily schedule.`,
+        title: "Group Visit Deleted",
+        description: `Group visit for "${selectedItem.name}" has been deleted.`,
+        variant: "destructive",
+      });
+    }
+  };
+
+  // CRUD operations for routes
+  const handleAddRoute = (route: any) => {
+    const newRoute = {
+      id: routes.length + 1,
+      ...route,
+    };
+    setRoutes([...routes, newRoute]);
+    toast({
+      title: "Route Created",
+      description: `Route "${route.name}" has been created successfully.`,
+    });
+  };
+
+  const handleEditRoute = (updatedRoute: any) => {
+    setRoutes(
+      routes.map((route) =>
+        route.id === updatedRoute.id ? updatedRoute : route
+      )
+    );
+    toast({
+      title: "Route Updated",
+      description: `Route "${updatedRoute.name}" has been updated successfully.`,
+    });
+  };
+
+  const handleDeleteRoute = () => {
+    if (selectedItem) {
+      setRoutes(routes.filter((route) => route.id !== selectedItem.id));
+      setDeleteModalOpen(false);
+      toast({
+        title: "Route Deleted",
+        description: `Route "${selectedItem.name}" has been deleted.`,
+        variant: "destructive",
+      });
+    }
+  };
+
+  // CRUD operations for bookings
+  // const handleAddBooking = (booking: any) => {
+  //   const newBooking = {
+  //     id: bookings.length + 1,
+  //     ...booking,
+  //   };
+  //   setBookings([...bookings, newBooking]);
+  //   toast({
+  //     title: "Booking Created",
+  //     description: `Booking for "${booking.visitorName}" has been created successfully.`,
+  //   });
+  // };
+
+  // const handleEditBooking = (updatedBooking: any) => {
+  //   setBookings(
+  //     bookings.map((booking) =>
+  //       booking.id === updatedBooking.id ? updatedBooking : booking
+  //     )
+  //   );
+  //   toast({
+  //     title: "Booking Updated",
+  //     description: `Booking for "${updatedBooking.visitorName}" has been updated successfully.`,
+  //   });
+  // };
+
+  const handleDeleteBooking = () => {
+    if (selectedItem) {
+      setBookings(bookings.filter((booking) => booking.id !== selectedItem.id));
+      setDeleteModalOpen(false);
+      toast({
+        title: "Booking Deleted",
+        description: `Booking for "${selectedItem.visitorName}" has been deleted.`,
         variant: "destructive",
       });
     }
   };
 
   // Open delete confirmation dialog
-  const openDeleteDialog = (type: any, item: any) => {
+  const openDeleteDialog = (
+    type: "event" | "group" | "route" | "booking",
+    item: any
+  ) => {
     setDeleteType(type);
     setSelectedItem(item);
     setDeleteModalOpen(true);
   };
 
-  // Handle notification sending
-  const sendNotification = (scheduleId: number) => {
-    setSchedules(
-      schedules.map((schedule) =>
-        schedule.id === scheduleId
-          ? { ...schedule, notificationSent: true }
-          : schedule
-      )
+  function NavigateToRecord(tab: string, mode: string, id?: number) {
+    router.push(
+      `/home/visit-planning?tab=${tab}&mode=${mode}` +
+        (id != undefined ? `&id=${id}` : "")
     );
-    toast({
-      title: "Notification Sent",
-      description: "Event notification has been sent to visitors.",
-    });
-  };
+  }
 
   return (
     <div className="flex-1 space-y-4">
       <div className="flex items-center justify-between">
         <SectionIntro
-          title="Digital Guide"
-          description="Explore and manage the digital guide."
+          title="Visit Planning"
+          description="Manage and plan visits for the zoo."
         />
+        <div className="flex items-center space-x-2">
+          {/* <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant={"outline"}
+                className={cn(
+                  "w-[200px] justify-start text-left font-normal",
+                  !date && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {date ? format(date, "PPP") : <span>Pick a date</span>}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="end">
+              <Calendar
+                mode="single"
+                selected={date}
+                onSelect={setDate}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover> */}
+          <Select defaultValue="all">
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Select Zoo" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Zoos</SelectItem>
+              {availableZoos.map((zoo) => (
+                <SelectItem key={zoo.id} value={zoo.id.toString()}>
+                  {zoo.name} {zoo.status === "maintenance" && "(Maintenance)"}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
-      <Tabs
-        defaultValue={activeTab}
-        value={activeTab}
-        onValueChange={setActiveTab}
-        className="space-y-4"
-      >
-        <TabsList className="flex-1 w-full">
-          {contentCategories.map((category) => (
-            <TabsTrigger
-              key={category.id}
-              value={category.id}
-              className="flex-1"
-            >
-              <category.icon className="mr-2 h-4 w-4" />
-              {category.name}
-            </TabsTrigger>
-          ))}
+
+      <Tabs defaultValue="featuredAnimals" className="space-y-4">
+        <TabsList className="">
+          <TabsTrigger value="featuredAnimals">Featured Animals</TabsTrigger>
+          <TabsTrigger value="dailySchedule">Daily Schedule</TabsTrigger>
         </TabsList>
 
-        {/* Scan & Learn Tab */}
-        <TabsContent value="scan" className="space-y-4">
-          <ScanLearnTable />
+        <TabsContent value="featuredAnimals" className="space-y-2">
+          <FeaturedAnimalsTable />
         </TabsContent>
 
-        {/* Audio Guide Tab */}
-        <TabsContent value="audio" className="space-y-4">
-          <AudioGuideTable />
-        </TabsContent>
-
-        {/* Featured Animals Tab */}
-        <TabsContent value="featured" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <div className="flex justify-between items-center border-b pb-2">
-                <div>
-                  <CardIntro
-                    title="Featured Animals"
-                    description="Manage featured animals and special highlights"
-                  />
-                </div>
-                <Button
-                  className="bg-green-700 hover:bg-green-800"
-                  onClick={() => {
-                    setModalMode("create");
-                    setSelectedItem(null);
-                    setFeaturedAnimalModalOpen(true);
-                  }}
-                >
-                  <PlusCircle className="mr-2 h-4 w-4" /> Add Featured Animal
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4 mt-4">
-              <div className="flex justify-between items-center">
-                <h3 className="text-sm font-poppins font-medium">Animal of the Day</h3>
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    // In a real app, this would randomly select a featured animal
-                    toast({
-                      title: "Animal of the Day Updated",
-                      description:
-                        "A new featured animal has been selected for today.",
-                    });
-                  }}
-                >
-                  Change Featured Animal
-                </Button>
-              </div>
-
-              <div className="border rounded-lg overflow-hidden">
-                <div className="relative h-64 w-full">
-                  <Image
-                    src={featuredAnimals[0]?.image || "/placeholder.svg"}
-                    alt="Featured Animal"
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-                <div className="p-4">
-                  <h3 className="text-xl font-bold">
-                    {featuredAnimals[0]?.name || "No featured animal"}
-                  </h3>
-                  <p className="text-muted-foreground italic">
-                    {featuredAnimals[0]?.scientificName}
-                  </p>
-
-                  <div className="mt-4 space-y-2">
-                    <p>{featuredAnimals[0]?.description}</p>
-                  </div>
-
-                  <div className="mt-4 grid grid-cols-2 gap-4">
-                    <div>
-                      <h4 className="font-medium">Conservation Status</h4>
-                      <div className="mt-1 px-2 py-1 bg-red-100 text-red-800 rounded-full text-sm inline-block">
-                        {featuredAnimals[0]?.conservationStatus}
-                      </div>
-                    </div>
-                    <div>
-                      <h4 className="font-medium">Location</h4>
-                      <p className="text-sm mt-1">
-                        {featuredAnimals[0]?.location}
-                      </p>
-                    </div>
-                    <div>
-                      <h4 className="font-medium">Feeding Times</h4>
-                      <p className="text-sm mt-1">
-                        {featuredAnimals[0]?.feedingTimes}
-                      </p>
-                    </div>
-                    <div>
-                      <h4 className="font-medium">Keeper Talk</h4>
-                      <p className="text-sm mt-1">
-                        {featuredAnimals[0]?.keeperTalk}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="mt-4 flex justify-end space-x-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        if (featuredAnimals[0]) {
-                          setModalMode("edit");
-                          setSelectedItem(featuredAnimals[0]);
-                          setFeaturedAnimalModalOpen(true);
-                        }
-                      }}
-                    >
-                      <Edit className="h-4 w-4 mr-2" /> Edit
-                    </Button>
-                  </div>
-                </div>
-              </div>
-
-              <h3 className="text-lg font-medium mt-6">
-                Other Featured Animals
-              </h3>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {featuredAnimals.slice(1).map((animal) => (
-                  <Card key={animal.id} className="overflow-hidden">
-                    <div className="relative h-40">
-                      <Image
-                        src={animal.image || "/placeholder.svg"}
-                        alt={animal.name}
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
-                    <CardHeader className="pb-2">
-                      <CardTitle>{animal.name}</CardTitle>
-                      <CardDescription>{animal.location}</CardDescription>
-                    </CardHeader>
-                    <CardContent className="pb-2">
-                      <div className="flex justify-between items-center">
-                        <div className="mt-1 px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs inline-block">
-                          {animal.conservationStatus}
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          Featured until: {animal.featuredUntil}
-                        </div>
-                      </div>
-                    </CardContent>
-                    <CardFooter className="flex justify-between">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          setModalMode("view");
-                          setSelectedItem(animal);
-                          setFeaturedAnimalModalOpen(true);
-                        }}
-                      >
-                        <Info className="h-4 w-4 mr-2" /> View Details
-                      </Button>
-                      <div className="flex space-x-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            setModalMode("edit");
-                            setSelectedItem(animal);
-                            setFeaturedAnimalModalOpen(true);
-                          }}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => openDeleteDialog("animal", animal)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </CardFooter>
-                  </Card>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Daily Schedule Tab */}
-        <TabsContent value="schedule" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <div className="flex justify-between items-center">
-                <div>
-                  <CardIntro
-                    title="Daily Schedule"
-                    description="Manage and display daily activities and events"
-                  />
-                </div>
-                <Button
-                  className="bg-green-700 hover:bg-green-800"
-                  onClick={() => {
-                    setModalMode("create");
-                    setSelectedItem(null);
-                    setScheduleModalOpen(true);
-                  }}
-                >
-                  <PlusCircle className="mr-2 h-4 w-4" /> Add Schedule
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4 mt-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm font-poppins font-medium">
-                  Today's Schedule
-                </h3>
-                {/* <div className="flex items-center gap-2">
-                  <Button variant="outline" size="sm">
-                    <Calendar className="h-4 w-4 mr-2" /> Change Date
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      setModalMode("create");
-                      setSelectedItem(null);
-                      setScheduleModalOpen(true);
-                    }}
-                  >
-                    <PlusCircle className="h-4 w-4 mr-2" /> Add Event
-                  </Button>
-                </div> */}
-              </div>
-
-              <div className="space-y-4">
-                {schedules.map((event) => (
-                  <div
-                    key={event.id}
-                    className="flex gap-4 border rounded-lg p-4"
-                  >
-                    <div className="flex-shrink-0 w-24 text-center flex flex-col justify-center">
-                      <div className="text-lg font-bold">{event.time}</div>
-                      <div
-                        className={`mt-1 px-2 py-1 rounded-full text-xs font-medium ${
-                          event.status === "completed"
-                            ? "bg-gray-100 text-gray-800"
-                            : event.status === "active"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-blue-100 text-blue-800"
-                        }`}
-                      >
-                        {event.status === "completed"
-                          ? "Completed"
-                          : event.status === "active"
-                          ? "In Progress"
-                          : "Upcoming"}
-                      </div>
-                    </div>
-                    <div className="flex-1 flex flex-col justify-center">
-                      <h3 className="font-medium">{event.title}</h3>
-                      <div className="text-sm text-muted-foreground mt-1">
-                        {event.location}
-                      </div>
-                      <p className="text-sm mt-2">{event.description}</p>
-                    </div>
-                    <div className="flex-shrink-0 flex flex-col gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          setModalMode("edit");
-                          setSelectedItem(event);
-                          setScheduleModalOpen(true);
-                        }}
-                      >
-                        <Edit className="h-4 w-4 mr-2" /> Edit
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => openDeleteDialog("schedule", event)}
-                      >
-                        <Trash2 className="h-4 w-4 mr-2" /> Delete
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+        <TabsContent value="dailySchedule" className="space-y-2">
+          <DailyScheduleTable />
         </TabsContent>
       </Tabs>
-      {/* Modals */}
-
-      {/* <AudioGuideModal
-        isOpen={audioGuideModalOpen}
-        onClose={() => setAudioGuideModalOpen(false)}
-        audioGuide={selectedItem}
-        onSave={
-          modalMode === "create" ? handleAddAudioGuide : handleEditAudioGuide
-        }
-        viewMode={modalMode === "view"}
-      /> */}
-      <FeaturedAnimalModal
-        isOpen={featuredAnimalModalOpen}
-        onClose={() => setFeaturedAnimalModalOpen(false)}
-        animal={selectedItem}
-        onSave={
-          modalMode === "create"
-            ? handleAddFeaturedAnimal
-            : handleEditFeaturedAnimal
-        }
-        viewMode={modalMode === "view"}
-      />
-      <ScheduleModal
-        isOpen={scheduleModalOpen}
-        onClose={() => setScheduleModalOpen(false)}
-        schedule={selectedItem}
-        onSave={modalMode === "create" ? handleAddSchedule : handleEditSchedule}
-        viewMode={modalMode === "view"}
-      />
-      <DeleteConfirmationDialog
-        isOpen={deleteModalOpen}
-        onClose={() => setDeleteModalOpen(false)}
-        onConfirm={() => {
-          if (deleteType === "animal") {
-            handleDeleteFeaturedAnimal();
-          } else if (deleteType === "schedule") {
-            handleDeleteSchedule();
-          }
-        }}
-        type={deleteType}
-        item={selectedItem}
-      />
     </div>
   );
 }

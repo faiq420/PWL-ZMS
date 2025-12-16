@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -9,75 +9,98 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import CardIntro from "../utils/Headings/CardIntro";
 
-export function ScheduleModal({ isOpen, onClose, schedule, onSave, viewMode = false }) {
+interface Props {
+  isOpen: boolean;
+  onClose: () => void;
+  schedule: any;
+  onSave: (data: any) => void;
+  viewMode?: boolean;
+}
+
+export function ScheduleModal({
+  isOpen,
+  onClose,
+  schedule,
+  onSave,
+  viewMode = false,
+}: Props) {
   const [formData, setFormData] = useState({
     time: "",
     title: "",
     location: "",
     description: "",
-    status: "upcoming",
-    notificationSent: false,
-    notifyTime: "30min",
-  })
+  });
 
   useEffect(() => {
     if (schedule) {
       setFormData({
         ...schedule,
-      })
+      });
     } else {
       setFormData({
         time: "",
         title: "",
         location: "",
         description: "",
-        status: "upcoming",
-        notificationSent: false,
-        notifyTime: "30min",
-      })
+      });
     }
-  }, [schedule])
+  }, [schedule]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
-  const handleSelectChange = (name, value) => {
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
+  const handleSelectChange = (name: string, value: string | number) => {
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    onSave(formData)
-    onClose()
-  }
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    onSave(formData);
+    onClose();
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>
-            {viewMode ? "Schedule Event Details" : schedule ? "Edit Schedule Event" : "Add Schedule Event"}
-          </DialogTitle>
-          <DialogDescription>
-            {viewMode
-              ? "View details about this scheduled event."
-              : schedule
+          <CardIntro
+            title={
+              viewMode
+                ? "Schedule Event Details"
+                : schedule
+                ? "Edit Schedule Event"
+                : "Add Schedule Event"
+            }
+            description={
+              viewMode
+                ? "View details about this scheduled event."
+                : schedule
                 ? "Make changes to the scheduled event here."
-                : "Add a new event to the daily schedule."}
-          </DialogDescription>
+                : "Add a new event to the daily schedule."
+            }
+          />
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="time" className="text-right">
+            <Label htmlFor="time" className="">
               Time
             </Label>
             <Input
@@ -92,7 +115,7 @@ export function ScheduleModal({ isOpen, onClose, schedule, onSave, viewMode = fa
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="title" className="text-right">
+            <Label htmlFor="title" className="">
               Title
             </Label>
             <Input
@@ -106,7 +129,7 @@ export function ScheduleModal({ isOpen, onClose, schedule, onSave, viewMode = fa
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="location" className="text-right">
+            <Label htmlFor="location" className="">
               Location
             </Label>
             <Input
@@ -120,7 +143,7 @@ export function ScheduleModal({ isOpen, onClose, schedule, onSave, viewMode = fa
             />
           </div>
           <div className="grid grid-cols-4 items-start gap-4">
-            <Label htmlFor="description" className="text-right pt-2">
+            <Label htmlFor="description" className=" pt-2">
               Description
             </Label>
             <Textarea
@@ -132,55 +155,16 @@ export function ScheduleModal({ isOpen, onClose, schedule, onSave, viewMode = fa
               disabled={viewMode}
             />
           </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="status" className="text-right">
-              Status
-            </Label>
-            <Select
-              value={formData.status}
-              onValueChange={(value) => handleSelectChange("status", value)}
-              disabled={viewMode}
-            >
-              <SelectTrigger className="col-span-3">
-                <SelectValue placeholder="Select status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="upcoming">Upcoming</SelectItem>
-                <SelectItem value="active">In Progress</SelectItem>
-                <SelectItem value="completed">Completed</SelectItem>
-                <SelectItem value="cancelled">Cancelled</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="notifyTime" className="text-right">
-              Notify Before
-            </Label>
-            <Select
-              value={formData.notifyTime}
-              onValueChange={(value) => handleSelectChange("notifyTime", value)}
-              disabled={viewMode}
-            >
-              <SelectTrigger className="col-span-3">
-                <SelectValue placeholder="Select notification time" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="15min">15 minutes</SelectItem>
-                <SelectItem value="30min">30 minutes</SelectItem>
-                <SelectItem value="1hour">1 hour</SelectItem>
-                <SelectItem value="2hours">2 hours</SelectItem>
-                <SelectItem value="1day">1 day</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
 
           {!viewMode && (
             <DialogFooter className="mt-4">
-              <Button type="submit">{schedule ? "Save Changes" : "Add Event"}</Button>
+              <Button type="submit">
+                {schedule ? "Save Changes" : "Add Event"}
+              </Button>
             </DialogFooter>
           )}
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

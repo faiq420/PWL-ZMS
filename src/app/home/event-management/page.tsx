@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Trash2, Edit, Plus, ArrowUpDown } from "lucide-react";
+import { Trash2, Edit, Plus, ArrowUpDown, Eye } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -35,100 +35,61 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { changeDateFormat } from "@/Helper/DateFormats";
 import Checkbox from "@/components/utils/FormElements/Checkbox";
+import useHelper from "@/Helper/helper";
+import { useToast } from "@/components/ui/use-toast";
 
-interface FeedSchedule {
-  id: number;
-  animalId: number;
-  animalName: string;
-  feedType: string;
-  quantity: string;
-  time: string;
-  frequency: string; // e.g., Daily, Weekly, Mon-Fri
-  notes?: string;
-  startDate: string;
-  endDate?: string;
-}
+type Event = {
+  EventId: number;
+  EventName: string;
+  StartingTime: string;
+  EndingTime: string;
+  ZooName: string;
+  Days: string;
+};
 
-const initialFeedSchedules: FeedSchedule[] = [
-  {
-    id: 1,
-    animalId: 1,
-    animalName: "Lion",
-    feedType: "Raw Meat",
-    quantity: "5 kg",
-    time: "09:00 AM",
-    frequency: "Daily",
-    notes: "Supplement with vitamins",
-    startDate: "2025-03-12",
-  },
-  {
-    id: 2,
-    animalId: 3,
-    animalName: "Elephant",
-    feedType: "Hay & Fruits",
-    quantity: "50 kg",
-    time: "10:30 AM",
-    frequency: "Daily",
-    notes: "Large water intake",
-    startDate: "2025-03-12",
-  },
-  {
-    id: 3,
-    animalId: 5,
-    animalName: "Penguin",
-    feedType: "Fish",
-    quantity: "0.5 kg",
-    time: "02:00 PM",
-    frequency: "Daily",
-    notes: "Feed in water",
-    startDate: "2025-05-01",
-  },
-];
-
-export default function FeedSchedulingPage() {
+export default function EventPage() {
+  const { toast } = useToast();
   const router = useRouter();
+  const helper = useHelper();
   const [searchQuery, setSearchQuery] = useState("");
-  const [schedules, setSchedules] = useState<FeedSchedule[]>([
-    ...initialFeedSchedules,
-  ]);
-  const [selectedSchedules, setSelectedSchedules] = useState<number[]>([]);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [events, setEvents] = useState<Event[]>([]);
+  const [selectedEvents, setSelectedEvents] = useState<number[]>([]);
   const [sortOrder, setSortOrder] = useState("name-asc");
-  const [deleteSchedulesDialog, setDeleteSchedulesDialog] = useState(false);
-  const [scheduleToDelete, setSchedulesToDelete] = useState<any>(null);
+  const [deleteEventsDialog, setDeleteEventsDialog] = useState(false);
+  const [eventToDelete, setEventToDelete] = useState<any>(null);
 
-  const toggleSelectSchedule = (bookingId: number) => {
-    setSelectedSchedules((prev) =>
-      prev.includes(bookingId)
-        ? prev.filter((id) => id !== bookingId)
-        : [...prev, bookingId]
+  const toggleSelectEvent = (eventId: number) => {
+    setSelectedEvents((prev) =>
+      prev.includes(eventId)
+        ? prev.filter((id) => id !== eventId)
+        : [...prev, eventId]
     );
   };
 
   const toggleSelectAll = () => {
-    if (selectedSchedules.length === filteredSchedules.length) {
-      setSelectedSchedules([]);
+    if (selectedEvents.length === filteredEvents.length) {
+      setSelectedEvents([]);
     } else {
-      setSelectedSchedules(filteredSchedules.map((booking: any) => booking.id));
+      setSelectedEvents(filteredEvents.map((event: any) => event.EventId));
     }
   };
 
-  const filteredSchedules = schedules.filter((schedule) => {
-    const matchesSearch = schedule.animalName
-      .toLowerCase()
-      .includes(searchQuery.toLowerCase());
+  const filteredEvents = events.filter((event) => {
+    const matchesSearch = event.EventName.toLowerCase().includes(
+      searchQuery.toLowerCase()
+    );
 
     return matchesSearch;
   });
 
-  // Sort Schedules based on selected sort order
-  const sortedSchedules = [...filteredSchedules].sort((a, b) => {
+  const sortedEvents = [...filteredEvents].sort((a, b) => {
     switch (sortOrder) {
       case "name-asc":
-        return a.animalName.localeCompare(b.animalName);
+        return a.EventName.localeCompare(b.EventName);
       case "name-desc":
-        return b.animalName.localeCompare(a.animalName);
+        return b.EventName.localeCompare(a.EventName);
       default:
         return 0;
     }
@@ -139,69 +100,91 @@ export default function FeedSchedulingPage() {
   const postsPerPage = 20;
   const indexOfLastPost = currentPage * postsPerPage;
   const indexOfFirstPost = indexOfLastPost - postsPerPage;
-  const currentPosts = sortedSchedules.slice(indexOfFirstPost, indexOfLastPost);
+  const currentPosts = sortedEvents.slice(indexOfFirstPost, indexOfLastPost);
 
-  const totalPages = Math.ceil(schedules.length / postsPerPage);
+  const totalPages = Math.ceil(events.length / postsPerPage);
   const paginationLabels = Array.from({ length: totalPages }, (_, i) => i + 1);
 
   /////////////////////////////////////
 
-  const handleDeleteSchedules = () => {
-    if (scheduleToDelete) {
-      const updatedSafeties = schedules.filter(
-        (schedule: any) => schedule.id !== scheduleToDelete.id
-      );
-      setSchedules(updatedSafeties);
-      setDeleteSchedulesDialog(false);
-      setSchedulesToDelete(null);
+  const handleDeleteEvents = () => {
+    if (eventToDelete) {
+      setIsDeleting(true);
+      helper.xhr
+        .Post(
+          "/Event/DeleteEvent",
+          helper.ConvertToFormData({
+            eventId: eventToDelete.EventId,
+          })
+        )
+        .then((res) => {
+          if (res == "Event deleted successfully.") {
+            const updatedEvents = events.filter(
+              (event: any) => event.EventId !== eventToDelete.EventId
+            );
+            setEvents(updatedEvents);
+            setDeleteEventsDialog(false);
+            setEventToDelete(null);
+            toast({ title: "Operation", description: res });
+          }
+        })
+        .catch((e) => {
+          toast({ title: "Operation", description: e });
+        })
+        .finally(() => {
+          setIsDeleting(false);
+        });
     }
   };
+
+  useEffect(() => {
+    helper.xhr.Get("/Event/GetEventList").then((res) => {
+      // setEvents(res);
+    });
+  }, []);
 
   return (
     <>
       <AlertDialog
-        open={deleteSchedulesDialog}
-        onOpenChange={setDeleteSchedulesDialog}
+        open={deleteEventsDialog}
+        onOpenChange={setDeleteEventsDialog}
       >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete the schedule for "
-              {scheduleToDelete?.animalName}
+              This will permanently delete the event "{eventToDelete?.EventName}
               ". This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              onClick={handleDeleteSchedules}
+              onClick={handleDeleteEvents}
+              disabled={isDeleting}
               className="bg-destructive text-destructive-foreground"
             >
-              Delete
+              {isDeleting ? "Deleting..." : "Delete"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
       <div className="flex flex-col gap-6">
         <SectionIntro
-          title="Feed Scheduling"
-          description="Manage feeding schedules for all animals in the zoo."
+          title="Event Management"
+          description="Manage zoo events & trips."
         />
 
         <Card className="space-y-4">
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardIntro
-              title="Active Feed Schedules"
-              description="Overview of all active feeding plans."
-            />
+            <CardIntro title="Events" description="Overview of all events." />
             <div className="w-fit">
               <ButtonComp
-                text="Add New Schedule"
+                text="Add New Event"
                 type={"dark"}
                 beforeIcon={<Plus className="h-4 w-4" />}
                 clickEvent={() => {
-                  router.push("/home/feed-scheduling/new");
+                  router.push("/home/event-management/new");
                 }}
               />
             </div>
@@ -210,13 +193,13 @@ export default function FeedSchedulingPage() {
             <SearchTag
               value={searchQuery}
               setter={(value) => setSearchQuery(value)}
-              placeHolder="Select Schedules..."
+              placeHolder="Select Events..."
             />
-            {selectedSchedules.length > 0 && (
+            {selectedEvents.length > 0 && (
               <div className="flex items-center gap-2 mb-4 p-2 bg-main-frostyBlue/10 rounded-md">
                 <span className="text-sm text-main-darkFadedBlue">
-                  {selectedSchedules.length} schedule
-                  {selectedSchedules.length > 1 ? "s" : ""} selected
+                  {selectedEvents.length} event
+                  {selectedEvents.length > 1 ? "s" : ""} selected
                 </span>
                 <div className="flex-1"></div>
                 <Button
@@ -236,9 +219,8 @@ export default function FeedSchedulingPage() {
                     <TableHead className="w-12">
                       <Checkbox
                         value={
-                          selectedSchedules.length ===
-                            filteredSchedules.length &&
-                          filteredSchedules.length > 0
+                          selectedEvents.length === filteredEvents.length &&
+                          filteredEvents.length > 0
                         }
                         setter={toggleSelectAll}
                         name=""
@@ -252,51 +234,41 @@ export default function FeedSchedulingPage() {
                         )
                       }
                     >
-                      Animal
+                      Event Name
                       <ArrowUpDown className="h-4 w-4" />
                     </TableHead>
-                    <TableHead>Feed Type</TableHead>
-                    <TableHead>Quantity</TableHead>
-                    <TableHead>Time</TableHead>
-                    <TableHead>Frequency</TableHead>
-                    <TableHead>Start Date</TableHead>
-                    <TableHead>End Date</TableHead>
+                    <TableHead>Days</TableHead>
+                    <TableHead>Timing</TableHead>
+                    <TableHead>Zoo</TableHead>
                     <TableHead className="text-center">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {currentPosts.length > 0 ? (
-                    currentPosts.map((schedule) => (
-                      <TableRow key={schedule.id}>
+                    currentPosts.map((event) => (
+                      <TableRow key={event.EventId}>
                         <TableCell>
                           <Checkbox
-                            value={selectedSchedules.includes(schedule.id)}
-                            setter={(n, v) => toggleSelectSchedule(schedule.id)}
+                            value={selectedEvents.includes(event.EventId)}
+                            setter={(n, v) => toggleSelectEvent(event.EventId)}
                             name="id"
                           />
                         </TableCell>
                         <TableCell className="font-medium">
-                          {schedule.animalName}
+                          {event.EventName}
                         </TableCell>
-                        <TableCell>{schedule.feedType}</TableCell>
-                        <TableCell>{schedule.quantity}</TableCell>
-                        <TableCell>{schedule.time}</TableCell>
-                        <TableCell>{schedule.frequency}</TableCell>
+                        <TableCell>{event.Days}</TableCell>
                         <TableCell>
-                          {changeDateFormat(schedule.startDate)}
+                          {event.StartingTime} - {event.EndingTime}
                         </TableCell>
-                        <TableCell>
-                          {schedule.endDate
-                            ? changeDateFormat(schedule.endDate)
-                            : "-"}
-                        </TableCell>
+                        <TableCell>{event.ZooName}</TableCell>
                         <TableCell className="text-right flex justify-end">
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => {
                               router.push(
-                                `/home/feed-scheduling/${schedule.id}`
+                                `/home/event-management/${event.EventId}`
                               );
                             }}
                           >
@@ -307,8 +279,8 @@ export default function FeedSchedulingPage() {
                             variant="ghost"
                             size="sm"
                             onClick={() => {
-                              setSchedulesToDelete(schedule);
-                              setDeleteSchedulesDialog(true);
+                              setEventToDelete(event);
+                              setDeleteEventsDialog(true);
                             }}
                             className="text-destructive hover:text-destructive"
                           >
@@ -323,7 +295,7 @@ export default function FeedSchedulingPage() {
                         colSpan={9}
                         className="h-24 text-center text-main-gray"
                       >
-                        No schedules found.
+                        No events found.
                       </TableCell>
                     </TableRow>
                   )}
