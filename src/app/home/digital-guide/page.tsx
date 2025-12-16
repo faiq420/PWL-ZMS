@@ -1,7 +1,7 @@
 "use client";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { Suspense, useEffect } from "react";
-import DigitalGuidePage from "./Main";
+import DigitalGuidePage from "./main";
 import FeaturedAnimals from "./windows/FeaturedAnimals";
 import DailySchedule from "./windows/DailySchedule";
 
