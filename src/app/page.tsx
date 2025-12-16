@@ -74,6 +74,7 @@ export default function LoginPage() {
             UserName: res.user.UserName,
           };
           setCookieKey("userDetails", JSON.stringify(userDetails));
+          helper.storeData("menu_items", JSON.stringify(res.menus));
           router.push("/home");
         }
       })

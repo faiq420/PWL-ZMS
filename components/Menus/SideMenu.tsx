@@ -22,6 +22,7 @@ import {
   Clock,
   ArrowRight,
   ArrowLeft,
+  Binoculars
 } from "lucide-react";
 import { RefObject, useRef, useState } from "react";
 import { Button } from "../ui/button";
@@ -71,6 +72,11 @@ export function SideMenu() {
       title: "Enclosure Management",
       href: "/home/enclosure-management",
       icon: <HomeIcon className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />,
+    },
+    {
+      title: "Trip Management",
+      href: "/home/trip-management",
+      icon: <Binoculars className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />,
     },
     {
       title: "Feed Scheduling",

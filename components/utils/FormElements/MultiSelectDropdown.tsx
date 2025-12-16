@@ -91,7 +91,7 @@ const MultiSelectDropdown = ({
       setDomOptions(options);
     }
     setDefaultValue(optArr);
-    handleDropdownChange(keyWord, array);
+    handleDropdownChange(name, array);
   }
 
   const customStyles = {

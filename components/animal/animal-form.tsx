@@ -191,7 +191,7 @@ export function AnimalForm({
                 {zooEnclosureMapping
                   .sort((a, b) => a.ZooId - b.ZooId)
                   .map((mapping) => (
-                    <div key={mapping.ZooId} className="rounded p-1 space-y-2">
+                    <div key={mapping.ZooId} className="rounded border p-1 space-y-2">
                       <Dropdown
                         activeId={mapping.EnclosureId}
                         clearable={true}
@@ -250,7 +250,7 @@ export function AnimalForm({
               placeHolder="Detailed description of the animal"
             />
             <div className="w-full">
-              <Label>Map Pin Image</Label>
+              <Label>Cover Image</Label>
               {coverImage != null || animal?.CoverImageFilepath != "" ? (
                 <div className="relative aspect-video rounded-md border border-main-gray/30 overflow-hidden w-full">
                   <Image

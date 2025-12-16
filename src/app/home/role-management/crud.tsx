@@ -74,43 +74,46 @@ const RoleCrud = ({ mode = "create", id = "0" }: Props) => {
 
   function HandleSubmit() {
     setIsCruding(true);
+    const createObj = {
+      obj: obj,
+      RoleId: isReplictionChecked ? selectedRole : 0,
+      Menus: !isReplictionChecked
+        ? allMenus.map((menu) => ({
+            MenuId: menu.MenuId,
+            View: menu.View,
+            Create: menu.Create,
+            Edit: menu.Edit,
+            Delete: menu.Delete,
+          }))
+        : [],
+    };
     helper.xhr
       .Post(
         `/Roles/${mode === "create" ? "CreateRole" : "UpdateRole"}`,
-        helper.ConvertToFormData({
-          obj: obj,
-          RoleId: isReplictionChecked ? selectedRole : 0,
-          Menus: !isReplictionChecked
-            ? allMenus.map((menu) => ({
-                MenuId: menu.MenuId,
-                View: menu.View,
-                Create: menu.Create,
-                Edit: menu.Edit,
-                Delete: menu.Delete,
-              }))
-            : [],
-        })
+        helper.ConvertToFormData(mode === "create" ? createObj : obj)
       )
       .then((response) => {
-        console.log(response);
         toast({
-          title: `Role ${mode === "edit" ? "Updated" : "Created"} Successfully`,
+          title: `Role ${mode === "edit" ? "updated" : "created"} successfully`,
           description: `Role \"${obj.RoleName}\" ${
             mode === "create" ? "Created" : "Updated"
-          } Successfully`,
+          } successfully`,
           variant: "success",
         });
+        setIsCruding(false);
+        setTimeout(() => {
+          router.back();
+        }, 3000);
       })
       .catch((error) => {
         toast({
-          title: `Role Not ${mode === "edit" ? "Updated" : "Created"} Successfully`,
+          title: `Role Not ${
+            mode === "edit" ? "Updated" : "Created"
+          } Successfully`,
           description: error.message,
           variant: "success",
         });
-      })
-      .finally(() => {
         setIsCruding(false);
-        router.back();
       });
   }
 

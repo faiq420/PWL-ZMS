@@ -26,6 +26,7 @@ import {
   FileText,
   Shield,
   Bell,
+  Binoculars,
 } from "lucide-react";
 const zoos = [
   { value: "lahore-zoo", label: "Lahore Zoo" },
@@ -57,4 +58,5 @@ export const iconOptions = {
   TowerControl: TowerControl,
   Logs: Logs,
   Paw: Paw,
+  Binoculars: Binoculars,
 };

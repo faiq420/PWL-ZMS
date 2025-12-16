@@ -48,7 +48,7 @@ const MenuCreate = ({ mode = "create", id = "0" }: Props) => {
     MenuId: 0,
     MenuName: "",
     Path: "/home/",
-    IsParent: false,
+    IsParent: true,
     ParentId: null,
     SortingOrder: 0,
     IsActive: true,
