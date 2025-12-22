@@ -39,6 +39,7 @@ export default function ZooProfilesPage() {
       ZooTitle: string;
       ZooDescription: string;
       CoverImageFilepath: string;
+      ZooLogoFilepath: string;
       ZooOpeningTime: string;
       ZooClosingTime: string;
     }[]
