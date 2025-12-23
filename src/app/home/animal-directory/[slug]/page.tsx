@@ -513,7 +513,7 @@ export default function AnimalDetailPage() {
             <MediaGallery
               media={animalImages.map((image) => ({
                 AnimalFileId: image.AnimalFileId,
-                Docpath: image.Docpath || "/placeholder.svg",
+                Docpath: helper.GetDocument(image.Docpath||"") || "/placeholder.svg",
               }))}
               type="images"
             />
