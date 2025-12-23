@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 const useHelper = () => {
   const BaseURL = "https://pwl-api.times-labs.com";
   const API: string =
-    process.env.NODE_ENV !== "development"
+    process.env.NODE_ENV === "development"
       ? "https://localhost:44383"
       : `${BaseURL}/api`;
   const headers: Headers = new Headers({
