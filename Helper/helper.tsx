@@ -3,11 +3,11 @@ import { defaultTokenObject, Token } from "@/lib/Token";
 import { usePathname, useRouter } from "next/navigation";
 
 const useHelper = () => {
-  const BaseURL = "https://pwl-api.times-labs.com";
-  const API: string =
+  const BaseURL =
     process.env.NODE_ENV === "development"
       ? "https://localhost:44383"
-      : `${BaseURL}/api`;
+      : "https://pwl-api.times-labs.com";
+  const API: string = `${BaseURL}/api`;
   const headers: Headers = new Headers({
     Authorization: "Bearer " + getTokenString(),
   });
@@ -178,6 +178,7 @@ const useHelper = () => {
     GetToken,
     removeData,
     GetDocument,
+    API,
   };
 };
 

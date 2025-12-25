@@ -48,11 +48,13 @@ type ImagesFiles = {
 };
 
 type trip = {
+  EventId: number;
   TripId: number;
-  Title: string;
-  Description: string;
+  TripTitle: string;
+  TripDescription: string;
   LocationId: number;
-  BannerImage: string | File;
+  TripCoverImage: null | File;
+  TripCoverFilepath: string;
 };
 
 type ticketDetails = {
@@ -73,18 +75,15 @@ const Page = () => {
   const [locations, setLocations] = useState<OPTION[]>([]);
   const [obj, setObj] = useState({
     EventId: 0,
-    EventName: "Jungle Safari",
-    StartingTime: "09:00",
-    EndingTime: "17:30",
-    LogoPath: "",
-    CoverImagePath: "",
-    Description:
-      "Begin your adventure from the EV Station as you set off on a scenic electric safari through Lahore Safari Park’s diverse landscapes. Each zone reveals a different ecosystem — and the animals that call it home.",
-    // FromDate: "",
-    // ToDate: "",
-    Days: "Monday,Tuesday,Wednesday,Thursday,Friday",
-    Tagline: "Explore Four Worlds of the Wild",
-    ZooId: 1,
+    EventTitle: "",
+    EventStartingTime: "",
+    EventClosingTime: "",
+    EventLogoFilepath: "",
+    EventCoverFilepath: "",
+    EventDescription: "",
+    EventDays: "",
+    TagLine: "",
+    ZooId: 0,
     LocationId: 0,
   });
   const [tickets, setTickets] = useState<
@@ -107,10 +106,12 @@ const Page = () => {
   ];
   const tripEvent: trip = {
     TripId: 0,
-    Title: "",
-    Description: "",
+    TripTitle: "",
+    TripDescription: "",
     LocationId: 0,
-    BannerImage: "",
+    TripCoverImage: null,
+    TripCoverFilepath: "",
+    EventId: 0,
   };
   const [eventDetails, setEventDetails] = useState<trip[]>([{ ...tripEvent }]);
   const [mappedAnimals, setMappedAnimals] = useState<number[]>([]);
@@ -136,7 +137,7 @@ const Page = () => {
   function GetHeading() {
     return `${capitalize(slug == "new" ? "create" : "edit")} - ${capitalize(
       "Trip"
-    )} ${slug != "new" ? `for ${obj.EventName}` : ""}`;
+    )} ${slug != "new" ? `for ${obj.EventTitle}` : ""}`;
   }
 
   function handleChange(n: string, v: string | boolean | number) {
@@ -165,14 +166,14 @@ const Page = () => {
     };
 
     switch (true) {
-      case obj.EventName === "":
+      case obj.EventTitle === "":
         return fail("Trip event name is required.");
 
-      case obj.StartingTime === "" || obj.EndingTime === "":
+      case obj.EventStartingTime === "" || obj.EventClosingTime === "":
         return fail("Starting and ending time are required.");
 
-      case obj.Days === "":
-        console.log(obj.Days);
+      case obj.EventDays === "":
+        console.log(obj.EventDays);
         return fail("Days are required.");
 
       case obj.ZooId === 0:
@@ -181,13 +182,13 @@ const Page = () => {
       case obj.LocationId === 0 && !hasNestedTrip:
         return fail("Select a location.");
 
-      case obj.Description === "":
+      case obj.EventDescription === "":
         return fail("Description is required.");
 
-      case obj.LogoPath === "" && logoFile == null:
+      case obj.EventLogoFilepath === "" && logoFile == null:
         return fail("Logo is required.");
 
-      case obj.CoverImagePath === "" && coverImageFile == null:
+      case obj.EventCoverFilepath === "" && coverImageFile == null:
         return fail("Cover image is required.");
 
       case eventImages.length === 0:
@@ -204,16 +205,16 @@ const Page = () => {
         const index = (i + 1).toString().padStart(2, "0");
 
         switch (true) {
-          case d.Title === "":
+          case d.TripTitle === "":
             return fail(`Title in event detail #${index} is required.`);
 
           case d.LocationId === 0:
             return fail(`Location in event detail #${index} is required.`);
 
-          case d.Description === "":
+          case d.TripDescription === "":
             return fail(`Description in event detail #${index} is required.`);
 
-          case d.BannerImage === "":
+          case d.TripCoverImage === null && d.TripCoverFilepath === "":
             return fail(`Banner image in event detail #${index} is required.`);
         }
       }
@@ -238,59 +239,147 @@ const Page = () => {
   const HandleSubmit = () => {
     if (verify()) {
       setIsCruding(true);
-      const createObject = {
-        obj: { ...obj },
+      const createObject: any = {
+        obj: {
+          ...obj,
+          LocationId: obj.LocationId == 0 ? null : obj.LocationId,
+        },
+        EventImages: eventImages.map((image) => image.file),
+        AnimalIds: mappedAnimals,
       };
-      const editObject = {
+      const editObject: any = {
         obj: { ...obj },
+        EventImages: eventImages
+          .filter((x) => x.file != null)
+          .map((image) => image.file),
+        AnimalIds: mappedAnimals,
+        DeletedFileIds: deletedFiles,
       };
-      console.log(
-        obj,
-        eventDetails,
-        eventImages,
-        logoFile,
-        coverImageFile,
-        mappedAnimals
-      );
-      // helper.xhr
-      //   .Post(
-      //     `/Event/${slug == "new" ? "AddEvent" : "UpdateEvent"}`,
-      //     helper.ConvertToFormData(obj.EventId == 0 ? createObject : editObject)
-      //   )
-      //   .then((response) => {
-      //     toast({
-      //       title: `Trip event ${
-      //         slug == "new" ? "created" : "updated"
-      //       } successfully`,
-      //       variant: "success",
-      //     });
-      //     setIsCruding(false);
-      //     setTimeout(() => {
-      //       router.back();
-      //     }, 3000);
-      //   })
-      //   .catch((error) => {
-      //     toast({
-      //       title: `Trip event not ${
-      //         slug == "new" ? "created" : "updated"
-      //       } successfully`,
-      //       description: error.message,
-      //       variant: "danger",
-      //     });
-      //     setIsCruding(false);
-      //   });
+      if (coverImageFile) {
+        slug == "new"
+          ? (createObject.EventCoverImage = coverImageFile)
+          : (editObject.EventCoverImage = coverImageFile);
+      }
+      if (logoFile) {
+        slug == "new"
+          ? (createObject.EventLogoImage = logoFile)
+          : (editObject.EventLogoImage = logoFile);
+      }
+      helper.xhr
+        .Post(
+          `/Event/${slug == "new" ? "CreateEvent" : "UpdateEvent"}`,
+          helper.ConvertToFormData(obj.EventId == 0 ? createObject : editObject)
+        )
+        .then(async (response) => {
+          console.log(response);
+          if (typeof response == "number") {
+            const details = eventDetails.map((x) => {
+              return { ...x, EventId: response };
+            });
+            const tripsAddedorUpdated = await AddOrUpdateTrip(details);
+            toast({
+              title: `Trip event ${
+                slug == "new" ? "created" : "updated"
+              } successfully`,
+              variant: "success",
+            });
+            setIsCruding(false);
+            setTimeout(() => {
+              router.back();
+            }, 3000);
+          }
+        })
+        .catch((error) => {
+          toast({
+            title: `Trip event not ${
+              slug == "new" ? "created" : "updated"
+            } successfully`,
+            description: error.message,
+            variant: "danger",
+          });
+          setIsCruding(false);
+        });
     }
+  };
+
+  const AddOrUpdateTrip = async (details: any) => {
+    console.log(details);
+    const payloads: { obj: trip; TripCoverImage?: File }[] = [];
+    details.forEach((x: any, i: number) => {
+      console.log(x);
+      payloads[i] = { obj: x };
+      if (x.TripCoverImage instanceof File) {
+        payloads[i].TripCoverImage = x.TripCoverImage;
+      }
+    });
+    console.log(payloads);
+    Promise.allSettled(
+      payloads.map((payload) => {
+        helper.xhr.Post(
+          `/Event/${slug == "new" ? "AddTrip" : "UpdateTrip"}`,
+          helper.ConvertToFormData(payload)
+        );
+      })
+    )
+      .then((res) => {
+        const successfulResult = res
+          .filter((x) => x.status === "fulfilled")
+          .map((x) => x.value);
+        return successfulResult;
+      })
+      .catch((error) => {
+        console.error("Error in AddOrUpdateTrip:", error);
+      });
   };
 
   useEffect(() => {
     if (!isNaN(Number(slug))) {
       helper.xhr
         .Get(
-          "/Event/GetEventForEdit",
-          helper.GetURLParamString({ EventId: Number(slug) }).toString()
+          "/Event/GetEventById",
+          helper.GetURLParamString({ id: Number(slug) }).toString()
         )
         .then((res) => {
-          setObj(res);
+          console.log(res);
+          setObj({
+            EventId: res.data.EventId,
+            EventTitle: res.data.EventTitle,
+            EventStartingTime: res.data.EventStartingTime,
+            EventClosingTime: res.data.EventClosingTime,
+            EventLogoFilepath: res.data.EventLogoFilepath,
+            EventCoverFilepath: res.data.EventCoverFilepath,
+            EventDescription: res.data.EventDescription,
+            EventDays: res.data.EventDays,
+            TagLine: res.data.TagLine,
+            ZooId: res.data.ZooId,
+            LocationId: res.data.LocationId,
+          });
+          setEventImages(
+            res.data.files.map((x: any) => {
+              return {
+                FileId: x.EventFileId,
+                file: null,
+                Docpath: x.EventFilepath,
+              };
+            })
+          );
+          setSelectedDays(res.data.EventDays.split(","));
+          setMappedAnimals(res.data.animalIds);
+          setEventDetails(
+            res.data.trips.map((x: any) => {
+              return {
+                TripTitle: x.TripTitle,
+                LocationId: x.LocationId,
+                TripId: x.TripId,
+                TripDescription: x.TripDescription,
+                TripCoverFilepath: x.TripCoverFilepath,
+                TripCoverImage: null,
+                EventId: res.data.EventId,
+              };
+            })
+          );
+          setAreAnimalsIncludedInThisEvent(res.data.animalIds.length > 0);
+          setHasNestedTrip(res.data.trips.length > 0);
         });
     }
   }, [slug]);
@@ -411,12 +500,14 @@ const Page = () => {
             <div className="hidden xl:block" />
             <div className="w-full">
               <Label>Logo</Label>
-              {logoFile != null || obj?.LogoPath != "" ? (
+              {logoFile != null ||
+              (obj?.EventLogoFilepath != null &&
+                obj?.EventLogoFilepath != "") ? (
                 <div className="relative aspect-video rounded-md border border-main-gray/30 overflow-hidden w-full">
                   <Image
                     src={
-                      obj?.LogoPath && obj?.LogoPath != ""
-                        ? helper.GetDocument(obj.LogoPath)
+                      obj?.EventLogoFilepath && obj?.EventLogoFilepath != ""
+                        ? helper.GetDocument(obj.EventLogoFilepath)
                         : logoFile
                         ? URL.createObjectURL(logoFile)
                         : "/placeholder.svg"
@@ -432,7 +523,7 @@ const Page = () => {
                     size="icon"
                     className="absolute top-1 right-1 h-6 w-6 rounded-full"
                     onClick={() => {
-                      handleChange("LogoPath", "");
+                      handleChange("EventLogoFilepath", "");
                       setLogoFile(null);
                     }}
                   >
@@ -464,12 +555,14 @@ const Page = () => {
             </div>
             <div className="w-full">
               <Label>Cover Image</Label>
-              {coverImageFile != null || obj?.CoverImagePath != "" ? (
+              {coverImageFile != null ||
+              (obj?.EventCoverFilepath != "" &&
+                obj?.EventCoverFilepath != null) ? (
                 <div className="relative aspect-video rounded-md border border-main-gray/30 overflow-hidden w-full">
                   <Image
                     src={
-                      obj?.CoverImagePath && obj?.CoverImagePath != ""
-                        ? helper.GetDocument(obj.CoverImagePath)
+                      obj?.EventCoverFilepath && obj?.EventCoverFilepath != ""
+                        ? helper.GetDocument(obj.EventCoverFilepath)
                         : coverImageFile
                         ? URL.createObjectURL(coverImageFile)
                         : "/placeholder.svg"
@@ -485,7 +578,7 @@ const Page = () => {
                     size="icon"
                     className="absolute top-1 right-1 h-6 w-6 rounded-full"
                     onClick={() => {
-                      handleChange("CoverImagePath", "");
+                      handleChange("EventCoverFilepath", "");
                       setCoverImageFile(null);
                     }}
                   >
@@ -517,8 +610,8 @@ const Page = () => {
             </div>
             <div className=""></div>
             <InputTag
-              value={obj.EventName}
-              name="EventName"
+              value={obj.EventTitle}
+              name="EventTitle"
               setter={handleChange}
               label="Event Name"
               placeHolder="Name of Event"
@@ -526,8 +619,8 @@ const Page = () => {
             />
             <div className="flex gap-2">
               <InputTag
-                value={obj.StartingTime}
-                name="StartingTime"
+                value={obj.EventStartingTime}
+                name="EventStartingTime"
                 placeHolder="00:00"
                 setter={handleChange}
                 label="Starting Time"
@@ -536,9 +629,9 @@ const Page = () => {
               />
               <InputTag
                 type="time"
-                value={obj.EndingTime}
+                value={obj.EventClosingTime}
                 placeHolder="00:00"
-                name="EndingTime"
+                name="EventClosingTime"
                 setter={handleChange}
                 label="Ending Time"
                 isRequired
@@ -559,15 +652,15 @@ const Page = () => {
               />
             ) : ( */}
             <InputTag
-              value={obj.Tagline}
-              name="Tagline"
+              value={obj.TagLine}
+              name="TagLine"
               setter={handleChange}
               label="Tagline"
               placeHolder="Explore.."
             />
             <MultiSelectDropdown
               options={days}
-              name="Days"
+              name="EventDays"
               handleDropdownChange={(n, v) => {
                 console.log(n, v.join(","));
                 handleChange(n, v.join(","));
@@ -588,7 +681,10 @@ const Page = () => {
               <Dropdown
                 activeId={obj.LocationId}
                 name="LocationId"
-                handleDropdownChange={handleChange}
+                clearable
+                handleDropdownChange={(n, v) => {
+                  handleChange(n, v??0);
+                }}
                 label="Location"
                 options={locations}
               />
@@ -596,8 +692,8 @@ const Page = () => {
             <div className="col-span-1 md:col-span-3 xl:col-span-4">
               <TextArea
                 isRequired
-                value={obj.Description}
-                name="Description"
+                value={obj.EventDescription}
+                name="EventDescription"
                 setter={handleChange}
                 label="Description"
                 placeHolder="Write description for the trip event here..."
@@ -616,6 +712,7 @@ const Page = () => {
             />
             <Toggle
               value={hasNestedTrip}
+              isDisabled={obj.LocationId !== 0}
               setter={(n, v) => {
                 setHasNestedTrip(v);
                 if (v) setObj({ ...obj, LocationId: 0 });
@@ -755,15 +852,23 @@ const Page = () => {
                       <div className="grid grid-cols-1 md:grid-cols-[30%_30%_38%] gap-2 gap-y-3">
                         <div className="">
                           <Label>Cover Image</Label>
-                          {detail?.BannerImage != "" ? (
+                          {detail?.TripCoverImage != null ||
+                          detail?.TripCoverFilepath != "" ? (
                             <div className="relative aspect-video rounded-md border border-main-gray/30 overflow-hidden w-full">
                               <Image
                                 src={
-                                  detail?.BannerImage == ""
+                                  detail?.TripCoverImage == null &&
+                                  detail?.TripCoverFilepath == ""
                                     ? "/placeholder.svg"
-                                    : typeof detail?.BannerImage == "string"
-                                    ? helper.GetDocument(detail.BannerImage)
-                                    : URL.createObjectURL(detail.BannerImage)
+                                    : detail?.TripCoverFilepath !== ""
+                                    ? helper.GetDocument(
+                                        detail?.TripCoverFilepath
+                                      )
+                                    : detail?.TripCoverImage
+                                    ? URL.createObjectURL(
+                                        detail?.TripCoverImage
+                                      )
+                                    : "/placeholder.svg"
                                 }
                                 alt="Cover image"
                                 fill
@@ -775,7 +880,15 @@ const Page = () => {
                                 variant="destructive"
                                 size="icon"
                                 className="absolute top-1 right-1 h-6 w-6 rounded-full"
-                                onClick={() => {}}
+                                onClick={() => {
+                                  const updateEventDetails = [...eventDetails];
+                                  updateEventDetails[index] = {
+                                    ...updateEventDetails[index],
+                                    TripCoverImage: null,
+                                    TripCoverFilepath: "",
+                                  };
+                                  setEventDetails(updateEventDetails);
+                                }}
                               >
                                 <X className="h-3 w-3" />
                                 <span className="sr-only">Remove image</span>
@@ -791,12 +904,15 @@ const Page = () => {
                                 onChange={(e) => {
                                   if (e.target.files && e.target.files[0]) {
                                     const selectedFile = e.target.files[0];
-                                    setCoverImageFile(selectedFile);
-                                    handleDetailsChange(
-                                      "BannerImage",
-                                      selectedFile,
-                                      index
-                                    );
+                                    const updateEventDetails = [
+                                      ...eventDetails,
+                                    ];
+                                    updateEventDetails[index] = {
+                                      ...updateEventDetails[index],
+                                      TripCoverImage: selectedFile,
+                                      TripCoverFilepath: "",
+                                    };
+                                    setEventDetails(updateEventDetails);
                                   }
                                 }}
                               />
@@ -819,8 +935,8 @@ const Page = () => {
                         </div>
                         <div className="space-y-2">
                           <InputTag
-                            value={detail.Title}
-                            name="Title"
+                            value={detail.TripTitle}
+                            name="TripTitle"
                             setter={(n, v) => handleDetailsChange(n, v, index)}
                             label="Title"
                           />
@@ -835,8 +951,8 @@ const Page = () => {
                           />
                         </div>
                         <TextArea
-                          value={detail.Description}
-                          name="Description"
+                          value={detail.TripDescription}
+                          name="TripDescription"
                           setter={(n, v) => handleDetailsChange(n, v, index)}
                           label="Description"
                         />
