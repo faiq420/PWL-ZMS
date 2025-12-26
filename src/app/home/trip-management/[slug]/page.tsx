@@ -364,7 +364,10 @@ const Page = () => {
             })
           );
           setSelectedDays(res.data.EventDays.split(","));
-          setMappedAnimals(res.data.animalIds);
+          // setMappedAnimals(res.data.animalIds)
+          setMappedAnimals(
+            res.data.animalIds.map((x: any) => x.AnimalId)
+          );   
           setEventDetails(
             res.data.trips.map((x: any) => {
               return {
