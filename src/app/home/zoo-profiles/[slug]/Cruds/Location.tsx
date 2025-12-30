@@ -147,15 +147,8 @@ const Location = ({ mode = "create", id = "0", tab }: Props) => {
   const [imageFiles, setImageFiles] = useState<ImagesFiles[]>([]);
   const [mapPinFile, setMapPinFile] = useState<File | null>(null);
   const [status, setStatus] = useState([]);
-  const [buildingType, setBuildingType] = useState([
-    // { value: 1, label: "Sanctuary" },
-    // { value: 2, label: "Prayer Area" },
-    // { value: 3, label: "Facility" },
-    // { value: 4, label: "Office" },
-    // { value: 5, label: "Cafeteria" },
-    // { value: 6, label: "Gate" },
-    // { value: 7, label: "Ticket Booth" },
-  ]);
+  const [buildingType, setBuildingType] = useState([]);
+  const [DeletedFileIds, setDeletedFileIds] = useState<number[]>([]);
   const capitalize = (value: string, space = " ") => {
     const words = String(value).split(space);
     const capitalizedWords = words.map(
@@ -193,18 +186,40 @@ const Location = ({ mode = "create", id = "0", tab }: Props) => {
   function HandleSubmit() {
     if (verify()) {
       setIsCruding(true);
+      const createObj = {
+        obj,
+      };
+      const editObj = {
+        obj,
+        DeletedFileIds,
+      };
+      const newFiles = imageFiles.filter((f) => f.file);
+      const filesToUpload: { file: File; type: string }[] = [];
+      if (mapPinFile) {
+        filesToUpload.push({ file: mapPinFile, type: "pin" });
+      }
+      if (newFiles.length > 0) {
+        newFiles.forEach((f) => {
+          if (f.file) {
+            filesToUpload.push({ file: f.file, type: "normal" });
+          }
+        });
+      }
       helper.xhr
         .Post(
           `/Location/${
             obj.LocationId !== 0 ? "UpdateLocation" : "AddLocation"
           }`,
-          helper.ConvertToFormData({
-            obj,
-            locationImage: mapPinFile,
-          })
+          helper.ConvertToFormData(obj.LocationId == 0 ? createObj : editObj)
         )
-        .then((response) => {
-          if (response) {
+        .then(async (response) => {
+          if (typeof response == "number") {
+            if (filesToUpload.length > 0) {
+              const filesUpload = await UploadLocationImages(
+                filesToUpload,
+                response
+              );
+            }
             toast({
               title: `Location ${
                 obj.LocationId !== 0 ? "updated" : "created"
@@ -230,6 +245,33 @@ const Location = ({ mode = "create", id = "0", tab }: Props) => {
     }
   }
 
+  const UploadLocationImages = async (
+    files: { file: File; type: string }[],
+    locationId: number
+  ) => {
+    const payloads: { locationId: number; file: File; type: string }[] = [];
+    files.forEach((x: any, i: number) => {
+      payloads[i] = { locationId: locationId, file: x.file, type: x.type };
+    });
+    Promise.allSettled(
+      payloads.map((payload) => {
+        helper.xhr.Post(
+          `/Location/UploadLocationImages`,
+          helper.ConvertToFormData(payload)
+        );
+      })
+    )
+      .then((res) => {
+        const successfulResult = res
+          .filter((x) => x.status === "fulfilled")
+          .map((x) => x.value);
+        return successfulResult;
+      })
+      .catch((error) => {
+        console.error("Error in file upload:", error);
+      });
+  };
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const selectedFiles = Array.from(e.target.files);
@@ -240,7 +282,6 @@ const Location = ({ mode = "create", id = "0", tab }: Props) => {
           LocationId: obj.LocationId,
         };
       });
-      console.log(temp);
       setImageFiles([...imageFiles, ...temp]);
     }
   };
@@ -250,23 +291,6 @@ const Location = ({ mode = "create", id = "0", tab }: Props) => {
       setMapPinFile(selectedFile);
     }
   };
-
-  function UpdateFile(id: number, file: File) {
-    const formData = new FormData();
-    formData.append("id", String(id));
-    formData.append("file.file", file);
-    // helper.xhr
-    //   .Post("/Category/UploadCategoryImage", formData)
-    //   .then((res) => {
-    //     Message("success", `${file.Type} updated.`);
-
-    //     setImgFile(null);
-    //   })
-    //   .catch((e) => {
-    //     console.log(e);
-    //   })
-    //   .finally(() => {});
-  }
 
   const addImageFiles = () => {
     document.getElementById("file-upload")?.click();
@@ -280,15 +304,9 @@ const Location = ({ mode = "create", id = "0", tab }: Props) => {
   };
 
   const DeleteLocationImage = (id: number, index: number) => {
-    helper.xhr
-      .Post("/Location/DeleteLocationImage", helper.ConvertToFormData({ id }))
-      .then((res) => {
-        // Message("success", "File removed.");
-        setImageFiles(imageFiles.filter((_, i) => i !== index));
-      });
+    setDeletedFileIds([...DeletedFileIds, id]);
+    removeLocationImage(index);
   };
-
-  function AddNewLocationFile(locationId: number, file: File, index?: number) {}
 
   useEffect(() => {
     helper.xhr.Get("/List/GetBuildingTypes").then((res) => {
@@ -316,7 +334,32 @@ const Location = ({ mode = "create", id = "0", tab }: Props) => {
         )
         .then((res) => {
           console.log(res);
-          setObj(res);
+          setObj({
+            BuildingTypeId: res.BuildingTypeId,
+            Description: res.Description,
+            IsActive: res.IsActive,
+            Latitude: res.Latitude,
+            LocationId: res.LocationId,
+            LocationName: res.LocationName,
+            Longitude: res.Longitude,
+            OperationalStatusId: res.OperationalStatusId,
+            ZooId: res.ZooId,
+            ImagePath:
+              res.ImagePaths.find((x: any) => x.Type === "pin")
+                .LocationFilepath || "",
+          });
+          if (res.ImagePaths) {
+            setImageFiles(
+              res.ImagePaths.filter((x: any) => x.Type !== "pin").map(
+                (x: any) => ({
+                  FileId: x.LocationFileId,
+                  file: null,
+                  Docpath: x.LocationFilepath,
+                  LocationId: obj.LocationId,
+                })
+              )
+            );
+          }
         })
         .catch((e) => {
           console.error(e);
@@ -485,8 +528,8 @@ const Location = ({ mode = "create", id = "0", tab }: Props) => {
                   </>
                 )}
               </div>
-              {/* <div className="">
-                <Label>Location Images</Label>
+              <div className="">
+                <Label>Location Map Images</Label>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                   {imageFiles.map((image, index) => (
                     <div key={index} className="space-y-2">
@@ -515,22 +558,6 @@ const Location = ({ mode = "create", id = "0", tab }: Props) => {
                             className="object-cover"
                           />
                         )}
-                        {image.FileId == 0 &&
-                          obj.Id != 0 &&
-                          imageFiles.length > 0 && (
-                            <Button
-                              variant="outline"
-                              size="icon"
-                              className="absolute top-1 left-1 h-6 w-6 rounded-full"
-                              onClick={() =>
-                                image.file &&
-                                AddNewLocationFile(obj.Id, image.file, index)
-                              }
-                            >
-                              <Save className="h-3 w-3" />
-                              <span className="sr-only">Remove image</span>
-                            </Button>
-                          )}
                         {image.FileId != 0 ? (
                           <Button
                             variant="destructive"
@@ -581,7 +608,7 @@ const Location = ({ mode = "create", id = "0", tab }: Props) => {
                     <span className="text-xs text-main-gray">Add Image</span>
                   </button>
                 </div>
-              </div> */}
+              </div>
             </div>
           </CardContent>
           <CardFooter>

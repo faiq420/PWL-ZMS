@@ -44,6 +44,7 @@ type Event = {
   EventTitle: string;
   EventStartingTime: string;
   EventClosingTime: string;
+  IsOccasional: boolean;
   ZooTitle: string;
   EventDays: string;
 };
@@ -139,7 +140,7 @@ export default function EventPage() {
 
   useEffect(() => {
     helper.xhr.Get("/Event/GetEventList").then((res) => {
-      setEvents(res.events);
+      setEvents(res.events.filter((event: any) => !event.IsOccasional));
     });
   }, []);
 
@@ -170,10 +171,7 @@ export default function EventPage() {
         </AlertDialogContent>
       </AlertDialog>
       <div className="flex flex-col gap-6">
-        <SectionIntro
-          title="Trip Management"
-          description="Manage zoo trips."
-        />
+        <SectionIntro title="Trip Management" description="Manage zoo trips." />
 
         <Card className="space-y-4">
           <CardHeader className="flex flex-row items-center justify-between">

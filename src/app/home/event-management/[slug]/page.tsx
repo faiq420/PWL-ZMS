@@ -46,46 +46,28 @@ const Page = () => {
   const params = useParams();
   const [isCruding, setIsCruding] = useState(false);
   const slug = params.slug as string;
-  const [zooList, setZooList] = useState<OPTION[]>([]);
   const [locations, setLocations] = useState<OPTION[]>([]);
-  const [obj, setObj] = useState({
-    EventId: 0,
-    EventName: "",
-    StartingTime: "",
-    EndingTime: "",
-    LogoPath: "",
-    CoverImagePath: "",
-    IsOccasional: false,
+  const [dateRange, setDateRange] = useState({
     FromDate: "",
     ToDate: "",
-    Days: "",
+  });
+  const [obj, setObj] = useState({
+    EventId: 0,
+    EventTitle: "",
+    EventDescription: "",
+    EventStartingTime: "",
+    EventClosingTime: "",
+    EventCoverFilepath: "",
+    IsOccasional: true,
+    EventDays: "",
     ZooId: 0,
+    LocationId: 0,
+    TagLine: "",
   });
   const [zoos, setZoos] = useState<OPTION[]>([]);
-  const [logoFile, setLogoFile] = useState<File | null>(null);
   const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
-  const [selectedDays, setSelectedDays] = useState<string[]>([]);
-  const days = [
-    { value: "Monday", label: "Monday" },
-    { value: "Tuesday", label: "Tuesday" },
-    { value: "Wednesday", label: "Wednesday" },
-    { value: "Thursday", label: "Thursday" },
-    { value: "Friday", label: "Friday" },
-    { value: "Saturday", label: "Saturday" },
-    { value: "Sunday", label: "Sunday" },
-  ];
-  const tripEvent: trip = {
-    TripId: 0,
-    Tagline: "",
-    Description: "",
-    LocationId: 0,
-    BannerImage: "",
-  };
-  const [eventDetails, setEventDetails] = useState<trip[]>([{ ...tripEvent }]);
-  const [mappedAnimals, setMappedAnimals] = useState<number[]>([]);
-  const [areAnimalsIncludedInThisEvent, setAreAnimalsIncludedInThisEvent] =
-    useState<boolean>(false);
-  const [animals, setAnimals] = useState<OPTION[]>([]);
+  const [eventImages, setEventImages] = useState<ImagesFiles[]>([]);
+  const [deletedFiles, setDeletedFiles] = useState<number[]>([]);
   useEffect(() => {
     if (slug) {
       if (slug != "new" && isNaN(Number(slug))) {
@@ -105,48 +87,84 @@ const Page = () => {
   function GetHeading() {
     return `${capitalize(slug == "new" ? "create" : "edit")} - ${capitalize(
       "Event"
-    )} ${slug != "new" ? `for ${obj.EventName}` : ""}`;
+    )} ${slug != "new" ? `for ${obj.EventTitle}` : ""}`;
   }
 
   function handleChange(n: string, v: string | boolean | number) {
     setObj({ ...obj, [n]: v });
   }
-  function handleDetailsChange(
-    n: string,
-    v: string | boolean | number,
-    i: number
-  ) {
-    const updatedEventDetails = [...eventDetails];
-    updatedEventDetails[i] = { ...updatedEventDetails[i], [n]: v };
-    setEventDetails(updatedEventDetails);
-  }
 
   const verify = () => {
-    const toastObj = { title: "Validation Error", description: "" };
-    // if (obj.EventName == "") {
-    //   toastObj.description = "Event Name is required.";
-    // } else if (obj.ZooId == 0 || obj.LocationId == 0) {
-    //   toastObj.description = "Zoo and Location are required.";
-    // }
-    if (toastObj.description !== "") {
+    const toastObj = {
+      title: "Validation Error",
+      description: "",
+    };
+
+    const fail = (message: string) => {
+      toastObj.description = message;
       toast(toastObj);
       return false;
+    };
+
+    switch (true) {
+      case obj.EventTitle === "":
+        return fail("Trip event name is required.");
+
+      case obj.EventStartingTime === "" || obj.EventClosingTime === "":
+        return fail("Starting and ending time are required.");
+
+      case obj.EventDays === "":
+        console.log(obj.EventDays);
+        return fail("Days are required.");
+
+      case obj.ZooId === 0:
+        return fail("Select a zoo.");
+
+      case obj.LocationId === 0:
+        return fail("Select a location.");
+
+      case obj.EventDescription === "":
+        return fail("Description is required.");
+
+      case obj.EventCoverFilepath === "" && coverImageFile == null:
+        return fail("Cover image is required.");
+
+      case eventImages.length === 0:
+        return fail("Event images are required.");
     }
+
+    // Nested validation — FIRST failure only
+
     return true;
   };
 
   const HandleSubmit = () => {
     if (verify()) {
       setIsCruding(true);
-      const createObject = {
-        obj: { ...obj },
+      const createObject: any = {
+        obj: {
+          ...obj,
+          LocationId: obj.LocationId == 0 ? null : obj.LocationId,
+        },
+        EventImages: eventImages.map((image) => image.file),
       };
-      const editObject = {
+      const editObject: any = {
         obj: { ...obj },
+        EventImages: eventImages
+          .filter((x) => x.file != null)
+          .map((image) => image.file),
+        DeletedFileIds: deletedFiles,
       };
+      if (coverImageFile) {
+        slug == "new"
+          ? (createObject.EventCoverImage = coverImageFile)
+          : (editObject.EventCoverImage = coverImageFile);
+      }
       helper.xhr
         .Post(
-          `/Event/${slug == "new" ? "AddEvent" : "UpdateEvent"}`,
+          `/Event/${
+            slug == "new" ? "CreateOccasionalEvent" : "UpdateOccasionalEvent"
+          }`,
           helper.ConvertToFormData(obj.EventId == 0 ? createObject : editObject)
         )
         .then((response) => {
@@ -178,11 +196,39 @@ const Page = () => {
     if (!isNaN(Number(slug))) {
       helper.xhr
         .Get(
-          "/Event/GetEventForEdit",
-          helper.GetURLParamString({ EventId: Number(slug) }).toString()
+          "/Event/GetEventById",
+          helper.GetURLParamString({ id: Number(slug) }).toString()
         )
         .then((res) => {
-          setObj(res);
+          setObj({
+            EventId: res.data.EventId,
+            EventTitle: res.data.EventTitle,
+            EventStartingTime: res.data.EventStartingTime,
+            EventClosingTime: res.data.EventClosingTime,
+            EventCoverFilepath: res.data.EventCoverFilepath,
+            EventDescription: res.data.EventDescription,
+            EventDays: res.data.EventDays,
+            TagLine: res.data.TagLine,
+            ZooId: res.data.ZooId,
+            LocationId: res.data.LocationId,
+            IsOccasional: res.data.IsOccasional,
+          });
+          setEventImages(
+            res.data.files.map((x: any) => {
+              return {
+                FileId: x.EventFileId,
+                file: null,
+                Docpath: x.EventFilepath,
+              };
+            })
+          );
+          setDateRange({
+            FromDate: res.data.EventDays.split(",")[0],
+            ToDate:
+              res.data.EventDays.split(",")[
+                res.data.EventDays.split(",").length - 1
+              ],
+          });
         });
     }
   }, [slug]);
@@ -211,6 +257,7 @@ const Page = () => {
           .toString()
       )
       .then((res) => {
+        console.log(res);
         setLocations(
           res.map((z: any) => {
             return {
@@ -222,17 +269,64 @@ const Page = () => {
       });
   }, [obj.ZooId]);
 
-  const handleLogoFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const selectedFile = e.target.files[0];
-      setLogoFile(selectedFile);
-    }
-  };
   const handleCoverFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const selectedFile = e.target.files[0];
       setCoverImageFile(selectedFile);
     }
+  };
+
+  const removeEventImage = (index: number) => {
+    setEventImages(eventImages.filter((_, i) => i !== index));
+  };
+
+  const DeleteEventImage = (id: number, index: number) => {
+    setDeletedFiles([...deletedFiles, id]);
+    removeEventImage(index);
+  };
+
+  const addEventImage = () => {
+    document.getElementById("file-upload")?.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const selectedFiles = Array.from(e.target.files);
+      const temp = selectedFiles.map((f) => {
+        return {
+          FileId: 0,
+          file: f,
+        };
+      });
+      setEventImages([...eventImages, ...temp]);
+    }
+  };
+
+  const GetDateRange = (from: string, to: string): string[] => {
+    const start = new Date(from);
+    const end = new Date(to);
+
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+      throw new Error("Invalid date format. Expected YYYY-MM-DD.");
+    }
+    if (start > end) {
+      throw new Error("Start date cannot be greater than end date.");
+    }
+
+    const result: string[] = [];
+
+    const current = new Date(start);
+    while (current <= end) {
+      const yyyy = current.getFullYear();
+      const mm = String(current.getMonth() + 1).padStart(2, "0");
+      const dd = String(current.getDate()).padStart(2, "0");
+
+      result.push(`${yyyy}-${mm}-${dd}`);
+
+      current.setDate(current.getDate() + 1);
+    }
+
+    return result;
   };
 
   return (
@@ -251,81 +345,23 @@ const Page = () => {
       </div>
       <Card>
         <CardHeader></CardHeader>
-        <CardContent className="space-y-10">
-          <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-2 gap-y-3">
-            <div className="hidden xl:block" />
-            {obj.IsOccasional ? (
-              <div />
-            ) : (
-              <div className="w-full">
-                <Label>Logo</Label>
-                {logoFile != null || obj?.LogoPath != "" ? (
-                  <div className="relative aspect-video rounded-md border border-main-gray/30 overflow-hidden w-full">
-                    <Image
-                      src={
-                        obj?.LogoPath && obj?.LogoPath != ""
-                          ? helper.GetDocument(obj.LogoPath)
-                          : logoFile
-                          ? URL.createObjectURL(logoFile)
-                          : "/placeholder.svg"
-                      }
-                      alt="Category image"
-                      fill
-                      className="object-contain"
-                      unoptimized
-                    />
-
-                    <Button
-                      variant="destructive"
-                      size="icon"
-                      className="absolute top-1 right-1 h-6 w-6 rounded-full"
-                      onClick={() => {
-                        handleChange("LogoPath", "");
-                        setLogoFile(null);
-                      }}
-                    >
-                      <X className="h-3 w-3" />
-                      <span className="sr-only">Remove image</span>
-                    </Button>
-                  </div>
-                ) : (
-                  <>
-                    <input
-                      id="iconimage-upload"
-                      type="file"
-                      className="hidden"
-                      accept="image/*"
-                      onChange={handleLogoFileChange}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => {
-                        document.getElementById("iconimage-upload")?.click();
-                      }}
-                      className="flex w-full flex-col items-center justify-center aspect-video rounded-md border border-dashed border-main-gray/50 bg-gray-50 hover:bg-gray-100 transition-colors"
-                    >
-                      <Upload className="h-6 w-6 text-main-gray mb-1" />
-                      <span className="text-xs text-main-gray">Add Image</span>
-                    </button>
-                  </>
-                )}
-              </div>
-            )}
-            <div className="w-full">
+        <CardContent className="space-y-3">
+          <div className="w-full flex justify-center">
+            <div className="w-full md:w-1/3 xl:w-1/4">
               <Label>Cover Image</Label>
-              {coverImageFile != null || obj?.CoverImagePath != "" ? (
+              {coverImageFile != null || obj?.EventCoverFilepath != "" ? (
                 <div className="relative aspect-video rounded-md border border-main-gray/30 overflow-hidden w-full">
                   <Image
                     src={
-                      obj?.CoverImagePath && obj?.CoverImagePath != ""
-                        ? helper.GetDocument(obj.CoverImagePath)
-                        : logoFile
-                        ? URL.createObjectURL(logoFile)
+                      obj?.EventCoverFilepath && obj?.EventCoverFilepath != ""
+                        ? helper.GetDocument(obj.EventCoverFilepath)
+                        : coverImageFile
+                        ? URL.createObjectURL(coverImageFile)
                         : "/placeholder.svg"
                     }
-                    alt="Category image"
+                    alt="Cover image"
                     fill
-                    className="object-contain"
+                    className="object-cover"
                     unoptimized
                   />
 
@@ -334,8 +370,8 @@ const Page = () => {
                     size="icon"
                     className="absolute top-1 right-1 h-6 w-6 rounded-full"
                     onClick={() => {
-                      handleChange("CoverImagePath", "");
-                      setLogoFile(null);
+                      handleChange("EventCoverFilepath", "");
+                      setCoverImageFile(null);
                     }}
                   >
                     <X className="h-3 w-3" />
@@ -349,7 +385,7 @@ const Page = () => {
                     type="file"
                     className="hidden"
                     accept="image/*"
-                    onChange={handleLogoFileChange}
+                    onChange={handleCoverFileChange}
                   />
                   <button
                     type="button"
@@ -364,18 +400,60 @@ const Page = () => {
                 </>
               )}
             </div>
-            <div className=""></div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-2 gap-y-3">
             <InputTag
-              value={obj.EventName}
-              name="EventName"
+              value={obj.EventTitle}
+              name="EventTitle"
               setter={handleChange}
               label="Event Name"
               placeHolder="Name of Event"
             />
+            <InputTag
+              value={obj.TagLine}
+              name="TagLine"
+              setter={handleChange}
+              label="Tagline"
+              placeHolder="Every day is paw-ty when you have a furry little companion."
+            />
+            <Dropdown
+              activeId={obj.ZooId}
+              name="ZooId"
+              handleDropdownChange={(n, v) => {
+                setObj({ ...obj, ZooId: Number(v), LocationId: 0 });
+              }}
+              label="Zoo"
+              options={zoos}
+            />
+            <Dropdown
+              activeId={obj.LocationId}
+              name="LocationId"
+              handleDropdownChange={handleChange}
+              label="Location"
+              options={locations}
+            />
+            <DateRangePicker
+              value={{
+                startDate: dateRange.FromDate,
+                endDate: dateRange.ToDate,
+              }}
+              name="DateRange"
+              setter={(n, v) => {
+                setDateRange({
+                  FromDate: v.startDate,
+                  ToDate: v.endDate,
+                });
+                setObj({
+                  ...obj,
+                  EventDays: GetDateRange(v.startDate, v.endDate).join(","),
+                });
+              }}
+              label="Date Range for the event"
+            />
             <div className="flex gap-2">
               <InputTag
-                value={obj.StartingTime}
-                name="StartingTime"
+                value={obj.EventStartingTime}
+                name="EventStartingTime"
                 placeHolder="00:00"
                 setter={handleChange}
                 label="Starting Time"
@@ -383,216 +461,120 @@ const Page = () => {
               />
               <InputTag
                 type="time"
-                value={obj.EndingTime}
+                value={obj.EventClosingTime}
                 placeHolder="00:00"
-                name="EndingTime"
+                name="EventClosingTime"
                 setter={handleChange}
                 label="Ending Time"
               />
             </div>
-            <Dropdown
-              activeId={obj.ZooId}
-              name="ZooId"
-              handleDropdownChange={handleChange}
-              label="Zoo"
-              options={zoos}
-            />
-            <Dropdown
-              activeId={obj.IsOccasional}
-              name="IsOccasional"
-              handleDropdownChange={handleChange}
-              label="Is Occasional"
-              options={[
-                { value: true, label: "Yes" },
-                { value: false, label: "No" },
-              ]}
-            />
-            {obj.IsOccasional ? (
-              <DateRangePicker
-                value={{ startDate: obj.FromDate, endDate: obj.ToDate }}
-                name="DateRange"
-                setter={(n, v) => {
-                  setObj({
-                    ...obj,
-                    FromDate: v.startDate,
-                    ToDate: v.endDate,
-                  });
-                }}
-                label="Date Range for the event"
-              />
-            ) : (
-              <MultiSelectDropdown
-                options={days}
-                name="Days"
-                handleDropdownChange={(n, v) => {
-                  handleChange(n, v.join(","));
-                  setSelectedDays(v);
-                }}
-                selectedIds={selectedDays}
-                label="Days for event"
-              />
-            )}
-            <div className="h-full flex items-end">
-              <Toggle
-                value={areAnimalsIncludedInThisEvent}
-                setter={(n, v) => {
-                  setAreAnimalsIncludedInThisEvent(v);
-                }}
-                name=""
-                label="Are Animals Included In This Event"
+            <div className="col-span-1 md:col-span-3 xl:col-span-4">
+              <TextArea
+                isRequired
+                value={obj.EventDescription}
+                name="EventDescription"
+                setter={handleChange}
+                label="Description"
+                placeHolder="Write description for the trip event here..."
               />
             </div>
           </div>
+        </CardContent>
+        <CardFooter></CardFooter>
+      </Card>
+      <Card>
+        <CardHeader></CardHeader>
+        <CardContent>
           <div className="space-y-3">
-            <div className="flex justify-between">
-              <Paragraph text="Event Details" />
-              <div className="w-fit">
-                <ButtonComp
-                  type={"white"}
-                  text="Add"
-                  clickEvent={() => {
-                    setEventDetails([...eventDetails, tripEvent]);
-                  }}
-                />
-              </div>
-            </div>
-            {eventDetails.map((detail, index) => (
-              <div
-                key={index}
-                className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-2 gap-y-3 rounded-lg border border-gray-300 p-2"
-              >
-                <div className="col-span-1 md:col-span-3 xl:col-span-4 flex justify-between items-start">
-                  <div className="w-full md:w-1/3 xl:w-1/4">
-                    <Label>Cover Image</Label>
-                    {detail?.BannerImage != "" ? (
-                      <div className="relative aspect-video rounded-md border border-main-gray/30 overflow-hidden w-full">
-                        <Image
-                          src={
-                            detail?.BannerImage == ""
-                              ? "/placeholder.svg"
-                              : typeof detail?.BannerImage == "string"
-                              ? helper.GetDocument(detail.BannerImage)
-                              : URL.createObjectURL(detail.BannerImage)
-                          }
-                          alt="Cover image"
-                          fill
-                          className="object-cover"
-                          unoptimized
-                        />
-
-                        <Button
-                          variant="destructive"
-                          size="icon"
-                          className="absolute top-1 right-1 h-6 w-6 rounded-full"
-                          onClick={() => {
-                            handleChange("CoverImagePath", "");
-                            setLogoFile(null);
-                          }}
-                        >
-                          <X className="h-3 w-3" />
-                          <span className="sr-only">Remove image</span>
-                        </Button>
-                      </div>
+            <Paragraph text="Event Images" />
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+              {eventImages.map((image, index) => (
+                <div key={index} className="space-y-2">
+                  <div className="relative aspect-square rounded-md border border-main-gray/30 overflow-hidden">
+                    {image.file && image.file.type.startsWith("video/") ? (
+                      <video
+                        src={
+                          image.FileId == 0
+                            ? URL.createObjectURL(image.file)
+                            : helper.GetDocument(image.Docpath || "")
+                        }
+                        controls
+                        className="object-cover"
+                        style={{ width: "100%", height: "100%" }}
+                      />
                     ) : (
-                      <>
-                        <input
-                          id="iconimage-upload"
-                          type="file"
-                          className="hidden"
-                          accept="image/*"
-                          onChange={handleLogoFileChange}
-                        />
-                        <button
-                          type="button"
-                          onClick={() => {
-                            document
-                              .getElementById("iconimage-upload")
-                              ?.click();
-                          }}
-                          className="flex w-full flex-col items-center justify-center aspect-video rounded-md border border-dashed border-main-gray/50 bg-gray-50 hover:bg-gray-100 transition-colors"
-                        >
-                          <Upload className="h-6 w-6 text-main-gray mb-1" />
-                          <span className="text-xs text-main-gray">
-                            Add Image
-                          </span>
-                        </button>
-                      </>
+                      <Image
+                        src={
+                          image.file
+                            ? URL.createObjectURL(image.file)
+                            : helper.GetDocument(image.Docpath || "")
+                        }
+                        alt={`Event image ${index + 1}`}
+                        fill
+                        unoptimized
+                        className="object-cover"
+                      />
+                    )}
+                    {image.FileId != 0 ? (
+                      <Button
+                        variant="destructive"
+                        size="icon"
+                        className="absolute top-1 right-1 h-6 w-6 rounded-full"
+                        onClick={() => DeleteEventImage(image.FileId, index)}
+                      >
+                        <Trash2 className="h-3 w-3" />
+                        <span className="sr-only">Remove image</span>
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="destructive"
+                        size="icon"
+                        className="absolute top-1 right-1 h-6 w-6 rounded-full"
+                        onClick={() => removeEventImage(index)}
+                      >
+                        <X className="h-3 w-3" />
+                        <span className="sr-only">Remove image</span>
+                      </Button>
                     )}
                   </div>
-                  <p
-                    className="text-xs text-red-900 hover:cursor-pointer"
-                    onClick={() => {
-                      setEventDetails(
-                        eventDetails.filter((i, _) => _ != index)
-                      );
-                    }}
-                  >
-                    Remove
-                  </p>
                 </div>
-                <div className="space-y-2">
-                  <InputTag
-                    value={detail.Tagline}
-                    name="Tagline"
-                    setter={(n, v) => handleDetailsChange(n, v, index)}
-                    label="Tagline"
-                  />
-                  <Dropdown
-                    activeId={detail.LocationId}
-                    name="LocationId"
-                    handleDropdownChange={(n, v) =>
-                      handleDetailsChange(n, v, index)
-                    }
-                    label="Location"
-                    options={locations}
-                  />
-                </div>
-                <div className="col-span-1 md:col-span-2">
-                  <TextArea
-                    value={detail.Description}
-                    name="Description"
-                    setter={(n, v) => handleDetailsChange(n, v, index)}
-                    label="Description"
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-          {areAnimalsIncludedInThisEvent && (
-            <div className="space-y-3">
-              <Paragraph text="Animals" />
-              <MultiSelectDropdown
-                options={animals}
-                selectedIds={mappedAnimals}
-                handleDropdownChange={(n, v) => {
-                  setMappedAnimals(v);
-                }}
-                name=""
-                label="Mapped Animal"
-                // options={}
+              ))}
+              <input
+                id="file-upload"
+                type="file"
+                className="hidden"
+                multiple
+                accept="image/*,video/*"
+                onChange={handleFileChange}
               />
+              <button
+                type="button"
+                onClick={addEventImage}
+                className="flex w-full flex-col items-center justify-center aspect-square rounded-md border border-dashed border-main-gray/50 bg-gray-50 hover:bg-gray-100 transition-colors"
+              >
+                <Upload className="h-6 w-6 text-main-gray mb-1" />
+                <span className="text-xs text-main-gray">Add Image</span>
+              </button>
             </div>
-          )}
+          </div>
         </CardContent>
-        <CardFooter>
-          <div className="w-full flex justify-end">
-            <div className="w-full md:w-fit flex space-x-2">
-              <ButtonComp
-                text={"Cancel"}
-                type={"white"}
-                clickEvent={() => router.back()}
-                beforeIcon={<X className="h-4 w-4" />}
-              />
-              <ButtonComp
-                text={slug !== "new" ? "Save" : "Create"}
-                clickEvent={HandleSubmit}
-                isCruding={isCruding}
-                beforeIcon={<Save className="h-4 w-4" />}
-              />
-            </div>
-          </div>
-        </CardFooter>
       </Card>
+      <div className="w-full flex justify-end">
+        <div className="w-full md:w-fit flex space-x-2">
+          <ButtonComp
+            text={"Cancel"}
+            type={"white"}
+            clickEvent={() => router.back()}
+            beforeIcon={<X className="h-4 w-4" />}
+          />
+          <ButtonComp
+            text={slug !== "new" ? "Save" : "Create"}
+            clickEvent={HandleSubmit}
+            isCruding={isCruding}
+            beforeIcon={<Save className="h-4 w-4" />}
+          />
+        </div>
+      </div>
     </div>
   );
 };

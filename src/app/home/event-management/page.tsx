@@ -38,14 +38,16 @@ import {
 import Checkbox from "@/components/utils/FormElements/Checkbox";
 import useHelper from "@/Helper/helper";
 import { useToast } from "@/components/ui/use-toast";
+import { changeDateFormat, to12Hour } from "@/Helper/DateFormats";
 
 type Event = {
   EventId: number;
-  EventName: string;
-  StartingTime: string;
-  EndingTime: string;
-  ZooName: string;
-  Days: string;
+  EventTitle: string;
+  EventStartingTime: string;
+  EventClosingTime: string;
+  IsOccasional: boolean;
+  ZooTitle: string;
+  EventDays: string;
 };
 
 export default function EventPage() {
@@ -77,7 +79,7 @@ export default function EventPage() {
   };
 
   const filteredEvents = events.filter((event) => {
-    const matchesSearch = event.EventName.toLowerCase().includes(
+    const matchesSearch = event.EventTitle.toLowerCase().includes(
       searchQuery.toLowerCase()
     );
 
@@ -87,9 +89,9 @@ export default function EventPage() {
   const sortedEvents = [...filteredEvents].sort((a, b) => {
     switch (sortOrder) {
       case "name-asc":
-        return a.EventName.localeCompare(b.EventName);
+        return a.EventTitle.localeCompare(b.EventTitle);
       case "name-desc":
-        return b.EventName.localeCompare(a.EventName);
+        return b.EventTitle.localeCompare(a.EventTitle);
       default:
         return 0;
     }
@@ -139,7 +141,7 @@ export default function EventPage() {
 
   useEffect(() => {
     helper.xhr.Get("/Event/GetEventList").then((res) => {
-      // setEvents(res);
+      setEvents(res.events.filter((event: any) => event.IsOccasional));
     });
   }, []);
 
@@ -153,7 +155,8 @@ export default function EventPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete the event "{eventToDelete?.EventName}
+              This will permanently delete the event "
+              {eventToDelete?.EventTitle}
               ". This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -245,7 +248,7 @@ export default function EventPage() {
                 </TableHeader>
                 <TableBody>
                   {currentPosts.length > 0 ? (
-                    currentPosts.map((event) => (
+                    currentPosts.map((event: Event) => (
                       <TableRow key={event.EventId}>
                         <TableCell>
                           <Checkbox
@@ -255,13 +258,20 @@ export default function EventPage() {
                           />
                         </TableCell>
                         <TableCell className="font-medium">
-                          {event.EventName}
+                          {event.EventTitle}
                         </TableCell>
-                        <TableCell>{event.Days}</TableCell>
                         <TableCell>
-                          {event.StartingTime} - {event.EndingTime}
+                          {changeDateFormat(event.EventDays.split(",")[0])} -
+                          {changeDateFormat(
+                            event.EventDays.split(",")[
+                              event.EventDays.split(",").length - 1
+                            ]
+                          )}
                         </TableCell>
-                        <TableCell>{event.ZooName}</TableCell>
+                        <TableCell>
+                          {to12Hour(event.EventStartingTime)} - {to12Hour(event.EventClosingTime)}
+                        </TableCell>
+                        <TableCell>{event.ZooTitle}</TableCell>
                         <TableCell className="text-right flex justify-end">
                           <Button
                             variant="ghost"

@@ -85,6 +85,7 @@ const Page = () => {
     TagLine: "",
     ZooId: 0,
     LocationId: 0,
+    IsOccasional: false,
   });
   const [tickets, setTickets] = useState<
     { Title: string; Details: ticketDetails[] }[]
@@ -121,7 +122,7 @@ const Page = () => {
   useEffect(() => {
     if (slug) {
       if (slug != "new" && isNaN(Number(slug))) {
-        router.push("/home/event-management");
+        router.push("/home/trip-management");
       }
     }
   }, [slug]);
@@ -303,10 +304,8 @@ const Page = () => {
   };
 
   const AddOrUpdateTrip = async (details: any) => {
-    console.log(details);
     const payloads: { obj: trip; TripCoverImage?: File }[] = [];
     details.forEach((x: any, i: number) => {
-      console.log(x);
       payloads[i] = { obj: x };
       if (x.TripCoverImage instanceof File) {
         payloads[i].TripCoverImage = x.TripCoverImage;
@@ -316,7 +315,9 @@ const Page = () => {
     Promise.allSettled(
       payloads.map((payload) => {
         helper.xhr.Post(
-          `/Event/${slug == "new" ? "AddTrip" : "UpdateTrip"}`,
+          `/Event/${
+            slug == "new" || payload.obj.TripId == 0 ? "AddTrip" : "UpdateTrip"
+          }`,
           helper.ConvertToFormData(payload)
         );
       })
@@ -340,7 +341,6 @@ const Page = () => {
           helper.GetURLParamString({ id: Number(slug) }).toString()
         )
         .then((res) => {
-          console.log(res);
           setObj({
             EventId: res.data.EventId,
             EventTitle: res.data.EventTitle,
@@ -353,6 +353,7 @@ const Page = () => {
             TagLine: res.data.TagLine,
             ZooId: res.data.ZooId,
             LocationId: res.data.LocationId,
+            IsOccasional: res.data.IsOccasional,
           });
           setEventImages(
             res.data.files.map((x: any) => {
@@ -364,10 +365,8 @@ const Page = () => {
             })
           );
           setSelectedDays(res.data.EventDays.split(","));
-          // setMappedAnimals(res.data.animalIds)
-          setMappedAnimals(
-            res.data.animalIds.map((x: any) => x.AnimalId)
-          );   
+          setMappedAnimals(res.data.animalIds);
+          setMappedAnimals(res.data.animalIds.map((x: any) => x.AnimalId));
           setEventDetails(
             res.data.trips.map((x: any) => {
               return {
@@ -686,7 +685,7 @@ const Page = () => {
                 name="LocationId"
                 clearable
                 handleDropdownChange={(n, v) => {
-                  handleChange(n, v??0);
+                  handleChange(n, v ?? 0);
                 }}
                 label="Location"
                 options={locations}

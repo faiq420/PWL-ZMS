@@ -79,6 +79,11 @@ export function SideMenu() {
       icon: <Binoculars className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />,
     },
     {
+      title: "Event Management",
+      href: "/home/event-management",
+      icon: <Binoculars className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />,
+    },
+    {
       title: "Feed Scheduling",
       href: "/home/feed-scheduling",
       icon: <Clock className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />,
