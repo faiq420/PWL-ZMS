@@ -334,6 +334,8 @@ const Location = ({ mode = "create", id = "0", tab }: Props) => {
         )
         .then((res) => {
           console.log(res);
+          const imagePath = res.ImagePaths.find((x: any) => x.Type === "pin");
+          console.log(imagePath);
           setObj({
             BuildingTypeId: res.BuildingTypeId,
             Description: res.Description,
@@ -344,9 +346,7 @@ const Location = ({ mode = "create", id = "0", tab }: Props) => {
             Longitude: res.Longitude,
             OperationalStatusId: res.OperationalStatusId,
             ZooId: res.ZooId,
-            ImagePath:
-              res.ImagePaths.find((x: any) => x.Type === "pin")
-                .LocationFilepath || "",
+            ImagePath: imagePath != undefined ? imagePath.LocationFilepath : "",
           });
           if (res.ImagePaths) {
             setImageFiles(
