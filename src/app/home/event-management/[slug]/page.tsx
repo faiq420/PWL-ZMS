@@ -63,6 +63,7 @@ const Page = () => {
     ZooId: 0,
     LocationId: 0,
     TagLine: "",
+    EventLastDate: "",
   });
   const [zoos, setZoos] = useState<OPTION[]>([]);
   const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
@@ -212,6 +213,10 @@ const Page = () => {
             ZooId: res.data.ZooId,
             LocationId: res.data.LocationId,
             IsOccasional: res.data.IsOccasional,
+            EventLastDate:
+              res.data.EventDays.split(",")[
+                res.data.EventDays.split(",").length - 1
+              ],
           });
           setEventImages(
             res.data.files.map((x: any) => {
@@ -446,6 +451,7 @@ const Page = () => {
                 setObj({
                   ...obj,
                   EventDays: GetDateRange(v.startDate, v.endDate).join(","),
+                  EventLastDate: v.endDate,
                 });
               }}
               label="Date Range for the event"
