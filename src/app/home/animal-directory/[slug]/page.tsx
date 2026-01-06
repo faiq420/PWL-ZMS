@@ -22,6 +22,7 @@ import { Message } from "@/Helper/ToastMessages";
 import { OPTION } from "@/types/utils";
 import { zoos } from "@/data/users";
 import ButtonComp from "@/components/utils/Button";
+import { compressFile } from "@/Helper/Utility";
 
 type AnimalFiles = {
   AnimalFileId: number;
@@ -176,8 +177,8 @@ export default function AnimalDetailPage() {
       toastObj.description = "Life span is required.";
     } else if (animal.CoverImageFilepath == "" && !coverImage) {
       toastObj.description = "Cover image is required.";
-    } else if (animalImages.length < 8) {
-      toastObj.description = "At least 8 images are required.";
+      // } else if (animalImages.length < 8) {
+      //   toastObj.description = "At least 8 images are required.";
     }
     if (toastObj.description !== "") {
       toast(toastObj);
@@ -186,20 +187,30 @@ export default function AnimalDetailPage() {
     return true;
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (verify()) {
       setIsCruding(true);
       const createObj = {
         obj: animal,
-        images: animalImages.map((img) => img.file),
-        animalCoverImage: coverImage,
+        images: await Promise.all(
+          animalImages
+            .filter((x) => x.file != null)
+            .map(async (image) =>
+              image.file ? await compressFile(image.file) : null
+            )
+        ),
+        animalCoverImage: coverImage ? await compressFile(coverImage) : null,
         dto: zooEnclosureMapping,
       };
       const editObj = {
         id: animal.AnimalId,
         obj: animal,
-        images: animalImages.filter((img) => img.file).map((img) => img.file),
-        animalCoverImage: coverImage,
+        images: animalImages
+          .filter((img) => img.file)
+          .map(async (image) =>
+            image.file ? await compressFile(image.file) : null
+          ),
+        animalCoverImage: coverImage ? await compressFile(coverImage) : null,
         dto: zooEnclosureMapping,
         deletedFileIds: deletedImages,
       };

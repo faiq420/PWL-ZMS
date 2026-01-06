@@ -1,3 +1,5 @@
+import imageCompression from "browser-image-compression";
+
 export const formatCnic = (string: string) => {
   let N = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
   let len = string.length;
@@ -34,7 +36,46 @@ export const formatPhoneNumber = (string: string) => {
   }
 
   return result;
-}
+};
+
+export const compressFile = async (
+  file: File,
+  options?: {
+    maxSizeMB?: number;
+    maxWidthOrHeight?: number;
+    maxIteration?: number;
+    useWebWorker?: boolean;
+  }
+): Promise<File> => {
+  if (!file) throw new Error("No file provided for compression");
+
+  const defaultOptions = {
+    maxSizeMB: 1, // Target size in MB
+    maxWidthOrHeight: 1920, // Resize large images
+    maxIteration: 10, // Safety loop for quality adjustments
+    useWebWorker: true, // Prevent UI freeze
+  };
+
+  const finalOptions = { ...defaultOptions, ...options };
+
+  // Only compress image types
+  if (!file.type.startsWith("image/")) {
+    return file; // return original for non-image files
+  }
+
+  try {
+    const compressed = await imageCompression(file, finalOptions);
+
+    // Return compressed as File
+    return new File([compressed], file.name, {
+      type: compressed.type,
+      lastModified: Date.now(),
+    });
+  } catch (error: any) {
+    console.error("Compression failed → returning original file", error);
+    return file;
+  }
+};
 
 type ScreenKey =
   | ""
@@ -77,4 +118,4 @@ export const NavigateToRecord = (
 export const validEmail = (string: string) => {
   const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return regex.test(string) ? string : "";
-}
+};

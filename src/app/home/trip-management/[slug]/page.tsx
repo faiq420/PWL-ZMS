@@ -27,6 +27,7 @@ import Toggle from "@/components/utils/FormElements/Toggle";
 import Paragraph from "@/components/utils/Headings/Paragraph";
 import Subheading from "@/components/utils/Headings/Subheading";
 import useHelper from "@/Helper/helper";
+import { compressFile } from "@/Helper/Utility";
 import { OPTION } from "@/types/utils";
 import {
   ArrowLeft,
@@ -237,7 +238,7 @@ const Page = () => {
     return true;
   };
 
-  const HandleSubmit = () => {
+  const HandleSubmit = async () => {
     if (verify()) {
       setIsCruding(true);
       const createObject: any = {
@@ -245,26 +246,40 @@ const Page = () => {
           ...obj,
           LocationId: obj.LocationId == 0 ? null : obj.LocationId,
         },
-        EventImages: eventImages.map((image) => image.file),
+        EventImages: await Promise.all(
+          eventImages.map(async (x) =>
+            x.file ? await compressFile(x.file) : null
+          )
+        ),
         AnimalIds: mappedAnimals,
       };
       const editObject: any = {
         obj: { ...obj },
-        EventImages: eventImages
-          .filter((x) => x.file != null)
-          .map((image) => image.file),
+        EventImages: await Promise.all(
+          eventImages
+            .filter((x) => x.file != null)
+            .map(async (image) =>
+              image.file ? await compressFile(image.file) : null
+            )
+        ),
         AnimalIds: mappedAnimals,
         DeletedFileIds: deletedFiles,
       };
       if (coverImageFile) {
+        const compressedCover = coverImageFile
+          ? await compressFile(coverImageFile)
+          : null;
         slug == "new"
-          ? (createObject.EventCoverImage = coverImageFile)
-          : (editObject.EventCoverImage = coverImageFile);
+          ? (createObject.EventCoverImage = compressedCover)
+          : (editObject.EventCoverImage = compressedCover);
       }
       if (logoFile) {
+        const compressedLogo = logoFile
+          ? await compressFile(logoFile)
+          : null;
         slug == "new"
-          ? (createObject.EventLogoImage = logoFile)
-          : (editObject.EventLogoImage = logoFile);
+          ? (createObject.EventLogoImage = compressedLogo)
+          : (editObject.EventLogoImage = compressedLogo);
       }
       helper.xhr
         .Post(
