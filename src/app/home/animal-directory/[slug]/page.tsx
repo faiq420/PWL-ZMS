@@ -83,6 +83,7 @@ export default function AnimalDetailPage() {
     }[]
   >([]);
   const [isCruding, setIsCruding] = useState(false);
+  const [isCompressing, setIsCompressing] = useState(false);
   const [coverImage, setCoverImage] = useState<File | null>(null);
   const [animalImages, setAnimalImages] = useState<AnimalFiles[]>([]);
   const [deletedImages, setDeletedImages] = useState<number[]>([]);
@@ -140,7 +141,6 @@ export default function AnimalDetailPage() {
 
   useEffect(() => {
     helper.xhr.Get("/List/GetZooList").then((res) => {
-      console.log(res);
       setZooList(
         res.map((z: any) => {
           return {
@@ -160,7 +160,6 @@ export default function AnimalDetailPage() {
 
   const verify = () => {
     const toastObj = { title: "Validation Error", description: "" };
-    console.log(animal);
     if (animal.AnimalName == "") {
       toastObj.description = "Animal Name is required.";
     } else if (animal.AnimalScientificName == "") {
@@ -190,6 +189,7 @@ export default function AnimalDetailPage() {
   const handleSave = async () => {
     if (verify()) {
       setIsCruding(true);
+      setIsCompressing(true);
       const createObj = {
         obj: animal,
         images: await Promise.all(
@@ -202,24 +202,29 @@ export default function AnimalDetailPage() {
         animalCoverImage: coverImage ? await compressFile(coverImage) : null,
         dto: zooEnclosureMapping,
       };
+      console.log(animalImages.filter((img) => img.file != null));
       const editObj = {
         id: animal.AnimalId,
         obj: animal,
-        images: animalImages
-          .filter((img) => img.file)
-          .map(async (image) =>
-            image.file ? await compressFile(image.file) : null
-          ),
+        images: await Promise.all(
+          animalImages
+            .filter((x) => x.file != null)
+            .map(async (image) =>
+              image.file ? await compressFile(image.file) : null
+            )
+        ),
         animalCoverImage: coverImage ? await compressFile(coverImage) : null,
         dto: zooEnclosureMapping,
         deletedFileIds: deletedImages,
       };
+      setIsCompressing(false);
+      console.log(editObj);
       helper.xhr
         .Post(
           `/Animal/${isNewAnimal ? "CreateAnimal" : "UpdateAnimal"}`,
           helper.ConvertToFormData(isNewAnimal ? createObj : editObj)
         )
-        .then((res) => {
+        .then(async (res) => {
           toast({
             title: isNewAnimal ? "Animal created" : "Animal updated",
             description: `${animal.AnimalName} has been ${
@@ -240,7 +245,9 @@ export default function AnimalDetailPage() {
             variant: "destructive",
           });
         })
-        .finally(() => setIsCruding(false));
+        .finally(() => {
+          setIsCruding(false);
+        });
     }
   };
 
@@ -332,6 +339,7 @@ export default function AnimalDetailPage() {
                 clickEvent={handleSave}
                 text="Save"
                 isCruding={isCruding}
+                isCrudingText={isCompressing ? "Compressing files..." : ""}
               />
             </>
           )}
@@ -480,7 +488,7 @@ export default function AnimalDetailPage() {
               <Separator />
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {animalImages.map((image: AnimalFiles, index: number) => (
-                  <div key={image.AnimalFileId} className="relative group">
+                  <div key={index} className="relative group">
                     <div className="aspect-square relative overflow-hidden rounded-md border">
                       <Image
                         src={

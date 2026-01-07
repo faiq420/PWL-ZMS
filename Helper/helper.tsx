@@ -105,9 +105,45 @@ const useHelper = () => {
     return formData;
   };
 
+  const appendValue = (formData: FormData, key: string, value: any) => {
+    if (value === null || value === undefined) return;
+
+    const type = typeof value;
+
+    if (type === "string" || type === "number" || type === "boolean") {
+      formData.append(key, value.toString());
+    } else if (value instanceof File) {
+      formData.append(key, value);
+    } else if (Array.isArray(value)) {
+      value.forEach((item, index) => {
+        appendValue(formData, `${key}[${index}]`, item);
+      });
+    } else if (type === "object") {
+      Object.keys(value).forEach((childKey) => {
+        appendValue(formData, `${key}[${childKey}]`, value[childKey]);
+      });
+    }
+  };
+
+  const ConvertToFormDataV2 = (object: { [key: string]: any }): FormData => {
+    const formData = new FormData();
+
+    Object.keys(object)
+      .filter((k) => object[k] !== null)
+      .forEach((key) => {
+        appendValue(formData, key, object[key]);
+      });
+
+    return formData;
+  };
+
   const xhr = {
     Post: async (endpoint: string, formData: FormData): Promise<any> => {
       // console.clear();
+      for (const [key, value] of formData.entries()) {
+        console.log(key, value);
+      }
+
       const response = await fetch(API + endpoint, {
         method: "POST",
         body: formData,
@@ -173,6 +209,7 @@ const useHelper = () => {
     storeData,
     getData,
     ConvertToFormData,
+    ConvertToFormDataV2,
     GetURLParamString,
     xhr,
     GetToken,
