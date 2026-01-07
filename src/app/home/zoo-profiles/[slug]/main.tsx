@@ -52,6 +52,7 @@ import DetailsTab from "./Tabs/Details";
 import Animals from "./Tabs/Animals";
 import Locations from "./Tabs/Locations";
 import useHelper from "@/Helper/helper";
+import Tickets from "./Tabs/Tickets";
 
 export default function ZooProfilePage() {
   const router = useRouter();
@@ -70,74 +71,7 @@ export default function ZooProfilePage() {
   });
   const [locations, setLocations] = useState<
     { LocationId: number; LocationName: string; Type: string; Status: string }[]
-  >([
-    // {
-    //   LocationId: 1,
-    //   LocationName: "Monkey Sanctuary",
-    //   Type: "Sanctuary",
-    //   Status: "Open",
-    // },
-    // {
-    //   LocationId: 2,
-    //   LocationName: "Tiger In The House",
-    //   Type: "Sanctuary",
-    //   Status: "Open",
-    // },
-    // {
-    //   LocationId: 3,
-    //   LocationName: "Birds",
-    //   Type: "Sanctuary",
-    //   Status: "Open",
-    // },
-    // {
-    //   LocationId: 4,
-    //   LocationName: "Camel Ride",
-    //   Type: "Sanctuary",
-    //   Status: "Open",
-    // },
-    // {
-    //   LocationId: 5,
-    //   LocationName: "Reptile House",
-    //   Type: "Sanctuary",
-    //   Status: "Open",
-    // },
-    // {
-    //   LocationId: 6,
-    //   LocationName: "Peacock House",
-    //   Type: "Sanctuary",
-    //   Status: "Closed",
-    // },
-    // {
-    //   LocationId: 7,
-    //   LocationName: "Fish Aquarium World",
-    //   Type: "Sanctuary",
-    //   Status: "Under-construstion",
-    // },
-    // {
-    //   LocationId: 8,
-    //   LocationName: "Rhinoceros House",
-    //   Type: "Sanctuary",
-    //   Status: "Open",
-    // },
-    // {
-    //   LocationId: 9,
-    //   LocationName: "Jungle Cafeteria",
-    //   Type: "Dining",
-    //   Status: "Renovating",
-    // },
-    // {
-    //   LocationId: 10,
-    //   LocationName: "Masjid Of Zoo",
-    //   Type: "Prayer Area",
-    //   Status: "Open",
-    // },
-    // {
-    //   LocationId: 11,
-    //   LocationName: "Clinic",
-    //   Type: "Facility",
-    //   Status: "Open",
-    // },
-  ]);
+  >([]);
   const [animals, setAnimals] = useState<
     {
       AnimalId: number;
@@ -145,38 +79,10 @@ export default function ZooProfilePage() {
       CategoryName: string;
       Count: number;
     }[]
-  >([
-    {
-      AnimalName: "Bengal Tiger",
-      Count: 2,
-      CategoryName: "Mammals",
-      AnimalId: 1,
-    },
-    { AnimalName: "Lion", Count: 3, CategoryName: "Mammals", AnimalId: 2 },
-    { AnimalName: "Leopard", Count: 1, CategoryName: "Mammals", AnimalId: 3 },
-    { AnimalName: "Hog Deer", Count: 14, CategoryName: "Mammals", AnimalId: 4 },
-    {
-      AnimalName: "Black Buck",
-      Count: 8,
-      CategoryName: "Mammals",
-      AnimalId: 5,
-    },
-    {
-      AnimalName: "Rhesus Monkey",
-      Count: 12,
-      CategoryName: "Mammals",
-      AnimalId: 6,
-    },
-    { AnimalName: "Peacock", Count: 10, CategoryName: "Birds", AnimalId: 7 },
-    { AnimalName: "Pheasant", Count: 8, CategoryName: "Birds", AnimalId: 8 },
-    { AnimalName: "Python", Count: 2, CategoryName: "Reptiles", AnimalId: 9 },
-    {
-      AnimalName: "Marsh Crocodile",
-      Count: 4,
-      CategoryName: "Reptiles",
-      AnimalId: 10,
-    },
-  ]);
+  >([]);
+  const [tickets, setTickets] = useState<
+    { TicketId: number; TicketName: string }[]
+  >([]);
 
   useEffect(() => {
     if (!isNaN(Number(slug))) {
@@ -237,7 +143,7 @@ export default function ZooProfilePage() {
         <Subheading text={zooDetails.ZooTitle} />
       </div>
       <Tabs defaultValue="history" className="space-y-2">
-        <TabsList className="grid grid-cols-2 md:grid-cols-3 w-full">
+        <TabsList className="grid grid-cols-2 md:grid-cols-4 w-full">
           <TabsTrigger value="history">
             <History className="h-4 w-4 mr-2" /> Basic Details
           </TabsTrigger>{" "}
@@ -246,6 +152,9 @@ export default function ZooProfilePage() {
           </TabsTrigger>
           <TabsTrigger value="animals">
             <Paw className="h-4 w-4 mr-2" /> Animals
+          </TabsTrigger>
+          <TabsTrigger value="tickets">
+            <Ticket className="h-4 w-4 mr-2" /> Tickets
           </TabsTrigger>
         </TabsList>
 
@@ -269,6 +178,13 @@ export default function ZooProfilePage() {
             id={zooDetails.ZooId}
             name={zooDetails.ZooTitle}
             locations={locations}
+          />
+        </TabsContent>
+        <TabsContent value="tickets" className="space-y-2">
+          <Tickets
+            id={zooDetails.ZooId}
+            name={zooDetails.ZooTitle}
+            tickets={tickets}
           />
         </TabsContent>
       </Tabs>

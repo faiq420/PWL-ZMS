@@ -4,13 +4,14 @@ import React, { useEffect } from "react";
 import ZooProfilePage from "./main";
 import Location from "./Cruds/Location";
 import ZooCrud from "./Cruds/Zoo";
+import Tickets from "./Cruds/Tickets";
 
 const Page = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const params = useParams();
   const slug = params.slug;
-  const tabs = ["locations", "edit"];
+  const tabs = ["locations", "edit", "tickets"];
   const crudModes = ["create", "edit", "view"];
   const activeTab = searchParams.get("tab");
   const zooId = params.slug as string;
@@ -35,6 +36,12 @@ const Page = () => {
     />
   ) : activeTab === "edit" ? (
     <ZooCrud ZooId={zooId ? parseInt(zooId) : undefined} />
+  ) : activeTab === "tickets" ? (
+    <Tickets
+      mode={crudModes.includes(mode ?? "") ? mode : "create"}
+      tab={activeTab}
+      id={id}
+    />
   ) : (
     <p>Invalid tab.</p>
   );
