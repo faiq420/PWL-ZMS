@@ -473,7 +473,7 @@ export default function AnimalDetailPage() {
             <div className="space-y-4">
               <FileUploader
                 onUpload={(files) => handleFileUpload(files, "images")}
-                accept=".jpg, .jpeg"
+                accept=".jpg, .jpeg, .png"
                 multiple={true}
                 label="Upload Images"
               />
