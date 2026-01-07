@@ -58,6 +58,7 @@ const ZooCrud = ({ ZooId }: Props) => {
   const [iconImageSrc, setIconImageSrc] = useState<File | null>(null);
   const [bannerImageSrc, setBannerImageSrc] = useState<File | null>(null);
   const [zooImages, setZooImages] = useState<ZooFiles[]>([]);
+  const [deletedFileIds, setDeletedFileIds] = useState<number[]>([]);
   const [coordinatePolygon, setCoordinatePolygon] = useState<LatLng[]>([]);
   const [showMapBoundaryPickerModal, setShowMapBoundaryPickerModal] =
     useState(false);
@@ -103,12 +104,8 @@ const ZooCrud = ({ ZooId }: Props) => {
   };
 
   const DeleteZooImage = (id: number, index: number) => {
-    helper.xhr
-      .Post("/Zoo/DeleteZooImage", helper.ConvertToFormData({ id }))
-      .then((res) => {
-        // Message("success", "File removed.");
-        setZooImages(zooImages.filter((_, i) => i !== index));
-      });
+    setDeletedFileIds([...deletedFileIds, id]);
+    removeZooImage(index);
   };
 
   function AddNewZooFile(zooId: number, file: File, index?: number) {
@@ -152,7 +149,7 @@ const ZooCrud = ({ ZooId }: Props) => {
 
   const handleSubmit = () => {
     if (verify()) {
-      const formData = helper.ConvertToFormData({
+      const object: any = {
         obj,
         boundaries: coordinatePolygon,
         zooCoverImage: bannerImageSrc,
@@ -160,20 +157,15 @@ const ZooCrud = ({ ZooId }: Props) => {
           return x.file;
         }),
         ZooLogo: iconImageSrc,
-      });
+      };
+      if (obj.ZooId != 0) {
+        object["deletedFileIds"] = deletedFileIds;
+      }
       setIsCruding(true);
       helper.xhr
         .Post(
-          `/Zoo/CreateZoo`,
-          helper.ConvertToFormData({
-            obj,
-            boundaries: coordinatePolygon,
-            zooCoverImage: bannerImageSrc,
-            zooImages: zooImages.map((x) => {
-              return x.file;
-            }),
-            ZooLogo: iconImageSrc,
-          })
+          obj.ZooId != 0 ? `/Zoo/UpdateZoo` : `/Zoo/CreateZoo`,
+          helper.ConvertToFormData(object)
         )
         .then((response) => {
           toast({
@@ -312,8 +304,7 @@ const ZooCrud = ({ ZooId }: Props) => {
               </div>
             </div>
           </div>
-          <Separator />
-          <div className="space-y-3">
+          <div className="space-y-3 hidden">
             <div className="flex justify-between items-center">
               <Paragraph text="Zoo Boundary" />
               <div className="w-fit">
@@ -349,13 +340,20 @@ const ZooCrud = ({ ZooId }: Props) => {
               )}
             </div>
           </div>
-          <Separator />
+        </CardContent>
+        <CardFooter></CardFooter>
+      </Card>
+      <Card>
+        <CardHeader>
+          <Paragraph text="Media Files" />
+        </CardHeader>
+        <CardContent className="mt-3">
           <div className="space-y-3">
-            <Paragraph text="Media Files" />
+            {/* <Paragraph text="Media Files" /> */}
             <div className="md:-mt-2 space-y-2 ">
               <div className="md:flex gap-2">
                 <div className="w-full md:w-1/3">
-                  <Label>Map Pin Image</Label>
+                  <Label>Logo Image</Label>
                   {iconImageSrc != null || obj?.ZooLogoFilepath != "" ? (
                     <div className="relative aspect-video rounded-md border border-main-gray/30 overflow-hidden w-full">
                       <Image
@@ -366,12 +364,12 @@ const ZooCrud = ({ ZooId }: Props) => {
                             ? URL.createObjectURL(iconImageSrc)
                             : "/placeholder.svg"
                         }
-                        alt="Category image"
+                        alt="Zoo Logo"
                         fill
                         className="object-contain"
                         unoptimized
                       />
-                      {iconImageSrc != null && obj.ZooId != 0 && (
+                      {/* {iconImageSrc != null && obj.ZooId != 0 && (
                         <Button
                           variant="default"
                           size="icon"
@@ -383,7 +381,7 @@ const ZooCrud = ({ ZooId }: Props) => {
                           <SaveIcon className="h-3 w-3" />
                           <span className="sr-only">Update image</span>
                         </Button>
-                      )}
+                      )} */}
                       <Button
                         variant="destructive"
                         size="icon"
@@ -434,12 +432,12 @@ const ZooCrud = ({ ZooId }: Props) => {
                             ? URL.createObjectURL(bannerImageSrc)
                             : "/placeholder.svg"
                         }
-                        alt="Category image"
+                        alt="Zoo Banner"
                         fill
                         className="object-cover"
                         unoptimized
                       />
-                      {bannerImageSrc != null && obj.ZooId != 0 && (
+                      {/* {bannerImageSrc != null && obj.ZooId != 0 && (
                         <Button
                           variant="default"
                           size="icon"
@@ -451,7 +449,7 @@ const ZooCrud = ({ ZooId }: Props) => {
                           <SaveIcon className="h-3 w-3" />
                           <span className="sr-only">Update image</span>
                         </Button>
-                      )}
+                      )} */}
                       <Button
                         variant="destructive"
                         size="icon"
@@ -497,7 +495,7 @@ const ZooCrud = ({ ZooId }: Props) => {
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
                   {zooImages.map((image, index) => (
                     <div key={index} className="space-y-2">
-                      <div className="relative aspect-square rounded-md border border-main-gray/30 overflow-hidden">
+                      <div className="relative aspect-video rounded-md border border-main-gray/30 overflow-hidden">
                         {image.file && image.file.type.startsWith("video/") ? (
                           <video
                             src={
@@ -522,7 +520,7 @@ const ZooCrud = ({ ZooId }: Props) => {
                             className="object-cover"
                           />
                         )}
-                        {image.Fileid == 0 &&
+                        {/* {image.Fileid == 0 &&
                           obj.ZooId != 0 &&
                           zooImages.length > 0 && (
                             <Button
@@ -537,7 +535,7 @@ const ZooCrud = ({ ZooId }: Props) => {
                               <Save className="h-3 w-3" />
                               <span className="sr-only">Remove image</span>
                             </Button>
-                          )}
+                          )} */}
                         {image.Fileid != 0 ? (
                           <Button
                             variant="destructive"
@@ -583,25 +581,23 @@ const ZooCrud = ({ ZooId }: Props) => {
             </div>
           </div>
         </CardContent>
-        <CardFooter>
-          <div className="w-full flex justify-end">
-            <div className="w-full md:w-fit flex space-x-2">
-              <ButtonComp
-                text={"Cancel"}
-                type={"white"}
-                clickEvent={() => router.back()}
-                beforeIcon={<X className="h-4 w-4" />}
-              />
-              <ButtonComp
-                text={"Create"}
-                clickEvent={handleSubmit}
-                beforeIcon={<Save className="h-4 w-4" />}
-                isCruding={isCruding}
-              />
-            </div>
-          </div>
-        </CardFooter>
       </Card>
+      <div className="w-full flex justify-end">
+        <div className="w-full md:w-fit flex space-x-2">
+          <ButtonComp
+            text={"Cancel"}
+            type={"white"}
+            clickEvent={() => router.back()}
+            beforeIcon={<X className="h-4 w-4" />}
+          />
+          <ButtonComp
+            text={`${obj.ZooId != 0 ? "Update" : "Create"}`}
+            clickEvent={handleSubmit}
+            beforeIcon={<Save className="h-4 w-4" />}
+            isCruding={isCruding}
+          />
+        </div>
+      </div>
     </div>
   );
 };
