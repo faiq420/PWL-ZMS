@@ -28,6 +28,7 @@ import Image from "next/image";
 import useHelper from "@/Helper/helper";
 import { servicesStatus } from "@/data";
 import { useToast } from "@/components/ui/use-toast";
+import { compressFile } from "@/Helper/Utility";
 
 interface Props {
   mode?: string;
@@ -183,7 +184,7 @@ const Location = ({ mode = "create", id = "0", tab }: Props) => {
     return true;
   };
 
-  function HandleSubmit() {
+  const HandleSubmit = async () => {
     if (verify()) {
       setIsCruding(true);
       const createObj = {
@@ -193,18 +194,25 @@ const Location = ({ mode = "create", id = "0", tab }: Props) => {
         obj,
         DeletedFileIds,
       };
-      const newFiles = imageFiles.filter((f) => f.file);
-      const filesToUpload: { file: File; type: string }[] = [];
+      const newFiles = imageFiles.filter((f) => f.file != null);
+      const filesToUpload: { file: File | null; type: string }[] = [];
       if (mapPinFile) {
-        filesToUpload.push({ file: mapPinFile, type: "pin" });
-      }
-      if (newFiles.length > 0) {
-        newFiles.forEach((f) => {
-          if (f.file) {
-            filesToUpload.push({ file: f.file, type: "normal" });
-          }
+        filesToUpload.push({
+          file: await compressFile(mapPinFile),
+          type: "pin",
         });
       }
+      if (newFiles.length > 0) {
+        const compressed = await Promise.all(
+          newFiles.map(async (f) => ({
+            file: f.file ? await compressFile(f.file) : null,
+            type: "normal",
+          }))
+        );
+
+        filesToUpload.push(...compressed);
+      }
+      console.log(filesToUpload);
       helper.xhr
         .Post(
           `/Location/${
@@ -213,7 +221,9 @@ const Location = ({ mode = "create", id = "0", tab }: Props) => {
           helper.ConvertToFormData(obj.LocationId == 0 ? createObj : editObj)
         )
         .then(async (response) => {
+          console.log(response);
           if (typeof response == "number") {
+            console.log(filesToUpload);
             if (filesToUpload.length > 0) {
               const filesUpload = await UploadLocationImages(
                 filesToUpload,
@@ -243,13 +253,13 @@ const Location = ({ mode = "create", id = "0", tab }: Props) => {
           setIsCruding(false);
         });
     }
-  }
+  };
 
   const UploadLocationImages = async (
-    files: { file: File; type: string }[],
+    files: { file: File | null; type: string }[],
     locationId: number
   ) => {
-    const payloads: { locationId: number; file: File; type: string }[] = [];
+    const payloads: { locationId: number; file: File | null; type: string }[] = [];
     files.forEach((x: any, i: number) => {
       payloads[i] = { locationId: locationId, file: x.file, type: x.type };
     });
@@ -335,7 +345,6 @@ const Location = ({ mode = "create", id = "0", tab }: Props) => {
         .then((res) => {
           console.log(res);
           const imagePath = res.ImagePaths.find((x: any) => x.Type === "pin");
-          console.log(imagePath);
           setObj({
             BuildingTypeId: res.BuildingTypeId,
             Description: res.Description,
