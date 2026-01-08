@@ -80,9 +80,9 @@ export default function ZooProfilePage() {
       Count: number;
     }[]
   >([]);
-  const [tickets, setTickets] = useState<
-    { TicketId: number; TicketName: string }[]
-  >([]);
+  const [tickets, setTickets] = useState<{ TicketId: number; Title: string }[]>(
+    []
+  );
 
   useEffect(() => {
     if (!isNaN(Number(slug))) {
@@ -101,6 +101,12 @@ export default function ZooProfilePage() {
           });
           setLocations(res.locations);
           setAnimals(res.animal_details);
+          setTickets(
+            res.tickets.map((ticket: any) => ({
+              TicketId: ticket.TicketId,
+              Title: ticket.Title,
+            }))
+          );
         });
     }
   }, []);

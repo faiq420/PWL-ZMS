@@ -38,6 +38,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { DeleteConfirmation } from "@/components/modals/delete-confirmation";
 
 interface Props {
   mode?: string;
@@ -46,13 +47,10 @@ interface Props {
 }
 
 type ticketDetail = {
-  TicketId: number;
-  TicketDetailId: number;
   Category: string;
-  Subcategory: string;
-  Type: string;
-  Description: string;
-  Fee: number;
+  SubCategory: string;
+  AdditionalInformation: string;
+  Amount: number;
 };
 
 const Tickets = ({ mode = "create", id = "0", tab }: Props) => {
@@ -64,18 +62,15 @@ const Tickets = ({ mode = "create", id = "0", tab }: Props) => {
   const [isCruding, setIsCruding] = useState(false);
   const [obj, setObj] = useState({
     TicketId: 0,
-    TicketName: "",
-    IsActive: true,
+    Title: "",
+    ZooId: Number(slug),
   });
   const [ticketDetails, setTicketDetails] = useState<ticketDetail[]>([]);
   const ticketDetailObj = {
-    TicketId: 0,
-    TicketDetailId: 0,
     Category: "",
-    Subcategory: "",
-    Type: "",
-    Description: "",
-    Fee: 0,
+    SubCategory: "",
+    AdditionalInformation: "",
+    Amount: 0,
   };
   const capitalize = (value: string, space = " ") => {
     const words = String(value).split(space);
@@ -87,7 +82,7 @@ const Tickets = ({ mode = "create", id = "0", tab }: Props) => {
 
   function GetHeading() {
     return `${capitalize(mode)} - ${capitalize(String(tab), "-")} ${
-      id != "0" ? `for ${obj.TicketName}` : ""
+      id != "0" ? `for ${obj.Title}` : ""
     }`;
   }
 
@@ -97,10 +92,10 @@ const Tickets = ({ mode = "create", id = "0", tab }: Props) => {
 
   const verify = () => {
     const toastObj = { title: "Validation Error", description: "" };
-    if (obj.TicketName == "") {
+    if (obj.Title == "") {
       toastObj.description = "Ticket Name is required.";
-      // } else if (obj.BuildingTypeId == 0) {
-      //   toastObj.description = "Building Type is required.";
+    } else if (ticketDetails.length == 0) {
+      toastObj.description = "Ticket Details are required.";
     }
     if (toastObj.description !== "") {
       toast(toastObj);
@@ -112,20 +107,18 @@ const Tickets = ({ mode = "create", id = "0", tab }: Props) => {
   function HandleSubmit() {
     if (verify()) {
       setIsCruding(true);
-      const createObj = {
+      const ticketDto = {
         ...obj,
-      };
-      const editObj = {
-        ...obj,
+        Details: ticketDetails,
       };
       helper.xhr
         .Post(
-          `/Location/${obj.TicketId !== 0 ? "UpdateLocation" : "AddLocation"}`,
-          helper.ConvertToFormData(obj.TicketId == 0 ? createObj : editObj)
+          `/Ticket/${obj.TicketId !== 0 ? "UpdateTicket" : "AddTicket"}`,
+          helper.ConvertToFormData(ticketDto)
         )
         .then(async (response) => {
           toast({
-            title: `Location ${
+            title: `Ticket ${
               obj.TicketId !== 0 ? "updated" : "created"
             } successfully`,
             variant: "success",
@@ -137,7 +130,7 @@ const Tickets = ({ mode = "create", id = "0", tab }: Props) => {
         })
         .catch((error) => {
           toast({
-            title: `Location not ${obj.TicketId !== 0 ? "updated" : "created"}`,
+            title: `Ticket not ${obj.TicketId !== 0 ? "updated" : "created"}`,
             description: error.message,
             variant: "danger",
           });
@@ -150,11 +143,17 @@ const Tickets = ({ mode = "create", id = "0", tab }: Props) => {
     if (id != "0") {
       helper.xhr
         .Get(
-          "/Location/GetLocationById",
+          "/Ticket/GetTicketById",
           helper.GetURLParamString({ ticketId: Number(id) }).toString()
         )
         .then((res) => {
           console.log(res);
+          setObj({
+            TicketId: res.TicketId,
+            Title: res.Title,
+            ZooId: res.ZooId,
+          });
+          setTicketDetails(res.Details);
         })
         .catch((e) => {
           console.error(e);
@@ -173,7 +172,6 @@ const Tickets = ({ mode = "create", id = "0", tab }: Props) => {
 
   return (
     <>
-      {" "}
       <div className="flex-1 space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
@@ -192,8 +190,8 @@ const Tickets = ({ mode = "create", id = "0", tab }: Props) => {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-2 gap-y-3">
               <InputTag
-                value={obj.TicketName}
-                name="TicketName"
+                value={obj.Title}
+                name="Title"
                 placeHolder="Parking"
                 setter={(n, v) => {
                   setObj({ ...obj, [n]: v });
@@ -222,7 +220,6 @@ const Tickets = ({ mode = "create", id = "0", tab }: Props) => {
               <Table className="border text-xs mt-2">
                 <TableHeader>
                   <TableHead>Category</TableHead>
-                  <TableHead>Subcategory</TableHead>
                   <TableHead>Visitor / Vehicle Type</TableHead>
                   <TableHead>Age / Description</TableHead>
                   <TableHead>Fee (PKR)</TableHead>
@@ -236,16 +233,6 @@ const Tickets = ({ mode = "create", id = "0", tab }: Props) => {
                           <InputTag
                             value={detail.Category}
                             name="Category"
-                            placeHolder="Safari"
-                            setter={(n, v) => {
-                              handleDetailsChange(detailIndex, n, v);
-                            }}
-                          />
-                        </TableCell>
-                        <TableCell className="px-2 py-1">
-                          <InputTag
-                            value={detail.Subcategory}
-                            name="Subcategory"
                             placeHolder="Day/Night Safari"
                             setter={(n, v) => {
                               handleDetailsChange(detailIndex, n, v);
@@ -254,9 +241,9 @@ const Tickets = ({ mode = "create", id = "0", tab }: Props) => {
                         </TableCell>
                         <TableCell className="px-2 py-1">
                           <InputTag
-                            value={detail.Type}
-                            name="Type"
-                            placeHolder="Child/Adult"
+                            value={detail.SubCategory}
+                            name="SubCategory"
+                            placeHolder="Car / Jeep / Child / Adult"
                             setter={(n, v) => {
                               handleDetailsChange(detailIndex, n, v);
                             }}
@@ -264,8 +251,8 @@ const Tickets = ({ mode = "create", id = "0", tab }: Props) => {
                         </TableCell>
                         <TableCell className="px-2 py-1">
                           <InputTag
-                            value={detail.Description}
-                            name="Description"
+                            value={detail.AdditionalInformation}
+                            name="AdditionalInformation"
                             placeHolder="Age 3-12 years"
                             setter={(n, v) => {
                               handleDetailsChange(detailIndex, n, v);
@@ -274,8 +261,8 @@ const Tickets = ({ mode = "create", id = "0", tab }: Props) => {
                         </TableCell>
                         <TableCell className="px-2 py-1">
                           <InputTag
-                            value={detail.Fee}
-                            name="Fee"
+                            value={detail.Amount}
+                            name="Amount"
                             type="number"
                             placeHolder="150"
                             setter={(n, v) => {
@@ -285,7 +272,7 @@ const Tickets = ({ mode = "create", id = "0", tab }: Props) => {
                         </TableCell>
                         <TableCell
                           className="px-2 py-1 !text-center"
-                        //   style={{ textAlign: "-webkit-center" }}
+                          //   style={{ textAlign: "-webkit-center" }}
                         >
                           <Trash2Icon
                             className="text-red-500 text-sm cursor-pointer"

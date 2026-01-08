@@ -22,14 +22,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useToast } from "@/components/ui/use-toast";
 import ButtonComp from "@/components/utils/Button";
 import BodyText from "@/components/utils/Headings/BodyText";
 import CardIntro from "@/components/utils/Headings/CardIntro";
 import Paragraph from "@/components/utils/Headings/Paragraph";
+import useHelper from "@/Helper/helper";
 import { Edit, EditIcon, Eye, Pen, Plus, Trash2 } from "lucide-react";
 import dynamic from "next/dynamic";
-import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
 const BoundarySelectorModal = dynamic(
   () => import("../../_components/BoundarySelectorModal"),
   { ssr: false }
@@ -43,11 +45,15 @@ interface Props {
 
 type Records = {
   TicketId: number;
-  TicketName: string;
+  Title: string;
 };
 
 const Tickets = ({ id, name, tickets }: Props) => {
   const router = useRouter();
+  const helper = useHelper();
+  const { toast } = useToast();
+  const params = useParams();
+  const slug = params.slug as string;
   const [tableData, setTableData] = useState<Records[]>(tickets);
   const [deleteConfirmation, setDeleteConfirmation] = useState({
     isOpen: false,
@@ -58,16 +64,29 @@ const Tickets = ({ id, name, tickets }: Props) => {
   });
 
   const handleDeleteRecord = (index: number) => {
-    setTableData((prev: any[]) =>
-      prev.filter((_: any, i: number) => i !== index)
-    );
-    setDeleteConfirmation({
-      isOpen: false,
-      type: "",
-      index: -1,
-      title: "",
-      description: "",
-    });
+    helper.xhr
+      .Post(
+        "/Ticket/DeleteTicket",
+        helper.ConvertToFormData({ ticketId: deleteConfirmation.index })
+      )
+      .then((res) => {
+        if (res) {
+          toast({
+            title: `Ticket deleted successfully`,
+            variant: "success",
+          });
+          setTableData((prev: any) =>
+            prev.filter((_: Records, i: number) => _.TicketId !== index)
+          );
+          setDeleteConfirmation({
+            isOpen: false,
+            type: "",
+            index: -1,
+            title: "",
+            description: "",
+          });
+        }
+      });
   };
 
   /////////////////////////////////////
@@ -81,19 +100,6 @@ const Tickets = ({ id, name, tickets }: Props) => {
   const paginationLabels = Array.from({ length: totalPages }, (_, i) => i + 1);
 
   /////////////////////////////////////
-
-  const handleDeleteLocation = (index: number) => {
-    setTableData((prev: any) =>
-      prev.filter((_: any, i: number) => i !== index)
-    );
-    setDeleteConfirmation({
-      isOpen: false,
-      type: "",
-      index: -1,
-      title: "",
-      description: "",
-    });
-  };
 
   function NavigateToRecord(tab: string, mode: string, locId?: number) {
     router.push(
@@ -158,7 +164,7 @@ const Tickets = ({ id, name, tickets }: Props) => {
                   <TableBody>
                     {currentPosts.map((loc: Records, index: number) => (
                       <TableRow key={index}>
-                        <TableCell>{loc.TicketName}</TableCell>
+                        <TableCell>{loc.Title}</TableCell>
                         <TableCell className="flex justify-center items-center space-x-2">
                           <EditIcon
                             className="text-black h-4 w-4 cursor-pointer"
@@ -167,18 +173,18 @@ const Tickets = ({ id, name, tickets }: Props) => {
                             }}
                           />
 
-                          {/* <Trash2
+                          <Trash2
                             className="text-red-500 h-4 w-4 cursor-pointer"
                             onClick={() => {
                               setDeleteConfirmation({
                                 isOpen: true,
-                                type: "location",
-                                index,
-                                title: "Delete Location",
-                                description: `Are you sure you want to delete ${loc.LocationName} from the location directory? This action cannot be undone.`,
+                                type: "ticket",
+                                index: loc.TicketId,
+                                title: "Delete Ticket",
+                                description: `Are you sure you want to delete ${loc.Title} from the location directory? This action cannot be undone.`,
                               });
                             }}
-                          /> */}
+                          />
                         </TableCell>
                       </TableRow>
                     ))}
