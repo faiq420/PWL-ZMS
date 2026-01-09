@@ -22,9 +22,9 @@ import {
   Clock,
   ArrowRight,
   ArrowLeft,
-  Binoculars
+  Binoculars,
 } from "lucide-react";
-import { RefObject, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
@@ -34,7 +34,9 @@ import {
 } from "@radix-ui/react-dropdown-menu";
 import typographyIcon from "@/public/assets/logos/Punjab_wildlife_logo.svg";
 import collapsedIcon from "@/public//assets/logos/sidemenu_icon.png";
-import { removeTokenCookie } from "@/lib/cookieToken";
+import { getCookieKey, removeTokenCookie } from "@/lib/cookieToken";
+import useHelper from "@/Helper/helper";
+import { iconOptions } from "@/data/zoos";
 
 type TooltipState = {
   index: number | null;
@@ -43,8 +45,9 @@ type TooltipState = {
 
 export function SideMenu() {
   const router = useRouter();
+  const helper = useHelper();
+
   const pathname = usePathname();
-  const iconRef = useRef<HTMLDivElement | null>(null);
   const [tooltip, setTooltip] = useState<TooltipState>({
     index: null,
     position: null,
@@ -52,100 +55,13 @@ export function SideMenu() {
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const sidebarItems = [
-    {
-      title: "Dashboard",
-      href: "/home",
-      icon: <Home className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />,
-    },
-    {
-      title: "Zoo Profiles",
-      href: "/home/zoo-profiles",
-      icon: <Building className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />,
-    },
-    {
-      title: "Animal Directory",
-      href: "/home/animal-directory",
-      icon: <Paw className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />,
-    },
-    {
-      title: "Enclosure Management",
-      href: "/home/enclosure-management",
-      icon: <HomeIcon className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />,
-    },
-    {
-      title: "Trip Management",
-      href: "/home/trip-management",
-      icon: <Binoculars className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />,
-    },
-    {
-      title: "Event Management",
-      href: "/home/event-management",
-      icon: <Binoculars className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />,
-    },
-    {
-      title: "Feed Scheduling",
-      href: "/home/feed-scheduling",
-      icon: <Clock className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />,
-    },
-    {
-      title: "Planned Visits",
-      href: "/home/visit-planning",
-      icon: <Calendar className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />,
-    },
-    {
-      title: "Digital Guide",
-      href: "/home/digital-guide",
-      icon: <Info className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />,
-    },
-    {
-      title: "Visitor Services",
-      href: "/home/visitor-services",
-      icon: <MapPin className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />,
-    },
-    {
-      title: "Veterinary Inspection",
-      href: "/home/veterinary-inspection",
-      icon: (
-        <Stethoscope className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />
-      ),
-    },
-    {
-      title: "User Management",
-      href: "/home/user-management",
-      icon: <User className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />,
-    },
-    {
-      title: "Menu Management",
-      href: "/home/menu-management",
-      icon: <Menu className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />,
-    },
-    {
-      title: "Role Management",
-      href: "/home/role-management",
-      icon: <UserCog className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />,
-    },
-    {
-      title: "Access Control",
-      href: "/home/access-control",
-      icon: (
-        <TowerControl className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />
-      ),
-    },
-    {
-      title: "Reports & Logs",
-      href: "/home/report-logs",
-      icon: <Logs className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`} />,
-    },
-  ];
+  const [sidebarItems, setSidebarItems] = useState<any[]>([]);
+  const iconRefs = useRef<(HTMLAnchorElement | null)[]>([]);
 
-  const handleMouseEnter = (
-    index: number,
-    ref: RefObject<HTMLAnchorElement>
-  ) => {
-    if (!isCollapsed || !ref.current) return;
+  const handleMouseEnter = (index: number) => {
+    if (!isCollapsed || !iconRefs.current[index]) return;
 
-    const rect = ref.current.getBoundingClientRect();
+    const rect = iconRefs.current[index]!.getBoundingClientRect();
     setTooltip({
       index,
       position: {
@@ -156,6 +72,38 @@ export function SideMenu() {
   };
 
   const handleMouseLeave = () => setTooltip({ index: null, position: null });
+
+  const isActiveURL = (href: string) => {
+    const pathInitial = "/" + pathname.split("/").slice(1, 3).join("/");
+    return href == pathInitial;
+  };
+
+  useEffect(() => {
+    if (typeof window != undefined) {
+      const menuItems = JSON.parse(helper.getData("menu_items"));
+      console.log(menuItems)
+      setSidebarItems(
+        menuItems
+          .sort((a: any, b: any) => a.MenuName.localeCompare(b.MenuName))
+          .sort((a: any, b: any) => a.SortingOrder - b.SortingOrder)
+          .map((item: any) => ({
+            title: item.MenuName,
+            Description: item.Description,
+            href: item.Path,
+            iconName: item.Icon,
+            MenuId: item.MenuId,
+            ParentId: item.ParentId,
+            SortingOrder: item.SortingOrder,
+            permissions: {
+              edit: item.Edit,
+              create: item.Create,
+              view: item.View,
+              delete: item.Delete,
+            },
+          }))
+      );
+    }
+  }, []);
 
   return (
     <>
@@ -190,22 +138,26 @@ export function SideMenu() {
               </div>
               <div className="py-4 flex-1">
                 <nav className="grid gap-1 px-2">
-                  {sidebarItems.map((item) => (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      onClick={() => setSidebarOpen(false)}
-                      className={cn(
-                        "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all hover:text-main-darkOrange",
-                        pathname.startsWith(item.href.replace(/\/$/, ""))
-                          ? "bg-main-darkOrange/10 font-medium text-main-darkOrange"
-                          : "text-muted-foreground"
-                      )}
-                    >
-                      {item.icon}
-                      {item.title}
-                    </Link>
-                  ))}
+                  {sidebarItems.map((item) => {
+                    const IconComponent =
+                      iconOptions[item.iconName as keyof typeof iconOptions];
+                    return (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        onClick={() => setSidebarOpen(false)}
+                        className={cn(
+                          "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all hover:text-main-darkOrange",
+                          pathname.startsWith(item.href.replace(/\/$/, ""))
+                            ? "bg-main-darkOrange/10 font-medium text-main-darkOrange"
+                            : "text-muted-foreground"
+                        )}
+                      >
+                        {IconComponent && <IconComponent className="h-4 w-4" />}
+                        {item.title}
+                      </Link>
+                    );
+                  })}
                 </nav>
               </div>
               <div className="mt-auto pl-2 py-[6px] w-full">
@@ -222,20 +174,6 @@ export function SideMenu() {
                         />
                       </div>
                     </DropdownMenuTrigger>
-                    {/* <DropdownMenuContent align="end">
-                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    className="text-red-500 focus:text-red-500"
-                    onClick={() => {
-                      localStorage.clear();
-                      // router.push("/");
-                    }}
-                  >
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent> */}
                   </DropdownMenu>
                   <div className="text-sm flex-1">
                     <div className="flex justify-between">
@@ -276,14 +214,12 @@ export function SideMenu() {
       {/* Desktop Sidebar */}
       <div
         className={`h-full hidden rounded-md bg-transparent border border-main-borderColor md:block ${
-          //
           isCollapsed ? "md:w-[5vw]" : "md:w-[17vw] xl:w-[15vw]"
         } font-roboto transition-all duration-300 ease-in-out`}
       >
         <div className="flex h-full max-h-screen flex-col gap-2">
           <div
             className={`flex relative border-b border-b-main-borderColor ${
-              //
               isCollapsed ? "flex-col" : "flex-row-reverse"
             } h-14 items-center px-4 justify-between`}
           >
@@ -311,37 +247,38 @@ export function SideMenu() {
               {isCollapsed ? (
                 <Image src={collapsedIcon} alt="Logo" />
               ) : (
-                <Image
-                  src={typographyIcon}
-                  // className="w-[50%] xl:w-[30%]"
-                  alt="Logo"
-                />
+                <Image src={typographyIcon} alt="Logo" />
               )}
             </Link>
           </div>
           <div className="flex-1 flex flex-col py-2">
             <nav className="grid overflow-auto max-h-[calc(100vh-90px)] gap-1 px-2">
               {sidebarItems.map((item, index) => {
-                const iconRef = useRef<any>(null);
                 const isActive = tooltip.index === index;
+                const IconComponent =
+                  iconOptions[item.iconName as keyof typeof iconOptions];
                 return (
                   <div key={index}>
                     <Link
-                      ref={iconRef}
-                      href={item.href}
-                      onMouseEnter={() => {
-                        if (iconRef.current) handleMouseEnter(index, iconRef);
+                      ref={(el) => {
+                        iconRefs.current[index] = el;
                       }}
+                      href={item.href}
+                      onMouseEnter={() => handleMouseEnter(index)}
                       onMouseLeave={handleMouseLeave}
                       className={cn(
                         "flex relative group items-center h-fit gap-3 rounded-lg px-3 py-2 text-xs transition-all",
-                        pathname === item.href
+                        isActiveURL(item.href)
                           ? "bg-[#CBE88C] font-medium text-black"
                           : "text-muted-foreground hover:text-black/70",
                         isCollapsed ? "justify-center" : ""
                       )}
                     >
-                      {item.icon}
+                      {IconComponent && (
+                        <IconComponent
+                          className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`}
+                        />
+                      )}
                       {!isCollapsed && item.title}
                     </Link>
                     {isCollapsed &&

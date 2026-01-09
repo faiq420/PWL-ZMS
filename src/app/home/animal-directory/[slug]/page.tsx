@@ -231,12 +231,12 @@ export default function AnimalDetailPage() {
               isNewAnimal ? "added to" : "updated in"
             } the directory.`,
           });
-          if (isNewAnimal) {
+          // if (isNewAnimal) {
             // Redirect to the new animal page
             router.back();
-          } else {
-            setIsEditing(false);
-          }
+          // } else {
+          //   setIsEditing(false);
+          // }
         })
         .catch((e) => {
           toast({

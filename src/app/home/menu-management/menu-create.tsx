@@ -73,16 +73,12 @@ const MenuCreate = ({ mode = "create", id = "0" }: Props) => {
   }
 
   function GetAllIcons() {
-    try {
-      setIcons(
-        iconOptions.map((icon: string) => ({
-          label: icon,
-          value: icon,
-        }))
-      );
-    } catch (error) {
-      console.error(error);
-    }
+    setIcons(
+      Object.keys(iconOptions).map((icon: string) => ({
+        label: icon,
+        value: icon,
+      }))
+    );
   }
 
   useEffect(() => {
@@ -148,14 +144,16 @@ const MenuCreate = ({ mode = "create", id = "0" }: Props) => {
           description: `Menu \"${obj.MenuName}\" ${
             mode === "create" ? "Created" : "Updated"
           } Successfully`,
-          variant: "success"
+          variant: "success",
         });
       })
       .catch((error) => {
         toast({
-          title: `Menu Not ${mode === "edit" ? "Updated" : "Created"} Successfully`,
+          title: `Menu Not ${
+            mode === "edit" ? "Updated" : "Created"
+          } Successfully`,
           description: error.message,
-          variant: "danger"
+          variant: "danger",
         });
       })
       .finally(() => {
@@ -227,7 +225,7 @@ const MenuCreate = ({ mode = "create", id = "0" }: Props) => {
             </div>
             <TextArea
               name="Description"
-              value={!!obj.Description ? obj.Description : "" }
+              value={!!obj.Description ? obj.Description : ""}
               setter={handleChange}
               label="Description"
             />
