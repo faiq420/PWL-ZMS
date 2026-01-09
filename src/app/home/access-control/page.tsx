@@ -36,11 +36,12 @@ export interface RoleProps {
 }
 
 export default function AccessControlPage() {
+  const helper = useHelper();
+  const pageData = helper.GetPageData();
   const [roles, setRoles] = useState<RoleProps[]>([]);
   const [menuItems, setMenuItems] = useState<OPTION[]>([]);
   const [isCruding, setIsCruding] = useState<boolean>(false);
   const { toast } = useToast();
-  const helper = useHelper();
 
   const handleSavePermissions = () => {
     setIsCruding(true);
@@ -137,8 +138,8 @@ export default function AccessControlPage() {
     <div className="flex-1 space-y-4 w-full md:w-min-[83vw] md:w-max-[95vw] xl:w-min-[85vw]">
       <div className="flex items-center justify-between">
         <SectionIntro
-          title="Access Control"
-          description="Manage role-based menu access and permissions."
+          title={pageData?.MenuName}
+          description={pageData?.Description}
         />
         <div className="grid place-content-center">
           <ButtonComp

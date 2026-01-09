@@ -3,6 +3,7 @@ import { defaultTokenObject, Token } from "@/lib/Token";
 import { usePathname, useRouter } from "next/navigation";
 
 const useHelper = () => {
+  const pathname = usePathname();
   const BaseURL =
     process.env.NODE_ENV === "development"
       ? "https://localhost:44383"
@@ -165,7 +166,7 @@ const useHelper = () => {
       paramString: string = "",
       expectFile = false
     ): Promise<any> => {
-      console.clear();
+      // console.clear();
       const response = await fetch(API + endpoint + "?" + paramString, {
         method: "GET",
         headers: headers,
@@ -205,6 +206,14 @@ const useHelper = () => {
     return `${BaseURL}${url}`;
   }
 
+  const GetPageData = () => {
+    const pathInitial = "/" + pathname.split("/").slice(1, 3).join("/");
+    const menuItem = JSON.parse(getData("sorted_menu_items")).find(
+      (item: any) => item.href === pathInitial
+    );
+    return menuItem;
+  };
+
   return {
     storeData,
     getData,
@@ -216,6 +225,7 @@ const useHelper = () => {
     removeData,
     GetDocument,
     API,
+    GetPageData,
   };
 };
 

@@ -29,10 +29,12 @@ import ZooProfileCard from "./_components/ZooProfileCard";
 import SectionIntro from "@/components/utils/Headings/SectionIntro";
 import { useEffect, useState } from "react";
 import useHelper from "@/Helper/helper";
+import Unauthorized from "../../unauthorized/page";
 
 export default function ZooProfilesPage() {
   const router = useRouter();
   const helper = useHelper();
+  const pageData = helper.GetPageData();
   const [zooProfiles, setZooProfiles] = useState<
     {
       ZooId: number;
@@ -55,17 +57,19 @@ export default function ZooProfilesPage() {
     <div className="flex-1 space-y-4">
       <div className="md:flex justify-between items-end">
         <SectionIntro
-          title="Zoo Profiles"
-          description="Manage and view zoo profiles."
+          title={pageData?.MenuName}
+          description={pageData?.Description}
         />
-        <div className="w-fit">
-          <ButtonComp
-            type="dark"
-            text="Add New Zoo"
-            beforeIcon={<Plus />}
-            clickEvent={() => router.push("/home/zoo-profiles/new")}
-          />
-        </div>
+        {pageData?.permissions.create && (
+          <div className="w-fit">
+            <ButtonComp
+              type="dark"
+              text="Add New Zoo"
+              beforeIcon={<Plus />}
+              clickEvent={() => router.push("/home/zoo-profiles/new")}
+            />
+          </div>
+        )}
       </div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {zooProfiles.map((zoo) => (

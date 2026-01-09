@@ -53,6 +53,7 @@ export default function EventPage() {
   const { toast } = useToast();
   const router = useRouter();
   const helper = useHelper();
+  const pageData = helper.GetPageData();
   const [searchQuery, setSearchQuery] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
   const [events, setEvents] = useState<Event[]>([]);
@@ -171,8 +172,10 @@ export default function EventPage() {
         </AlertDialogContent>
       </AlertDialog>
       <div className="flex flex-col gap-6">
-        <SectionIntro title="Trip Management" description="Manage zoo trips." />
-
+        <SectionIntro
+          title={pageData?.MenuName}
+          description={pageData?.Description}
+        />
         <Card className="space-y-4">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardIntro title="Trips" description="Overview of all trips." />

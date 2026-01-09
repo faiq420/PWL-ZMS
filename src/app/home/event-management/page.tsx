@@ -54,6 +54,7 @@ export default function EventPage() {
   const { toast } = useToast();
   const router = useRouter();
   const helper = useHelper();
+  const pageData = helper.GetPageData();
   const [searchQuery, setSearchQuery] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
   const [events, setEvents] = useState<Event[]>([]);
@@ -174,8 +175,8 @@ export default function EventPage() {
       </AlertDialog>
       <div className="flex flex-col gap-6">
         <SectionIntro
-          title="Event Management"
-          description="Manage zoo events & trips."
+          title={pageData?.MenuName}
+          description={pageData?.Description}
         />
 
         <Card className="space-y-4">
@@ -269,7 +270,8 @@ export default function EventPage() {
                           )}
                         </TableCell>
                         <TableCell>
-                          {to12Hour(event.EventStartingTime)} - {to12Hour(event.EventClosingTime)}
+                          {to12Hour(event.EventStartingTime)} -{" "}
+                          {to12Hour(event.EventClosingTime)}
                         </TableCell>
                         <TableCell>{event.ZooTitle}</TableCell>
                         <TableCell className="text-right flex justify-end">

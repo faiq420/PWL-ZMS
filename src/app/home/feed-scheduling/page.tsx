@@ -37,6 +37,7 @@ import {
 } from "@/components/ui/pagination";
 import { changeDateFormat } from "@/Helper/DateFormats";
 import Checkbox from "@/components/utils/FormElements/Checkbox";
+import useHelper from "@/Helper/helper";
 
 interface FeedSchedule {
   id: number;
@@ -89,6 +90,8 @@ const initialFeedSchedules: FeedSchedule[] = [
 
 export default function FeedSchedulingPage() {
   const router = useRouter();
+  const helper = useHelper();
+  const pageData = helper.GetPageData();
   const [searchQuery, setSearchQuery] = useState("");
   const [schedules, setSchedules] = useState<FeedSchedule[]>([
     ...initialFeedSchedules,
@@ -185,10 +188,9 @@ export default function FeedSchedulingPage() {
       </AlertDialog>
       <div className="flex flex-col gap-6">
         <SectionIntro
-          title="Feed Scheduling"
-          description="Manage feeding schedules for all animals in the zoo."
+          title={pageData?.MenuName}
+          description={pageData?.Description}
         />
-
         <Card className="space-y-4">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardIntro

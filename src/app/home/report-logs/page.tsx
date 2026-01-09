@@ -14,8 +14,11 @@ import { useState } from "react";
 import ReportCards from "./components/ReportCards";
 import CardIntro from "@/components/utils/Headings/CardIntro";
 import ButtonComp from "@/components/utils/Button";
+import useHelper from "@/Helper/helper";
 
 export default function ReportsLogsPage() {
+  const helper = useHelper();
+  const pageData = helper.GetPageData();
   const [cardData, setCardData] = useState([
     {
       title: "Visitor Statistics",
@@ -53,14 +56,18 @@ export default function ReportsLogsPage() {
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
         <SectionIntro
-          title="Reports & Logs"
-          description="Access various reports and system logs for comprehensive insights."
+          title={pageData?.MenuName}
+          description={pageData?.Description}
         />
       </div>
       <Tabs defaultValue="reports" className="w-full">
         <TabsList className="flex w-full">
-          <TabsTrigger value="reports" className="flex-1">Reports</TabsTrigger>
-          <TabsTrigger value="audit-trail" className="flex-1">Audit Trail</TabsTrigger>
+          <TabsTrigger value="reports" className="flex-1">
+            Reports
+          </TabsTrigger>
+          <TabsTrigger value="audit-trail" className="flex-1">
+            Audit Trail
+          </TabsTrigger>
           {/* <TabsTrigger value="error-logs">Error Logs</TabsTrigger>
           <TabsTrigger value="audit-trail">Audit Trail</TabsTrigger> */}
         </TabsList>

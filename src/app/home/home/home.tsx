@@ -20,10 +20,11 @@ import RedArrow from "@/public/assets/menu/redArrowHead.svg";
 import { changeDateFormat, formatISOStringDate } from "@/Helper/DateFormats";
 import { Calendar, PawPrintIcon as Paw, Ticket, Users } from "lucide-react";
 import dynamic from "next/dynamic";
-import {useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import CustomBarChart from "./BarChart";
 import { motion } from "framer-motion";
+import useHelper from "@/Helper/helper";
 
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
@@ -39,6 +40,8 @@ export default function Home() {
   const [chartParams, setChartParams] = useState<{
     dates: string[];
   }>({ dates: [] });
+  const helper = useHelper();
+  const pageData = helper.GetPageData();
   const [series, setSeries] = useState<{ name: string; data: number[] }[]>([]);
   const [cards, setCards] = useState<Card[]>([
     {
@@ -264,6 +267,8 @@ export default function Home() {
       end: format(year, monthIndex, endDay),
     };
   };
+
+  console.log(pageData);
 
   return (
     <div className="flex-1 space-y-4 font-poppins">

@@ -27,10 +27,13 @@ import Heading from "@/components/utils/Headings/Heading";
 import EventsTable from "./tabs/EventsTable";
 import BookingsTable from "./tabs/BookingsTable";
 import SectionIntro from "@/components/utils/Headings/SectionIntro";
+import useHelper from "@/Helper/helper";
 
 export default function VisitPlanningPage() {
   const { toast } = useToast();
   const router = useRouter();
+  const helper = useHelper();
+  const pageData = helper.GetPageData();
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [routeModalOpen, setRouteModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -409,8 +412,8 @@ export default function VisitPlanningPage() {
     <div className="flex-1 space-y-4">
       <div className="flex items-center justify-between">
         <SectionIntro
-          title="Visit Planning"
-          description="Manage and plan visits for the zoo."
+          title={pageData?.MenuName}
+          description={pageData?.Description}
         />
         <div className="flex items-center space-x-2">
           {/* <Popover>

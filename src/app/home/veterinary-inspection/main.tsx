@@ -34,14 +34,17 @@ import Image from "next/image";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import SectionIntro from "@/components/utils/Headings/SectionIntro";
+import useHelper from "@/Helper/helper";
 
 export default function VeterinaryInspectionPage() {
+  const helper = useHelper();
+  const pageData = helper.GetPageData();
   return (
     <div className="flex-1 space-y-4">
       <div className="flex items-center justify-between">
         <SectionIntro
-          title="Veterinary Field Inspection"
-          description="Manage and track veterinary field inspections."
+          title={pageData?.MenuName}
+          description={pageData?.Description}
         />
         <Button className="bg-green-700 hover:bg-green-800" asChild>
           <Link href="/home/veterinary-inspection/new">

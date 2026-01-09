@@ -36,6 +36,7 @@ export default function MenuManagementPage() {
   const [isCruding, setIsCruding] = useState<boolean>(false);
   const router = useRouter();
   const helper = useHelper();
+  const pageData = helper.GetPageData();
   const { toast } = useToast();
 
   const handleCreateMenu = () => {
@@ -193,8 +194,8 @@ export default function MenuManagementPage() {
         console.log(response);
         toast({
           title: "Reordering Successful",
-          description: 'Menu Reordered Successfully',
-          variant: "success"
+          description: "Menu Reordered Successfully",
+          variant: "success",
         });
       })
       .catch((error) => {
@@ -210,8 +211,8 @@ export default function MenuManagementPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <SectionIntro
-          title="Menu Management"
-          description="Manage system navigation menus and hierarchy."
+          title={pageData?.MenuName}
+          description={pageData?.Description}
         />
         <Button onClick={handleCreateMenu}>
           <Plus className="mr-2 h-4 w-4" />

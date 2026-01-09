@@ -1,4 +1,8 @@
 import imageCompression from "browser-image-compression";
+import useHelper from "./helper";
+import { usePathname } from "next/navigation";
+const helper = useHelper();
+const pathname = usePathname();
 
 export const formatCnic = (string: string) => {
   let N = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];

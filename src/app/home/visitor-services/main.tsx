@@ -4,13 +4,16 @@ import { FacilitiesAndSafety } from "@/components/visitor-services/facilities-an
 import SectionIntro from "@/components/utils/Headings/SectionIntro";
 import { Card, CardContent } from "@/components/ui/card";
 import FoodCourtTable from "./tabs/FoodCourt";
+import useHelper from "@/Helper/helper";
 
 export default function VisitorServicesPage() {
+  const helper = useHelper();
+  const pageData = helper.GetPageData();
   return (
     <div className="flex-1 space-y-4">
       <SectionIntro
-        title="Visitor Services"
-        description="Manage all visitor-related services including food, dining, facilities, and safety."
+        title={pageData?.MenuName}
+        description={pageData?.Description}
       />
 
       <Tabs defaultValue="food-dining" className="space-y-4">

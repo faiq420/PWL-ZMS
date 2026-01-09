@@ -55,6 +55,7 @@ export default function EnclosurePage() {
   const { toast } = useToast();
   const router = useRouter();
   const helper = useHelper();
+  const pageData = helper.GetPageData();
   const [searchQuery, setSearchQuery] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
   const [enclosures, setEnclosures] = useState<Enclosure[]>([]);
@@ -182,10 +183,9 @@ export default function EnclosurePage() {
       </AlertDialog>
       <div className="flex flex-col gap-6">
         <SectionIntro
-          title="Enclosure Management"
-          description="Manage zoo enclosures and geographical zones."
+          title={pageData?.MenuName}
+          description={pageData?.Description}
         />
-
         <Card className="space-y-4">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardIntro

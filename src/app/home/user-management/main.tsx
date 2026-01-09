@@ -37,6 +37,7 @@ export default function UserManagementPage() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [activeTab, setActiveTab] = useState<string>("all");
   const helper = useHelper();
+  const pageData = helper.GetPageData();
   const router = useRouter();
 
   function GetAllUsers() {
@@ -140,8 +141,8 @@ export default function UserManagementPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <SectionIntro
-          title="User Management"
-          description="Manage users, roles, and permissions across the system."
+          title={pageData?.MenuName}
+          description={pageData?.Description}
         />
         <div className="fit">
           <ButtonComp

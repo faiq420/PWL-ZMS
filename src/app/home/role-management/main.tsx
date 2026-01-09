@@ -42,6 +42,7 @@ export interface RoleProps {
 export default function RoleManagementPage() {
   const router = useRouter();
   const helper = useHelper();
+  const pageData = helper.GetPageData();
   const [roles, setRoles] = useState<RoleProps[]>([]);
   
   const [searchTerm, setSearchTerm] = useState("");
@@ -138,8 +139,8 @@ export default function RoleManagementPage() {
     <div className="space-y-4">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <SectionIntro
-          title="Role Management"
-          description="Manage user roles."
+          title={pageData?.MenuName}
+          description={pageData?.Description}
         />
         <div className="flex gap-2">
           <ButtonComp

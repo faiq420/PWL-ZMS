@@ -60,6 +60,7 @@ import useHelper from "@/Helper/helper";
 export default function AnimalDirectoryPage() {
   const router = useRouter();
   const helper = useHelper();
+  const pageData = helper.GetPageData();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [activeTab, setActiveTab] = useState("all");
@@ -161,8 +162,8 @@ export default function AnimalDirectoryPage() {
     <div className="flex-1 space-y-4">
       <div className="flex items-center justify-between">
         <SectionIntro
-          title="Animal Directory"
-          description="Explore and manage the animal directory."
+          title={pageData?.MenuName}
+          description={pageData?.Description}
         />
       </div>
 

@@ -81,27 +81,26 @@ export function SideMenu() {
   useEffect(() => {
     if (typeof window != undefined) {
       const menuItems = JSON.parse(helper.getData("menu_items"));
-      console.log(menuItems)
-      setSidebarItems(
-        menuItems
-          .sort((a: any, b: any) => a.MenuName.localeCompare(b.MenuName))
-          .sort((a: any, b: any) => a.SortingOrder - b.SortingOrder)
-          .map((item: any) => ({
-            title: item.MenuName,
-            Description: item.Description,
-            href: item.Path,
-            iconName: item.Icon,
-            MenuId: item.MenuId,
-            ParentId: item.ParentId,
-            SortingOrder: item.SortingOrder,
-            permissions: {
-              edit: item.Edit,
-              create: item.Create,
-              view: item.View,
-              delete: item.Delete,
-            },
-          }))
-      );
+      const sortedMenuItems = menuItems
+        .sort((a: any, b: any) => a.MenuName.localeCompare(b.MenuName))
+        .sort((a: any, b: any) => a.SortingOrder - b.SortingOrder)
+        .map((item: any) => ({
+          MenuName: item.MenuName,
+          Description: item.Description,
+          href: item.Path,
+          iconName: item.Icon,
+          MenuId: item.MenuId,
+          ParentId: item.ParentId,
+          SortingOrder: item.SortingOrder,
+          permissions: {
+            edit: item.Edit,
+            create: item.Create,
+            view: item.View,
+            delete: item.Delete,
+          },
+        }));
+      setSidebarItems(sortedMenuItems);
+      helper.storeData("sorted_menu_items", JSON.stringify(sortedMenuItems));
     }
   }, []);
 
@@ -154,7 +153,7 @@ export function SideMenu() {
                         )}
                       >
                         {IconComponent && <IconComponent className="h-4 w-4" />}
-                        {item.title}
+                        {item.MenuName}
                       </Link>
                     );
                   })}
@@ -279,7 +278,7 @@ export function SideMenu() {
                           className={`${isCollapsed ? "h-4 w-4" : "h-3 w-3"}`}
                         />
                       )}
-                      {!isCollapsed && item.title}
+                      {!isCollapsed && item.MenuName}
                     </Link>
                     {isCollapsed &&
                       isActive &&
@@ -292,7 +291,7 @@ export function SideMenu() {
                             left: tooltip.position.left,
                           }}
                         >
-                          {item.title}
+                          {item.MenuName}
                           <div className="absolute left-[-6px] top-1/2 -translate-y-1/2 w-0 h-0 border-y-8 border-y-transparent border-r-8 border-r-[#CBE88C]" />
                         </div>,
                         document.body
