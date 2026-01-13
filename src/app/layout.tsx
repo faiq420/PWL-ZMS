@@ -93,10 +93,10 @@ export default function RootLayout({
       className={`${poppins.variable} ${barlow.variable} ${montserrat.variable} ${roboto.variable} ${DMSans.variable} ${syne.variable} ${faustina.variable} ${tajawal.variable} min-h-screen`}
     >
       <body className="flex-1 flex flex-col min-h-screen">
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+        {/* <ThemeProvider attribute="class" defaultTheme="light" enableSystem> */}
           {children}
           <Toaster />
-        </ThemeProvider>
+        {/* </ThemeProvider> */}
       </body>
     </html>
   );

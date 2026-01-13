@@ -1,9 +1,15 @@
-import { getTokenCookie, getTokenString } from "@/lib/cookieToken";
+import {
+  getTokenCookie,
+  getTokenString,
+  removeCookieKey,
+  removeTokenCookie,
+} from "@/lib/cookieToken";
 import { defaultTokenObject, Token } from "@/lib/Token";
 import { usePathname, useRouter } from "next/navigation";
 
 const useHelper = () => {
   const pathname = usePathname();
+  const router = useRouter();
   const BaseURL =
     process.env.NODE_ENV === "development"
       ? "https://localhost:44383"
@@ -208,10 +214,35 @@ const useHelper = () => {
 
   const GetPageData = () => {
     const pathInitial = "/" + pathname.split("/").slice(1, 3).join("/");
-    const menuItem = JSON.parse(getData("sorted_menu_items")).find(
+    const menuItem = JSON.parse(getData("menu_items")).find(
       (item: any) => item.href === pathInitial
     );
-    return menuItem;
+    if (menuItem) {
+      return menuItem;
+    } else {
+      return {
+        MenuName: "",
+        Description: "",
+        href: "",
+        iconName: "",
+        MenuId: 0,
+        ParentId: null,
+        SortingOrder: "",
+        permissions: {
+          edit: false,
+          create: false,
+          view: false,
+          delete: false,
+        },
+      };
+    }
+  };
+
+  const Logout = () => {
+    removeTokenCookie();
+    removeCookieKey("userDetails");
+    removeData("menu_items");
+    router.push("/");
   };
 
   return {
@@ -226,6 +257,7 @@ const useHelper = () => {
     GetDocument,
     API,
     GetPageData,
+    Logout,
   };
 };
 

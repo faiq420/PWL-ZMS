@@ -133,38 +133,40 @@ export function RoleMenuMapping({
       {currentRole && (
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-base font-poppins font-medium mb-3">
               Permissions for {currentRole.RoleName}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-3">
               {allMenus.map((menu) => {
                 const access = getMenuAccess(Number(menu.value));
                 return (
-                  <div key={menu.label} className="border rounded-lg p-4">
-                    <div className="flex items-center space-x-5 mb-3">
-                      <h4 className="font-medium">{menu.label}</h4>
+                  <div
+                    key={menu.label}
+                    className="border rounded-lg p-4 space-y-3"
+                  >
+                    <div className="flex gap-2 items-center">
+                      <Checkbox
+                        id="select-all"
+                        checked={
+                          access.View &&
+                          access.Create &&
+                          access.Delete &&
+                          access.Edit
+                        }
+                        onCheckedChange={(checked) =>
+                          updateMenuAccess(
+                            Number(menu.value),
+                            checked as boolean
+                          )
+                        }
+                      />
+                      <h4 className="font-medium text-sm font-poppins">
+                        {menu.label}
+                      </h4>
                     </div>
-                    <div className="grid grid-cols-5 gap-4">
-                      <div className="flex items-center space-x-2">
-                        <Checkbox
-                          id="select-all"
-                          checked={
-                            access.View &&
-                            access.Create &&
-                            access.Delete &&
-                            access.Edit
-                          }
-                          onCheckedChange={(checked) =>
-                            updateMenuAccess(
-                              Number(menu.value),
-                              checked as boolean
-                            )
-                          }
-                        />
-                        <Label className="text-sm">Select All</Label>
-                      </div>
+                    <div className="space-y-1.5 ml-2">
                       <div className="flex items-center space-x-2">
                         <Checkbox
                           id={`${menu.value}-view`}
@@ -179,7 +181,7 @@ export function RoleMenuMapping({
                         />
                         <Label
                           htmlFor={`${menu.value}-view`}
-                          className="text-sm"
+                          className="text-xs font-poppins font-normal"
                         >
                           View
                         </Label>
@@ -198,7 +200,7 @@ export function RoleMenuMapping({
                         />
                         <Label
                           htmlFor={`${menu.value}-edit`}
-                          className="text-sm"
+                          className="text-xs font-poppins font-normal"
                         >
                           Edit
                         </Label>
@@ -217,7 +219,7 @@ export function RoleMenuMapping({
                         />
                         <Label
                           htmlFor={`${menu.value}-create`}
-                          className="text-sm"
+                          className="text-xs font-poppins font-normal"
                         >
                           Create
                         </Label>
@@ -236,7 +238,7 @@ export function RoleMenuMapping({
                         />
                         <Label
                           htmlFor={`${menu.value}-delete`}
-                          className="text-sm"
+                          className="text-xs font-poppins font-normal"
                         >
                           Delete
                         </Label>

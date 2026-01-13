@@ -20,6 +20,7 @@ import ButtonComp from "@/components/utils/Button";
 import { useToast } from "@/components/ui/use-toast";
 import { RoleMenuMapping } from "@/components/access-control/role-menu-mapping";
 import { BulkPermissions } from "@/components/access-control/bulk-permissions";
+import CardIntro from "@/components/utils/Headings/CardIntro";
 
 export interface MenuProps {
   MenuId?: number;
@@ -134,6 +135,8 @@ export default function AccessControlPage() {
     GetRoleMenuMapping();
   }, []);
 
+  console.log(pageData);
+
   return (
     <div className="flex-1 space-y-4 w-full md:w-min-[83vw] md:w-max-[95vw] xl:w-min-[85vw]">
       <div className="flex items-center justify-between">
@@ -141,15 +144,17 @@ export default function AccessControlPage() {
           title={pageData?.MenuName}
           description={pageData?.Description}
         />
-        <div className="grid place-content-center">
-          <ButtonComp
-            clickEvent={handleSavePermissions}
-            text="Save Changes"
-            beforeIcon={<Save className="mr-2 h-4 w-4" />}
-            type={"dark"}
-            isCruding={isCruding}
-          />
-        </div>
+        {(pageData.permissions.create || pageData.permissions.edit) && (
+          <div className="grid place-content-center">
+            <ButtonComp
+              clickEvent={handleSavePermissions}
+              text="Save Changes"
+              beforeIcon={<Save className="mr-2 h-4 w-4" />}
+              type={"dark"}
+              isCruding={isCruding}
+            />
+          </div>
+        )}
         {/* <Button onClick={handleSavePermissions}>
           <Save className="mr-2 h-4 w-4" />
           Save Changes
@@ -220,12 +225,12 @@ export default function AccessControlPage() {
         </TabsContent> */}
 
         <TabsContent value="mapping" className="space-y-4">
-          <Card>
+          <Card className="space-y-4">
             <CardHeader>
-              <CardTitle>Role-Menu Mapping</CardTitle>
-              <CardDescription>
-                Configure detailed menu access permissions for each role
-              </CardDescription>
+              <CardIntro
+                title="Role-Menu Mapping"
+                description="Configure detailed menu access permissions for each role."
+              />
             </CardHeader>
             <CardContent>
               <RoleMenuMapping
