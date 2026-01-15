@@ -265,6 +265,7 @@ const Page = () => {
         AnimalIds: mappedAnimals,
         DeletedFileIds: deletedFiles,
       };
+      console.log(coverImageFile, logoFile);
       if (coverImageFile) {
         const compressedCover = coverImageFile
           ? await compressFile(coverImageFile)
@@ -274,9 +275,7 @@ const Page = () => {
           : (editObject.EventCoverImage = compressedCover);
       }
       if (logoFile) {
-        const compressedLogo = logoFile
-          ? await compressFile(logoFile)
-          : null;
+        const compressedLogo = logoFile ? await compressFile(logoFile) : null;
         slug == "new"
           ? (createObject.EventLogoImage = compressedLogo)
           : (editObject.EventLogoImage = compressedLogo);
@@ -292,7 +291,9 @@ const Page = () => {
             const details = eventDetails.map((x) => {
               return { ...x, EventId: response };
             });
+            console.log(details, "details");
             const tripsAddedorUpdated = await AddOrUpdateTrip(details);
+            console.log(tripsAddedorUpdated);
             toast({
               title: `Trip event ${
                 slug == "new" ? "created" : "updated"
@@ -318,34 +319,46 @@ const Page = () => {
     }
   };
 
-  const AddOrUpdateTrip = async (details: any) => {
-    const payloads: { obj: trip; TripCoverImage?: File }[] = [];
-    details.forEach((x: any, i: number) => {
-      payloads[i] = { obj: x };
-      if (x.TripCoverImage instanceof File) {
-        payloads[i].TripCoverImage = x.TripCoverImage;
-      }
-    });
-    console.log(payloads);
-    Promise.allSettled(
-      payloads.map((payload) => {
+  const AddOrUpdateTrip = async (details: any[]) => {
+    // 1️⃣ Prepare payloads properly
+
+    const payloads = await Promise.allSettled(
+      details.map(async (x) => {
+        const payload: { obj: trip; TripCoverImage?: File } = { obj: x };
+
+        if (x.TripCoverImage instanceof File) {
+          payload.TripCoverImage = await compressFile(x.TripCoverImage);
+        }
+
+        return payload;
+      })
+    );
+    console.log(payloads, "payloads");
+    const fulfilledPayloads = payloads
+      .filter(
+        (
+          p
+        ): p is PromiseFulfilledResult<{ obj: trip; TripCoverImage?: File }> =>
+          p.status === "fulfilled"
+      )
+      .map((p) => p.value);
+    console.log(fulfilledPayloads, "fulfilledPayloads");
+    const results = await Promise.allSettled(
+      fulfilledPayloads.map((payload) =>
         helper.xhr.Post(
           `/Event/${
-            slug == "new" || payload.obj.TripId == 0 ? "AddTrip" : "UpdateTrip"
+            slug === "new" || payload.obj.TripId === 0
+              ? "AddTrip"
+              : "UpdateTrip"
           }`,
-          helper.ConvertToFormData(payload)
-        );
-      })
-    )
-      .then((res) => {
-        const successfulResult = res
-          .filter((x) => x.status === "fulfilled")
-          .map((x) => x.value);
-        return successfulResult;
-      })
-      .catch((error) => {
-        console.error("Error in AddOrUpdateTrip:", error);
-      });
+          helper.ConvertToFormDataV2({ ...payload })
+        )
+      )
+    );
+
+    return results
+      .filter((r) => r.status === "fulfilled")
+      .map((r: any) => r.value);
   };
 
   useEffect(() => {
