@@ -81,26 +81,7 @@ export function SideMenu() {
   useEffect(() => {
     if (typeof window != undefined) {
       const menuItems = JSON.parse(helper.getData("menu_items"));
-      const sortedMenuItems = menuItems
-        .sort((a: any, b: any) => a.MenuName.localeCompare(b.MenuName))
-        .sort((a: any, b: any) => a.SortingOrder - b.SortingOrder)
-        .map((item: any) => ({
-          MenuName: item.MenuName,
-          Description: item.Description,
-          href: item.Path,
-          iconName: item.Icon,
-          MenuId: item.MenuId,
-          ParentId: item.ParentId,
-          SortingOrder: item.SortingOrder,
-          permissions: {
-            edit: item.Edit,
-            create: item.Create,
-            view: item.View,
-            delete: item.Delete,
-          },
-        }));
-      setSidebarItems(sortedMenuItems);
-      helper.storeData("sorted_menu_items", JSON.stringify(sortedMenuItems));
+      setSidebarItems(menuItems);
     }
   }, []);
 

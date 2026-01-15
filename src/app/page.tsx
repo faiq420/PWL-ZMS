@@ -74,7 +74,29 @@ export default function LoginPage() {
             UserName: res.user.UserName,
           };
           setCookieKey("userDetails", JSON.stringify(userDetails));
-          helper.storeData("menu_items", JSON.stringify(res.menus));
+          helper.storeData(
+            "menu_items",
+            JSON.stringify(
+              res.menus
+                .sort((a: any, b: any) => a.MenuName.localeCompare(b.MenuName))
+                .sort((a: any, b: any) => a.SortingOrder - b.SortingOrder)
+                .map((item: any) => ({
+                  MenuName: item.MenuName,
+                  Description: item.Description,
+                  href: item.Path,
+                  iconName: item.Icon,
+                  MenuId: item.MenuId,
+                  ParentId: item.ParentId,
+                  SortingOrder: item.SortingOrder,
+                  permissions: {
+                    edit: item.Edit,
+                    create: item.Create,
+                    view: item.View,
+                    delete: item.Delete,
+                  },
+                }))
+            )
+          );
           router.push("/home");
         }
       })

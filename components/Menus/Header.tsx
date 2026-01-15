@@ -13,15 +13,13 @@ import { LogOut, UserCog } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { removeTokenCookie } from "@/lib/cookieToken";
+import Logout from "@/Helper/helper";
+import useHelper from "@/Helper/helper";
 
 const Header = () => {
   const router = useRouter();
+  const helper = useHelper();
   const [userName, setUserName] = useState("Admin User");
-
-  const Logout = () => {
-    removeTokenCookie();
-    router.push("/");
-  };
 
   return (
     <div className="flex justify-end items-center min-h-[57px] border-b border-b-[#d7d7d7] px-4 md:px-5">
@@ -61,9 +59,7 @@ const Header = () => {
           <DropdownMenuSeparator />
           <DropdownMenuItem
             className="text-red-500 focus:text-red-500"
-            onClick={() => {
-              Logout();
-            }}
+            onClick={helper.Logout}
           >
             <LogOut className="mr-2 h-3 w-3" />
             <span className="text-xs">Log out</span>
