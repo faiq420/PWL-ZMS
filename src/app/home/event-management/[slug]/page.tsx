@@ -65,6 +65,7 @@ const Page = () => {
     TagLine: "",
     EventLastDate: "",
     EventStartDate: "",
+    EventTypeId: 3,
   });
   const [zoos, setZoos] = useState<OPTION[]>([]);
   const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
@@ -214,6 +215,7 @@ const Page = () => {
             ZooId: res.data.ZooId,
             LocationId: res.data.LocationId,
             IsOccasional: res.data.IsOccasional,
+            EventTypeId: res.data.EventTypeId,
             EventStartDate:res.data.EventDays.split(",")[0],
             EventLastDate:
               res.data.EventDays.split(",")[
