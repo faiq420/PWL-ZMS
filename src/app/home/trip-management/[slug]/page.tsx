@@ -688,13 +688,6 @@ const Page = () => {
                 label="Ending Time"
                 isRequired
               />
-              <Dropdown
-                activeId={obj.EventTypeId}
-                name="EventTypeId"
-                handleDropdownChange={handleChange}
-                label="Event Type"
-                options={eventTypes}
-              />
             </div>
             {/* {obj.IsOccasional ? (
               <DateRangePicker
@@ -735,6 +728,13 @@ const Page = () => {
               label="Zoo"
               options={zoos}
               isRequired
+            />
+            <Dropdown
+              activeId={obj.EventTypeId}
+              name="EventTypeId"
+              handleDropdownChange={handleChange}
+              label="Event Type"
+              options={eventTypes}
             />
             {!hasNestedTrip && (
               <Dropdown
