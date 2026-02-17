@@ -8,7 +8,7 @@ import { defaultTokenObject, Token } from "@/lib/Token";
 
 const useHelper = () => {
   const BaseURL =
-    process.env.NODE_ENV !== "development"
+    process.env.NODE_ENV === "development"
       ? "https://localhost:44383"
       : "https://pwl-api.times-labs.com";
   const API: string = `${BaseURL}/api`;
