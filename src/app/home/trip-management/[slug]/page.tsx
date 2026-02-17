@@ -87,12 +87,14 @@ const Page = () => {
     ZooId: 0,
     LocationId: 0,
     IsOccasional: false,
+    EventTypeId: 0,
   });
   const [tickets, setTickets] = useState<
     { Title: string; Details: ticketDetails[] }[]
   >([]);
   const [hasNestedTrip, setHasNestedTrip] = useState<boolean>(false);
   const [zoos, setZoos] = useState<OPTION[]>([]);
+  const [eventTypes, setEventTypes] = useState<OPTION[]>([]);
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [deletedFiles, setDeletedFiles] = useState<number[]>([]);
   const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
@@ -131,14 +133,14 @@ const Page = () => {
   const capitalize = (value: string, space = " ") => {
     const words = String(value).split(space);
     const capitalizedWords = words.map(
-      (word) => word.charAt(0).toUpperCase() + word.slice(1)
+      (word) => word.charAt(0).toUpperCase() + word.slice(1),
     );
     return capitalizedWords.join(" ");
   };
 
   function GetHeading() {
     return `${capitalize(slug == "new" ? "create" : "edit")} - ${capitalize(
-      "Trip"
+      "Trip",
     )} ${slug != "new" ? `for ${obj.EventTitle}` : ""}`;
   }
 
@@ -148,7 +150,7 @@ const Page = () => {
   function handleDetailsChange(
     n: string,
     v: string | boolean | number | File,
-    i: number
+    i: number,
   ) {
     const updatedEventDetails = [...eventDetails];
     updatedEventDetails[i] = { ...updatedEventDetails[i], [n]: v };
@@ -180,6 +182,9 @@ const Page = () => {
 
       case obj.ZooId === 0:
         return fail("Select a zoo.");
+
+      case obj.EventTypeId === 0:
+        return fail("Select a EventType.");
 
       case obj.LocationId === 0 && !hasNestedTrip:
         return fail("Select a location.");
@@ -248,8 +253,8 @@ const Page = () => {
         },
         EventImages: await Promise.all(
           eventImages.map(async (x) =>
-            x.file ? await compressFile(x.file) : null
-          )
+            x.file ? await compressFile(x.file) : null,
+          ),
         ),
         AnimalIds: mappedAnimals,
       };
@@ -259,12 +264,13 @@ const Page = () => {
           eventImages
             .filter((x) => x.file != null)
             .map(async (image) =>
-              image.file ? await compressFile(image.file) : null
-            )
+              image.file ? await compressFile(image.file) : null,
+            ),
         ),
         AnimalIds: mappedAnimals,
         DeletedFileIds: deletedFiles,
       };
+      console.log(coverImageFile, logoFile);
       if (coverImageFile) {
         const compressedCover = coverImageFile
           ? await compressFile(coverImageFile)
@@ -275,6 +281,7 @@ const Page = () => {
       }
       if (logoFile) {
         const compressedLogo = logoFile ? await compressFile(logoFile) : null;
+        const compressedLogo = logoFile ? await compressFile(logoFile) : null;
         slug == "new"
           ? (createObject.EventLogoImage = compressedLogo)
           : (editObject.EventLogoImage = compressedLogo);
@@ -282,7 +289,9 @@ const Page = () => {
       helper.xhr
         .Post(
           `/Event/${slug == "new" ? "CreateEvent" : "UpdateEvent"}`,
-          helper.ConvertToFormData(obj.EventId == 0 ? createObject : editObject)
+          helper.ConvertToFormData(
+            obj.EventId == 0 ? createObject : editObject,
+          ),
         )
         .then(async (response) => {
           console.log(response);
@@ -290,7 +299,9 @@ const Page = () => {
             const details = eventDetails.map((x) => {
               return { ...x, EventId: response };
             });
+            console.log(details, "details");
             const tripsAddedorUpdated = await AddOrUpdateTrip(details);
+            console.log(tripsAddedorUpdated);
             toast({
               title: `Trip event ${
                 slug == "new" ? "created" : "updated"
@@ -316,34 +327,46 @@ const Page = () => {
     }
   };
 
-  const AddOrUpdateTrip = async (details: any) => {
-    const payloads: { obj: trip; TripCoverImage?: File }[] = [];
-    details.forEach(async (x: any, i: number) => {
-      payloads[i] = { obj: x };
-      if (x.TripCoverImage instanceof File) {
-        payloads[i].TripCoverImage = await compressFile(x.TripCoverImage);
-      }
-    });
-    console.log(payloads);
-    Promise.allSettled(
-      payloads.map((payload) => {
+  const AddOrUpdateTrip = async (details: any[]) => {
+    // 1️⃣ Prepare payloads properly
+
+    const payloads = await Promise.allSettled(
+      details.map(async (x) => {
+        const payload: { obj: trip; TripCoverImage?: File } = { obj: x };
+
+        if (x.TripCoverImage instanceof File) {
+          payload.TripCoverImage = await compressFile(x.TripCoverImage);
+        }
+
+        return payload;
+      }),
+    );
+    console.log(payloads, "payloads");
+    const fulfilledPayloads = payloads
+      .filter(
+        (
+          p,
+        ): p is PromiseFulfilledResult<{ obj: trip; TripCoverImage?: File }> =>
+          p.status === "fulfilled",
+      )
+      .map((p) => p.value);
+    console.log(fulfilledPayloads, "fulfilledPayloads");
+    const results = await Promise.allSettled(
+      fulfilledPayloads.map((payload) =>
         helper.xhr.Post(
           `/Event/${
-            slug == "new" || payload.obj.TripId == 0 ? "AddTrip" : "UpdateTrip"
+            slug === "new" || payload.obj.TripId === 0
+              ? "AddTrip"
+              : "UpdateTrip"
           }`,
-          helper.ConvertToFormData(payload)
-        );
-      })
-    )
-      .then((res) => {
-        const successfulResult = res
-          .filter((x) => x.status === "fulfilled")
-          .map((x) => x.value);
-        return successfulResult;
-      })
-      .catch((error) => {
-        console.error("Error in AddOrUpdateTrip:", error);
-      });
+          helper.ConvertToFormDataV2({ ...payload }),
+        ),
+      ),
+    );
+
+    return results
+      .filter((r) => r.status === "fulfilled")
+      .map((r: any) => r.value);
   };
 
   useEffect(() => {
@@ -351,7 +374,7 @@ const Page = () => {
       helper.xhr
         .Get(
           "/Event/GetEventById",
-          helper.GetURLParamString({ id: Number(slug) }).toString()
+          helper.GetURLParamString({ id: Number(slug) }).toString(),
         )
         .then((res) => {
           setObj({
@@ -367,6 +390,7 @@ const Page = () => {
             ZooId: res.data.ZooId,
             LocationId: res.data.LocationId,
             IsOccasional: res.data.IsOccasional,
+            EventTypeId: res.data.EventTypeId,
           });
           setEventImages(
             res.data.files.map((x: any) => {
@@ -375,7 +399,7 @@ const Page = () => {
                 file: null,
                 Docpath: x.EventFilepath,
               };
-            })
+            }),
           );
           setSelectedDays(res.data.EventDays.split(","));
           setMappedAnimals(res.data.animalIds);
@@ -391,7 +415,7 @@ const Page = () => {
                 TripCoverImage: null,
                 EventId: res.data.EventId,
               };
-            })
+            }),
           );
           setAreAnimalsIncludedInThisEvent(res.data.animalIds.length > 0);
           setHasNestedTrip(res.data.trips.length > 0);
@@ -407,7 +431,21 @@ const Page = () => {
             value: Number(z.ZooId),
             label: z.ZooTitle,
           };
-        })
+        }),
+      );
+    });
+  }, []);
+
+  useEffect(() => {
+    helper.xhr.Get("/List/GetEventTypes").then((res) => {
+      let arr = res.filter((ef: any) => ef.EventTypeId != 3);
+      setEventTypes(
+        arr.map((z: any) => {
+          return {
+            value: Number(z.EventTypeId),
+            label: z.Type,
+          };
+        }),
       );
     });
   }, []);
@@ -420,7 +458,7 @@ const Page = () => {
           .GetURLParamString({
             zooId: obj.ZooId,
           })
-          .toString()
+          .toString(),
       )
       .then((res) => {
         setAnimals(
@@ -429,7 +467,7 @@ const Page = () => {
               value: z.AnimalId,
               label: z.AnimalName,
             };
-          })
+          }),
         );
       });
   }, [obj.ZooId]);
@@ -441,7 +479,7 @@ const Page = () => {
           .GetURLParamString({
             zooId: obj.ZooId,
           })
-          .toString()
+          .toString(),
       )
       .then((res) => {
         setLocations(
@@ -450,7 +488,7 @@ const Page = () => {
               value: z.LocationId,
               label: z.LocationName,
             };
-          })
+          }),
         );
       });
   }, [obj.ZooId]);
@@ -524,8 +562,8 @@ const Page = () => {
                       obj?.EventLogoFilepath && obj?.EventLogoFilepath != ""
                         ? helper.GetDocument(obj.EventLogoFilepath)
                         : logoFile
-                        ? URL.createObjectURL(logoFile)
-                        : "/placeholder.svg"
+                          ? URL.createObjectURL(logoFile)
+                          : "/placeholder.svg"
                     }
                     alt="Trip event logo"
                     fill
@@ -579,8 +617,8 @@ const Page = () => {
                       obj?.EventCoverFilepath && obj?.EventCoverFilepath != ""
                         ? helper.GetDocument(obj.EventCoverFilepath)
                         : coverImageFile
-                        ? URL.createObjectURL(coverImageFile)
-                        : "/placeholder.svg"
+                          ? URL.createObjectURL(coverImageFile)
+                          : "/placeholder.svg"
                     }
                     alt="Cover image"
                     fill
@@ -691,6 +729,13 @@ const Page = () => {
               label="Zoo"
               options={zoos}
               isRequired
+            />
+            <Dropdown
+              activeId={obj.EventTypeId}
+              name="EventTypeId"
+              handleDropdownChange={handleChange}
+              label="Event Type"
+              options={eventTypes}
             />
             {!hasNestedTrip && (
               <Dropdown
@@ -857,7 +902,7 @@ const Page = () => {
                           className="text-xs text-red-900 hover:cursor-pointer text-right"
                           onClick={() => {
                             setEventDetails(
-                              eventDetails.filter((i, _) => _ != index)
+                              eventDetails.filter((i, _) => _ != index),
                             );
                           }}
                         >
@@ -876,14 +921,14 @@ const Page = () => {
                                   detail?.TripCoverFilepath == ""
                                     ? "/placeholder.svg"
                                     : detail?.TripCoverFilepath !== ""
-                                    ? helper.GetDocument(
-                                        detail?.TripCoverFilepath
-                                      )
-                                    : detail?.TripCoverImage
-                                    ? URL.createObjectURL(
-                                        detail?.TripCoverImage
-                                      )
-                                    : "/placeholder.svg"
+                                      ? helper.GetDocument(
+                                          detail?.TripCoverFilepath,
+                                        )
+                                      : detail?.TripCoverImage
+                                        ? URL.createObjectURL(
+                                            detail?.TripCoverImage,
+                                          )
+                                        : "/placeholder.svg"
                                 }
                                 alt="Cover image"
                                 fill
