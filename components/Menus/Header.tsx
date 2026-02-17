@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,20 +12,39 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { LogOut, UserCog } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { removeTokenCookie } from "@/lib/cookieToken";
+import { getCookieKey, removeTokenCookie } from "@/lib/cookieToken";
 import Logout from "@/Helper/helper";
 import useHelper from "@/Helper/helper";
 
 const Header = () => {
   const router = useRouter();
   const helper = useHelper();
-  const [userName, setUserName] = useState("Admin User");
+  const [userName, setUserName] = useState("");
+  const [subDetail, setSubDetail] = useState("");
+
+  useEffect(() => {
+    const userDetails = JSON.parse(getCookieKey("userDetails") || "");
+    if (userDetails) {
+      setUserName(userDetails.UserName);
+      setSubDetail(userDetails.UserCnic);
+    }
+  }, []);
 
   return (
     <div className="flex justify-end items-center min-h-[57px] border-b border-b-[#d7d7d7] px-4 md:px-5">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <div className="flex gap-3 h-full items-center">
+            <div className="text-sm flex-1 flex flex-col justify-center">
+              <div className="flex justify-between">
+                <p className="tracking-tight font-medium text-xs mb-0 font-poppins leading-[1.2]">
+                  {userName}
+                </p>
+              </div>
+              <p className="text-[10px] font-poppins font-normal text-muted-foreground mb-0 leading-[1.2]">
+                {subDetail}
+              </p>
+            </div>
             <div className="bg-slate-200 rounded-full h-8 w-8 cursor-pointer">
               <Image
                 src="/assets/menu/userProfile.svg"
@@ -34,14 +53,6 @@ const Header = () => {
                 alt="User"
                 className="rounded-full"
               />
-            </div>
-            <div className="text-sm flex-1 flex flex-col justify-center">
-              <div className="flex justify-between">
-                <p className="leading-3 font-medium mb-0">Admin User</p>
-              </div>
-              <p className="text-xs text-muted-foreground mb-0 leading-3">
-                ID: xxxxxx
-              </p>
             </div>
           </div>
         </DropdownMenuTrigger>

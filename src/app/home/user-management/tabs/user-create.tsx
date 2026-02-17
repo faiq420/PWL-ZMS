@@ -1,3 +1,4 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -205,7 +206,9 @@ const UserCreate = ({ mode = "create", id = "0" }: Props) => {
       })
       .catch((error) => {
         toast({
-          title: `User Not ${mode === "edit" ? "Updated" : "Created"} Successfully`,
+          title: `User Not ${
+            mode === "edit" ? "Updated" : "Created"
+          } Successfully`,
           description: error.message,
           variant: "danger",
         });
@@ -238,8 +241,7 @@ const UserCreate = ({ mode = "create", id = "0" }: Props) => {
                   <Image
                     src={
                       obj?.ImagePath && obj?.ImagePath != ""
-                        ?  helper.GetDocument(obj.ImagePath)
-                          
+                        ? helper.GetDocument(obj.ImagePath)
                         : imgFile
                         ? URL.createObjectURL(imgFile)
                         : "/placeholder.svg"

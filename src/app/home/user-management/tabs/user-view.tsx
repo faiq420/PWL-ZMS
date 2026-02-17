@@ -1,3 +1,4 @@
+"use client";
 import React, { useEffect, useState } from "react";
 import { Button } from "../../../../../components/ui/button";
 import {
@@ -60,7 +61,7 @@ const UserView = ({ mode = "create", id = "0" }: Props) => {
     role: "admin",
     status: "active",
     createdAt: "",
-    ImagePath: ""
+    ImagePath: "",
   });
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -85,7 +86,10 @@ const UserView = ({ mode = "create", id = "0" }: Props) => {
           lastLogin: response.user.LastLogin,
           permissions: response.permissions,
           phone: response.user.UserPhone,
-          ImagePath: `/user/${response.user.UserId}${response.user.Extension}?v=${Date.now()}` || "",
+          ImagePath:
+            `/user/${response.user.UserId}${
+              response.user.Extension
+            }?v=${Date.now()}` || "",
           activityLog: response.logs,
         });
       })
@@ -176,7 +180,13 @@ const UserView = ({ mode = "create", id = "0" }: Props) => {
           <Card className="sticky top-0">
             <CardHeader className="text-center">
               <Avatar className="w-24 h-24 mx-auto mb-4 border-2 border-2-background">
-                <AvatarImage src={user.ImagePath !== undefined ? helper.GetDocument(user.ImagePath) : "/placeholder.svg"} />
+                <AvatarImage
+                  src={
+                    user.ImagePath !== undefined
+                      ? helper.GetDocument(user.ImagePath)
+                      : "/placeholder.svg"
+                  }
+                />
                 <AvatarFallback className="text-lg">
                   {user.firstName.charAt(0)}
                   {user.lastName.charAt(0)}

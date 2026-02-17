@@ -438,7 +438,7 @@ export default function DigitalGuidePage() {
               />
             </PopoverContent>
           </Popover> */}
-          <Select defaultValue="all">
+          {/* <Select defaultValue="all">
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Select Zoo" />
             </SelectTrigger>
@@ -450,11 +450,11 @@ export default function DigitalGuidePage() {
                 </SelectItem>
               ))}
             </SelectContent>
-          </Select>
+          </Select> */}
         </div>
       </div>
 
-      <Tabs defaultValue="featuredAnimals" className="space-y-4">
+      {/* <Tabs defaultValue="featuredAnimals" className="space-y-4">
         <TabsList className="">
           <TabsTrigger value="featuredAnimals">Featured Animals</TabsTrigger>
           <TabsTrigger value="dailySchedule">Daily Schedule</TabsTrigger>
@@ -467,7 +467,7 @@ export default function DigitalGuidePage() {
         <TabsContent value="dailySchedule" className="space-y-2">
           <DailyScheduleTable />
         </TabsContent>
-      </Tabs>
+      </Tabs> */}
     </div>
   );
 }

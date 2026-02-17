@@ -14,6 +14,7 @@ import {
 import "./globals.css";
 import { ThemeProvider } from "../../components/theme-provider";
 import { Toaster } from "../../components/toaster";
+import Providers from "./providers";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -94,8 +95,10 @@ export default function RootLayout({
     >
       <body className="flex-1 flex flex-col min-h-screen">
         {/* <ThemeProvider attribute="class" defaultTheme="light" enableSystem> */}
+        <Providers>
           {children}
           <Toaster />
+        </Providers>
         {/* </ThemeProvider> */}
       </body>
     </html>

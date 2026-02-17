@@ -274,9 +274,7 @@ const Page = () => {
           : (editObject.EventCoverImage = compressedCover);
       }
       if (logoFile) {
-        const compressedLogo = logoFile
-          ? await compressFile(logoFile)
-          : null;
+        const compressedLogo = logoFile ? await compressFile(logoFile) : null;
         slug == "new"
           ? (createObject.EventLogoImage = compressedLogo)
           : (editObject.EventLogoImage = compressedLogo);
@@ -320,10 +318,10 @@ const Page = () => {
 
   const AddOrUpdateTrip = async (details: any) => {
     const payloads: { obj: trip; TripCoverImage?: File }[] = [];
-    details.forEach((x: any, i: number) => {
+    details.forEach(async (x: any, i: number) => {
       payloads[i] = { obj: x };
       if (x.TripCoverImage instanceof File) {
-        payloads[i].TripCoverImage = x.TripCoverImage;
+        payloads[i].TripCoverImage = await compressFile(x.TripCoverImage);
       }
     });
     console.log(payloads);

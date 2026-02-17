@@ -37,16 +37,32 @@ import collapsedIcon from "@/public//assets/logos/sidemenu_icon.png";
 import { getCookieKey, removeTokenCookie } from "@/lib/cookieToken";
 import useHelper from "@/Helper/helper";
 import { iconOptions } from "@/data/zoos";
+import { useSelector } from "react-redux";
 
 type TooltipState = {
   index: number | null;
   position: { top: number; left: number } | null;
 };
 
+type RootState = {
+  menu: {
+    items: Array<{ href: string; MenuName: string; iconName: string }>;
+  };
+};
+
 export function SideMenu() {
   const router = useRouter();
   const helper = useHelper();
+  const [userName, setUserName] = useState("");
+  const [subDetail, setSubDetail] = useState("");
 
+  useEffect(() => {
+    const userDetails = JSON.parse(getCookieKey("userDetails") || "");
+    if (userDetails) {
+      setUserName(userDetails.UserName);
+      setSubDetail(userDetails.UserCnic);
+    }
+  }, []);
   const pathname = usePathname();
   const [tooltip, setTooltip] = useState<TooltipState>({
     index: null,
@@ -55,7 +71,8 @@ export function SideMenu() {
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [sidebarItems, setSidebarItems] = useState<any[]>([]);
+  // const [sidebarItems, setSidebarItems] = useState<any[]>([]);
+  const sidebarItems = useSelector((state: RootState) => state.menu.items);
   const iconRefs = useRef<(HTMLAnchorElement | null)[]>([]);
 
   const handleMouseEnter = (index: number) => {
@@ -78,12 +95,12 @@ export function SideMenu() {
     return href == pathInitial;
   };
 
-  useEffect(() => {
-    if (typeof window != undefined) {
-      const menuItems = JSON.parse(helper.getData("menu_items"));
-      setSidebarItems(menuItems);
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (typeof window != undefined) {
+  //     const menuItems = JSON.parse(helper.getData("menu_items"));
+  //     setSidebarItems(menuItems);
+  //   }
+  // }, []);
 
   return (
     <>
@@ -103,8 +120,8 @@ export function SideMenu() {
       {/* Mobile Sidebar */}
       {sidebarOpen && (
         <div className="fixed inset-0 z-[1000] bg-white/80 backdrop-blur-sm md:hidden font-roboto">
-          <div className="isolate">
-            <div className="fixed inset-y-0 left-0 z-[1000] w-3/4 max-w-xs bg-transparent shadow-lg flex flex-col">
+          <div className="bg-white">
+            <div className="fixed inset-y-0 left-0 z-[1000] w-3/4 max-w-xs bg-transparent shadow-lg flex flex-col bg-white">
               <div className="flex items-center justify-between h-16 px-6 border-b">
                 <h2 className="font-semibold">Navigation</h2>
                 <Button
@@ -128,9 +145,9 @@ export function SideMenu() {
                         onClick={() => setSidebarOpen(false)}
                         className={cn(
                           "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all hover:text-main-darkOrange",
-                          pathname.startsWith(item.href.replace(/\/$/, ""))
-                            ? "bg-main-darkOrange/10 font-medium text-main-darkOrange"
-                            : "text-muted-foreground"
+                          isActiveURL(item.href)
+                            ? "bg-[#CBE88C] font-medium text-black"
+                            : "text-muted-foreground hover:text-black/70"
                         )}
                       >
                         {IconComponent && <IconComponent className="h-4 w-4" />}
@@ -157,11 +174,9 @@ export function SideMenu() {
                   </DropdownMenu>
                   <div className="text-sm flex-1">
                     <div className="flex justify-between">
-                      <p className="font-medium">Admin User</p>
+                      <p className="font-medium">{userName}</p>
                     </div>
-                    <p className="text-xs text-muted-foreground">
-                      admin@zoosystem.com
-                    </p>
+                    <p className="text-xs text-muted-foreground">{subDetail}</p>
                   </div>
                 </div>
                 <Link

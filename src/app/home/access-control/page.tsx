@@ -21,6 +21,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { RoleMenuMapping } from "@/components/access-control/role-menu-mapping";
 import { BulkPermissions } from "@/components/access-control/bulk-permissions";
 import CardIntro from "@/components/utils/Headings/CardIntro";
+import { getCookieKey } from "@/lib/cookieToken";
 
 export interface MenuProps {
   MenuId?: number;
@@ -39,6 +40,7 @@ export interface RoleProps {
 export default function AccessControlPage() {
   const helper = useHelper();
   const pageData = helper.GetPageData();
+  console.log(pageData)
   const [roles, setRoles] = useState<RoleProps[]>([]);
   const [menuItems, setMenuItems] = useState<OPTION[]>([]);
   const [isCruding, setIsCruding] = useState<boolean>(false);
@@ -59,8 +61,38 @@ export default function AccessControlPage() {
           );
         })
     )
-      .then((response) => {
-        console.log(response);
+      .then(async (response) => {
+        const successfulResponse = response
+          .filter((x) => x.status == "fulfilled")
+          .map((x) => x.value);
+        const userDetails = JSON.parse(getCookieKey("userDetails") || "");
+        if (userDetails) {
+          const roleMapping = successfulResponse.find(
+            (x) => x.RoleId === userDetails.RoleId
+          );
+          if (roleMapping) {
+            helper.updateMenuItemsInLocalStorage(
+              roleMapping.mappings
+                .sort((a: any, b: any) => a.MenuName.localeCompare(b.MenuName))
+                .sort((a: any, b: any) => a.SortingOrder - b.SortingOrder)
+                .map((item: any) => ({
+                  MenuName: item.MenuName,
+                  Description: item.Description,
+                  href: item.Path,
+                  iconName: item.Icon,
+                  MenuId: item.MenuId,
+                  ParentId: item.ParentId,
+                  SortingOrder: item.SortingOrder,
+                  permissions: {
+                    edit: item.Edit,
+                    create: item.Create,
+                    view: item.View,
+                    delete: item.Delete,
+                  },
+                }))
+            );
+          }
+        }
         toast({
           title: "Permissions Updated Successfully",
           description:
@@ -135,8 +167,6 @@ export default function AccessControlPage() {
     GetRoleMenuMapping();
   }, []);
 
-  console.log(pageData);
-
   return (
     <div className="flex-1 space-y-4 w-full md:w-min-[83vw] md:w-max-[95vw] xl:w-min-[85vw]">
       <div className="flex items-center justify-between">
@@ -144,7 +174,7 @@ export default function AccessControlPage() {
           title={pageData?.MenuName}
           description={pageData?.Description}
         />
-        {(pageData.permissions.create || pageData.permissions.edit) && (
+        {(pageData?.permissions?.create || pageData?.permissions?.edit) && (
           <div className="grid place-content-center">
             <ButtonComp
               clickEvent={handleSavePermissions}

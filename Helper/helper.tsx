@@ -11,7 +11,7 @@ const useHelper = () => {
   const pathname = usePathname();
   const router = useRouter();
   const BaseURL =
-    process.env.NODE_ENV === "development"
+    process.env.NODE_ENV !== "development"
       ? "https://localhost:44383"
       : "https://pwl-api.times-labs.com";
   const API: string = `${BaseURL}/api`;
@@ -147,9 +147,9 @@ const useHelper = () => {
   const xhr = {
     Post: async (endpoint: string, formData: FormData): Promise<any> => {
       // console.clear();
-      for (const [key, value] of formData.entries()) {
-        console.log(key, value);
-      }
+      // for (const [key, value] of formData.entries()) {
+      //   console.log(key, value);
+      // }
 
       const response = await fetch(API + endpoint, {
         method: "POST",
@@ -164,7 +164,7 @@ const useHelper = () => {
         return data;
       } else {
         const err = await response.json();
-        throw new Error(err.Message);
+        throw new Error(err.message);
       }
     },
     Get: async (
@@ -214,29 +214,38 @@ const useHelper = () => {
 
   const GetPageData = () => {
     const pathInitial = "/" + pathname.split("/").slice(1, 3).join("/");
-    const menuItem = JSON.parse(getData("menu_items")).find(
-      (item: any) => item.href === pathInitial
-    );
-    if (menuItem) {
-      return menuItem;
-    } else {
-      return {
-        MenuName: "",
-        Description: "",
-        href: "",
-        iconName: "",
-        MenuId: 0,
-        ParentId: null,
-        SortingOrder: "",
-        permissions: {
-          edit: false,
-          create: false,
-          view: false,
-          delete: false,
-        },
-      };
+    console.log(pathInitial, "pi");
+    if (typeof window !== "undefined") {
+      const menuItem = JSON.parse(getData("menu_items")).find(
+        (item: any) => item.href === pathInitial
+      );
+      console.log(menuItem);
+      if (menuItem) {
+        return menuItem;
+      } else {
+        return {
+          MenuName: "",
+          Description: "",
+          href: "",
+          iconName: "",
+          MenuId: 0,
+          ParentId: null,
+          SortingOrder: "",
+          permissions: {
+            edit: false,
+            create: false,
+            view: false,
+            delete: false,
+          },
+        };
+      }
     }
   };
+
+  function updateMenuItemsInLocalStorage(items: any[]) {
+    localStorage.setItem("menu_items", JSON.stringify(items));
+    window.dispatchEvent(new Event("menu_items_updated"));
+  }
 
   const Logout = () => {
     removeTokenCookie();
@@ -258,6 +267,7 @@ const useHelper = () => {
     API,
     GetPageData,
     Logout,
+    updateMenuItemsInLocalStorage,
   };
 };
 
