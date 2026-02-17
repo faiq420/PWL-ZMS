@@ -56,11 +56,12 @@ import {
 } from "@/components/ui/pagination";
 import CardIntro from "@/components/utils/Headings/CardIntro";
 import useHelper from "@/Helper/helper";
+import { usePageData } from "@/hooks/usePageData";
 
 export default function AnimalDirectoryPage() {
   const router = useRouter();
   const helper = useHelper();
-  const pageData = helper.GetPageData();
+  const pageData = usePageData();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [activeTab, setActiveTab] = useState("all");

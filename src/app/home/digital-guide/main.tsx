@@ -28,12 +28,13 @@ import SectionIntro from "@/components/utils/Headings/SectionIntro";
 import FeaturedAnimalsTable from "./tabs/FeaturedAnimalsTable";
 import DailyScheduleTable from "./tabs/DailyScheduleTable";
 import useHelper from "@/Helper/helper";
+import { usePageData } from "@/hooks/usePageData";
 
 export default function DigitalGuidePage() {
   const { toast } = useToast();
   const router = useRouter();
   const helper = useHelper();
-  const pageData = helper.GetPageData();
+  const pageData = usePageData();
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [routeModalOpen, setRouteModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);

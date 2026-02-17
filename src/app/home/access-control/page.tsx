@@ -22,6 +22,7 @@ import { RoleMenuMapping } from "@/components/access-control/role-menu-mapping";
 import { BulkPermissions } from "@/components/access-control/bulk-permissions";
 import CardIntro from "@/components/utils/Headings/CardIntro";
 import { getCookieKey } from "@/lib/cookieToken";
+import { usePageData } from "@/hooks/usePageData";
 
 export interface MenuProps {
   MenuId?: number;
@@ -39,7 +40,7 @@ export interface RoleProps {
 
 export default function AccessControlPage() {
   const helper = useHelper();
-  const pageData = helper.GetPageData();
+  const pageData = usePageData();
   console.log(pageData)
   const [roles, setRoles] = useState<RoleProps[]>([]);
   const [menuItems, setMenuItems] = useState<OPTION[]>([]);

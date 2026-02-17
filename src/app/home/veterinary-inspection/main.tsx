@@ -35,10 +35,11 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import SectionIntro from "@/components/utils/Headings/SectionIntro";
 import useHelper from "@/Helper/helper";
+import { usePageData } from "@/hooks/usePageData";
 
 export default function VeterinaryInspectionPage() {
   const helper = useHelper();
-  const pageData = helper.GetPageData();
+  const pageData = usePageData();
   return (
     <div className="flex-1 space-y-4">
       <div className="flex items-center justify-between">

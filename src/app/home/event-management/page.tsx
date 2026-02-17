@@ -39,6 +39,7 @@ import Checkbox from "@/components/utils/FormElements/Checkbox";
 import useHelper from "@/Helper/helper";
 import { useToast } from "@/components/ui/use-toast";
 import { changeDateFormat, to12Hour } from "@/Helper/DateFormats";
+import { usePageData } from "@/hooks/usePageData";
 
 type Event = {
   EventId: number;
@@ -54,7 +55,7 @@ export default function EventPage() {
   const { toast } = useToast();
   const router = useRouter();
   const helper = useHelper();
-  const pageData = helper.GetPageData();
+  const pageData = usePageData();
   const [searchQuery, setSearchQuery] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
   const [events, setEvents] = useState<Event[]>([]);

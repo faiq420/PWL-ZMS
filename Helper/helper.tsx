@@ -5,11 +5,8 @@ import {
   removeTokenCookie,
 } from "@/lib/cookieToken";
 import { defaultTokenObject, Token } from "@/lib/Token";
-import { usePathname, useRouter } from "next/navigation";
 
 const useHelper = () => {
-  const pathname = usePathname();
-  const router = useRouter();
   const BaseURL =
     process.env.NODE_ENV !== "development"
       ? "https://localhost:44383"
@@ -212,35 +209,35 @@ const useHelper = () => {
     return `${BaseURL}${url}`;
   }
 
-  const GetPageData = () => {
-    const pathInitial = "/" + pathname.split("/").slice(1, 3).join("/");
-    console.log(pathInitial, "pi");
-    if (typeof window !== "undefined") {
-      const menuItem = JSON.parse(getData("menu_items")).find(
-        (item: any) => item.href === pathInitial
-      );
-      console.log(menuItem);
-      if (menuItem) {
-        return menuItem;
-      } else {
-        return {
-          MenuName: "",
-          Description: "",
-          href: "",
-          iconName: "",
-          MenuId: 0,
-          ParentId: null,
-          SortingOrder: "",
-          permissions: {
-            edit: false,
-            create: false,
-            view: false,
-            delete: false,
-          },
-        };
-      }
-    }
-  };
+  // const GetPageData = () => {
+  //   const pathInitial = "/" + pathname.split("/").slice(1, 3).join("/");
+  //   console.log(pathInitial, "pi");
+  //   if (typeof window !== "undefined") {
+  //     const menuItem = JSON.parse(getData("menu_items")).find(
+  //       (item: any) => item.href === pathInitial
+  //     );
+  //     console.log(menuItem);
+  //     if (menuItem) {
+  //       return menuItem;
+  //     } else {
+  //       return {
+  //         MenuName: "",
+  //         Description: "",
+  //         href: "",
+  //         iconName: "",
+  //         MenuId: 0,
+  //         ParentId: null,
+  //         SortingOrder: "",
+  //         permissions: {
+  //           edit: false,
+  //           create: false,
+  //           view: false,
+  //           delete: false,
+  //         },
+  //       };
+  //     }
+  //   }
+  // };
 
   function updateMenuItemsInLocalStorage(items: any[]) {
     localStorage.setItem("menu_items", JSON.stringify(items));
@@ -251,7 +248,7 @@ const useHelper = () => {
     removeTokenCookie();
     removeCookieKey("userDetails");
     removeData("menu_items");
-    router.push("/");
+    // router.push("/");
   };
 
   return {
@@ -265,7 +262,7 @@ const useHelper = () => {
     removeData,
     GetDocument,
     API,
-    GetPageData,
+    // GetPageData,
     Logout,
     updateMenuItemsInLocalStorage,
   };

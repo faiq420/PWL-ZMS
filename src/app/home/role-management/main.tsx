@@ -29,6 +29,7 @@ import { useRouter } from "next/navigation";
 import SectionIntro from "@/components/utils/Headings/SectionIntro";
 import SearchTag from "@/components/utils/FormElements/SearchTag";
 import useHelper from "@/Helper/helper";
+import { usePageData } from "@/hooks/usePageData";
 
 export interface RoleProps {
   RoleId: number;
@@ -42,7 +43,7 @@ export interface RoleProps {
 export default function RoleManagementPage() {
   const router = useRouter();
   const helper = useHelper();
-  const pageData = helper.GetPageData();
+  const pageData = usePageData();
   const [roles, setRoles] = useState<RoleProps[]>([]);
   
   const [searchTerm, setSearchTerm] = useState("");

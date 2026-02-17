@@ -28,6 +28,7 @@ import useHelper from "@/Helper/helper";
 import { useRouter } from "next/navigation";
 import ButtonComp from "@/components/utils/Button";
 import SectionIntro from "@/components/utils/Headings/SectionIntro";
+import { usePageData } from "@/hooks/usePageData";
 
 export default function UserManagementPage() {
   const [users, setUsers] = useState<User[]>(mockUsers);
@@ -37,7 +38,7 @@ export default function UserManagementPage() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [activeTab, setActiveTab] = useState<string>("all");
   const helper = useHelper();
-  const pageData = helper.GetPageData();
+  const pageData = usePageData();
   const router = useRouter();
 
   function GetAllUsers() {

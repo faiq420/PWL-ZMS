@@ -27,6 +27,7 @@ import { useRouter } from "next/navigation";
 import useHelper from "@/Helper/helper";
 import ButtonComp from "@/components/utils/Button";
 import { useToast } from "@/components/ui/use-toast";
+import { usePageData } from "@/hooks/usePageData";
 
 export default function MenuManagementPage() {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
@@ -36,7 +37,7 @@ export default function MenuManagementPage() {
   const [isCruding, setIsCruding] = useState<boolean>(false);
   const router = useRouter();
   const helper = useHelper();
-  const pageData = helper.GetPageData();
+  const pageData = usePageData();
   const { toast } = useToast();
 
   const handleCreateMenu = () => {

@@ -30,11 +30,12 @@ import SectionIntro from "@/components/utils/Headings/SectionIntro";
 import { useEffect, useState } from "react";
 import useHelper from "@/Helper/helper";
 import Unauthorized from "../../unauthorized/page";
+import { usePageData } from "@/hooks/usePageData";
 
 export default function ZooProfilesPage() {
   const router = useRouter();
   const helper = useHelper();
-  const pageData = helper.GetPageData();
+  const pageData = usePageData();
   const [zooProfiles, setZooProfiles] = useState<
     {
       ZooId: number;

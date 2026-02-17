@@ -70,7 +70,10 @@ const Header = () => {
           <DropdownMenuSeparator />
           <DropdownMenuItem
             className="text-red-500 focus:text-red-500"
-            onClick={helper.Logout}
+            onClick={() => {
+              helper.Logout();
+              router.push("/");
+            }}
           >
             <LogOut className="mr-2 h-3 w-3" />
             <span className="text-xs">Log out</span>

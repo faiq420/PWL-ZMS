@@ -7,18 +7,8 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { useToast } from "@/components/ui/use-toast";
 import ButtonComp from "@/components/utils/Button";
-import DateRangePicker from "@/components/utils/FormElements/DateRangePicker";
 import Dropdown from "@/components/utils/FormElements/Dropdown";
 import InputTag from "@/components/utils/FormElements/InputTag";
 import MultiSelectDropdown from "@/components/utils/FormElements/MultiSelectDropdown";
@@ -65,7 +55,7 @@ type ticketDetails = {
   Amount: number;
 };
 
-const Page = () => {
+const TripManagementPage = () => {
   const { toast } = useToast();
   const helper = useHelper();
   const router = useRouter();
@@ -281,7 +271,6 @@ const Page = () => {
       }
       if (logoFile) {
         const compressedLogo = logoFile ? await compressFile(logoFile) : null;
-        const compressedLogo = logoFile ? await compressFile(logoFile) : null;
         slug == "new"
           ? (createObject.EventLogoImage = compressedLogo)
           : (editObject.EventLogoImage = compressedLogo);
@@ -328,7 +317,6 @@ const Page = () => {
   };
 
   const AddOrUpdateTrip = async (details: any[]) => {
-    // 1️⃣ Prepare payloads properly
 
     const payloads = await Promise.allSettled(
       details.map(async (x) => {
@@ -690,20 +678,7 @@ const Page = () => {
                 isRequired
               />
             </div>
-            {/* {obj.IsOccasional ? (
-              <DateRangePicker
-                value={{ startDate: obj.FromDate, endDate: obj.ToDate }}
-                name="DateRange"
-                setter={(n, v) => {
-                  setObj({
-                    ...obj,
-                    FromDate: v.startDate,
-                    ToDate: v.endDate,
-                  });
-                }}
-                label="Date Range for the event"
-              />
-            ) : ( */}
+
             <InputTag
               value={obj.TagLine}
               name="TagLine"
@@ -759,7 +734,6 @@ const Page = () => {
                 placeHolder="Write description for the trip event here..."
               />
             </div>
-            {/* )} */}
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-2 gap-y-3">
             <Toggle
@@ -1028,150 +1002,6 @@ const Page = () => {
           </CardContent>
         </Card>
       )}
-      {/* <Card>
-        <CardHeader></CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            <div className="flex justify-between">
-              <Paragraph text="Ticket Pricing" />
-              <div className="w-fit">
-                <ButtonComp
-                  type={"white"}
-                  text="Add"
-                  clickEvent={() => {
-                    setTickets([...tickets, { Title: "", Details: [] }]);
-                  }}
-                />
-              </div>
-            </div>
-            <div className="space-y-4">
-              {tickets.map((ticket, index) => (
-                <div className="" key={index}>
-                  <div className="w-full md:w-1/3 xl:w-1/4">
-                    <InputTag
-                      value={ticket.Title}
-                      name="Title"
-                      placeHolder="Day safari"
-                      setter={(n, v) => {
-                        const updatedTickets = [...tickets];
-                        updatedTickets[index] = {
-                          ...updatedTickets[index],
-                          [n]: v,
-                        };
-                        setTickets(updatedTickets);
-                      }}
-                      label="Title"
-                    />
-                  </div>
-                  <Table className="border text-xs mt-2">
-                    <TableHeader>
-                      <TableHead>S.No</TableHead>
-                      <TableHead>Category</TableHead>
-                      <TableHead>Amount</TableHead>
-                      <TableHead>Additional Information</TableHead>
-                    </TableHeader>
-                    <TableBody>
-                      {ticket.Details.map((detail, detailIndex) => (
-                        <TableRow key={detailIndex}>
-                          <TableCell className="w-8">
-                            {(detailIndex + 1).toString().padStart(2, "0")}.
-                          </TableCell>
-                          <TableCell className="px-2 py-1 w-[250px]">
-                            <InputTag
-                              value={detail.Category}
-                              name="Category"
-                              placeHolder="Child/Adult"
-                              setter={(n, v) => {
-                                const updatedDetails = [...ticket.Details];
-                                updatedDetails[detailIndex] = {
-                                  ...updatedDetails[detailIndex],
-                                  [n]: v,
-                                };
-                                const updatedTickets = [...tickets];
-                                updatedTickets[index] = {
-                                  ...updatedTickets[index],
-                                  Details: updatedDetails,
-                                };
-                                setTickets(updatedTickets);
-                              }}
-                            />
-                          </TableCell>
-                          <TableCell className="px-2 py-1 w-20">
-                            <InputTag
-                              value={detail.Amount}
-                              name="Amount"
-                              type="number"
-                              setter={(n, v) => {
-                                const updatedDetails = [...ticket.Details];
-                                updatedDetails[detailIndex] = {
-                                  ...updatedDetails[detailIndex],
-                                  [n]: v,
-                                };
-                                const updatedTickets = [...tickets];
-                                updatedTickets[index] = {
-                                  ...updatedTickets[index],
-                                  Details: updatedDetails,
-                                };
-                                setTickets(updatedTickets);
-                              }}
-                            />
-                          </TableCell>
-                          <TableCell className="px-2 py-1">
-                            <InputTag
-                              value={detail.AdditionalInformation}
-                              name="AdditionalInformation"
-                              placeHolder="Between the age of 03 to 12 years."
-                              setter={(n, v) => {
-                                const updatedDetails = [...ticket.Details];
-                                updatedDetails[detailIndex] = {
-                                  ...updatedDetails[detailIndex],
-                                  [n]: v,
-                                };
-                                const updatedTickets = [...tickets];
-                                updatedTickets[index] = {
-                                  ...updatedTickets[index],
-                                  Details: updatedDetails,
-                                };
-                                setTickets(updatedTickets);
-                              }}
-                            />
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                      <TableCell className="" colSpan={4}>
-                        <div
-                          onClick={() => {
-                            const updatedTickets = [...tickets];
-                            updatedTickets[index] = {
-                              ...updatedTickets[index],
-                              Details: [
-                                ...updatedTickets[index]["Details"],
-                                {
-                                  Category: "",
-                                  AdditionalInformation: "",
-                                  Amount: 0,
-                                },
-                              ],
-                            };
-                            setTickets(updatedTickets);
-                          }}
-                          className="flex items-center gap-2 cursor-pointer w-fit"
-                        >
-                          <PlusCircle size={12} />
-                          <p>Add Ticket Category</p>
-                        </div>
-                      </TableCell>
-                    </TableBody>
-                  </Table>
-                  {index < tickets.length - 1 && (
-                    <hr className="w-full h-[1px] bg-main-borderColor mt-4" />
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        </CardContent>
-      </Card> */}
       <div className="w-full flex justify-end">
         <div className="w-full md:w-fit flex space-x-2">
           <ButtonComp
@@ -1192,4 +1022,4 @@ const Page = () => {
   );
 };
 
-export default Page;
+export default TripManagementPage;

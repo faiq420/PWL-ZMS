@@ -25,6 +25,7 @@ import Image from "next/image";
 import CustomBarChart from "./BarChart";
 import { motion } from "framer-motion";
 import useHelper from "@/Helper/helper";
+import { usePageData } from "@/hooks/usePageData";
 
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
@@ -41,7 +42,7 @@ export default function Home() {
     dates: string[];
   }>({ dates: [] });
   const helper = useHelper();
-  const pageData = helper.GetPageData();
+  const pageData = usePageData();
   const [series, setSeries] = useState<{ name: string; data: number[] }[]>([]);
   const [cards, setCards] = useState<Card[]>([
     {

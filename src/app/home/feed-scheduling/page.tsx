@@ -38,6 +38,7 @@ import {
 import { changeDateFormat } from "@/Helper/DateFormats";
 import Checkbox from "@/components/utils/FormElements/Checkbox";
 import useHelper from "@/Helper/helper";
+import { usePageData } from "@/hooks/usePageData";
 
 interface FeedSchedule {
   id: number;
@@ -91,7 +92,7 @@ const initialFeedSchedules: FeedSchedule[] = [
 export default function FeedSchedulingPage() {
   const router = useRouter();
   const helper = useHelper();
-  const pageData = helper.GetPageData();
+  const pageData = usePageData();
   const [searchQuery, setSearchQuery] = useState("");
   const [schedules, setSchedules] = useState<FeedSchedule[]>([
     ...initialFeedSchedules,

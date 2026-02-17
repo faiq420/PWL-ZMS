@@ -5,18 +5,19 @@ import SectionIntro from "@/components/utils/Headings/SectionIntro";
 import { Card, CardContent } from "@/components/ui/card";
 import FoodCourtTable from "./tabs/FoodCourt";
 import useHelper from "@/Helper/helper";
+import { usePageData } from "@/hooks/usePageData";
 
 export default function VisitorServicesPage() {
   const helper = useHelper();
-  // const pageData = helper.GetPageData();
+  const pageData = usePageData();
   return (
     <div className="flex-1 space-y-4">
-      {/* <SectionIntro
+      <SectionIntro
         title={pageData?.MenuName}
         description={pageData?.Description}
-      /> */}
+      />
 
-      {/* <Tabs defaultValue="food-dining" className="space-y-4">
+      <Tabs defaultValue="food-dining" className="space-y-4">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="food-dining">Food & Dining</TabsTrigger>
           <TabsTrigger value="facilities-safety">
@@ -31,7 +32,7 @@ export default function VisitorServicesPage() {
         <TabsContent value="facilities-safety" className="space-y-4">
           <FacilitiesAndSafety />
         </TabsContent>
-      </Tabs> */}
+      </Tabs>
     </div>
   );
 }

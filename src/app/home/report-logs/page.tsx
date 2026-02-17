@@ -15,10 +15,11 @@ import ReportCards from "./components/ReportCards";
 import CardIntro from "@/components/utils/Headings/CardIntro";
 import ButtonComp from "@/components/utils/Button";
 import useHelper from "@/Helper/helper";
+import { usePageData } from "@/hooks/usePageData";
 
 export default function ReportsLogsPage() {
   const helper = useHelper();
-  const pageData = helper.GetPageData();
+  const pageData = usePageData();
   const [cardData, setCardData] = useState([
     {
       title: "Visitor Statistics",
