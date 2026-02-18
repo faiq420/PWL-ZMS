@@ -78,7 +78,7 @@ export function UserTable({ users, onDelete }: UserTableProps) {
 
   function handleOpenModal(user: User) {
     setSelectedUser({
-      label: `${user.firstName} ${user.lastName}`,
+      label: `${user.userName}`,
       value: user.Id,
     });
     setIsModalOpen(true);
@@ -88,13 +88,13 @@ export function UserTable({ users, onDelete }: UserTableProps) {
   function NavigateToRecord(mode: string, id?: number) {
     router.push(
       `/home/user-management?mode=${mode}` +
-        (id != undefined ? `&id=${id}` : "")
+        (id != undefined ? `&id=${id}` : ""),
     );
   }
 
   return (
     <>
-      <div className="rounded-md border">
+      <div className="rounded-md border font-tajawal">
         <Table>
           <TableHeader>
             <TableRow>
@@ -111,16 +111,9 @@ export function UserTable({ users, onDelete }: UserTableProps) {
               <TableRow key={index}>
                 <TableCell>
                   <div className="flex items-center space-x-3">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src={user.avatar || "/placeholder.svg"} />
-                      <AvatarFallback>
-                        {user.firstName.charAt(0)}
-                        {user.lastName.charAt(0)}
-                      </AvatarFallback>
-                    </Avatar>
                     <div>
                       <div className="font-medium">
-                        {user.firstName} {user.lastName}
+                        {user.userName}
                       </div>
                       <div className="text-sm text-muted-foreground">
                         {user.email}
@@ -129,12 +122,18 @@ export function UserTable({ users, onDelete }: UserTableProps) {
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Badge className={getRoleColor(user.role)} variant={"outline"}>
+                  <Badge
+                    className={getRoleColor(user.role)}
+                    variant={"outline"}
+                  >
                     {formatRole(user.role)}
                   </Badge>
                 </TableCell>
                 <TableCell>
-                  <Badge className={getStatusColor(user.status)} variant={"outline"}>
+                  <Badge
+                    className={getStatusColor(user.status)}
+                    variant={"outline"}
+                  >
                     {formatRole(user.status)}
                   </Badge>
                 </TableCell>
@@ -175,7 +174,7 @@ export function UserTable({ users, onDelete }: UserTableProps) {
                         onClick={() =>
                           NavigateToRecord(
                             "view",
-                            user.Id ? user.Id : undefined
+                            user.Id ? user.Id : undefined,
                           )
                         }
                       >
@@ -186,7 +185,7 @@ export function UserTable({ users, onDelete }: UserTableProps) {
                         onClick={() =>
                           NavigateToRecord(
                             "edit",
-                            user.Id ? parseInt(String(user.Id)) : undefined
+                            user.Id ? parseInt(String(user.Id)) : undefined,
                           )
                         }
                       >

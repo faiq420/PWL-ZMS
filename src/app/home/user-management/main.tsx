@@ -31,7 +31,7 @@ import SectionIntro from "@/components/utils/Headings/SectionIntro";
 import { usePageData } from "@/hooks/usePageData";
 
 export default function UserManagementPage() {
-  const [users, setUsers] = useState<User[]>(mockUsers);
+  const [users, setUsers] = useState<User[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -50,15 +50,12 @@ export default function UserManagementPage() {
           response.users.map((item: any) => ({
             Id: item.UserId,
             email: item.UserEmail,
-            firstName: item.UserName.split(" ")[0],
-            lastName: item.UserName.includes(" ")
-              ? item.UserName.split("")[1]
-              : "",
+            userName: item.UserName,
             role: item.RoleName,
             status: item.IsActive === true ? "active" : "inactive",
             lastLogin: item.LastLogin,
             phone: item.UserPhone,
-          }))
+          })),
         );
       })
       .catch((error) => {
@@ -91,7 +88,7 @@ export default function UserManagementPage() {
   function NavigateToRecord(mode: string, id?: number) {
     router.push(
       `/home/user-management?mode=${mode}` +
-        (id != undefined ? `&id=${id}` : "")
+        (id != undefined ? `&id=${id}` : ""),
     );
   }
 
@@ -102,8 +99,8 @@ export default function UserManagementPage() {
         users.map((user) =>
           user.Id === selectedUser.Id
             ? { ...user, ...userData, updatedAt: new Date().toISOString() }
-            : user
-        )
+            : user,
+        ),
       );
     } else {
       // Create new user
@@ -121,8 +118,8 @@ export default function UserManagementPage() {
 
   const filteredUsers = users.filter((user) => {
     const matchesSearch =
-      user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (user.userName &&
+        user.userName.toLowerCase().includes(searchTerm.toLowerCase())) ||
       user.email.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus =
       statusFilter === "all" || user.status === statusFilter;
@@ -194,7 +191,7 @@ export default function UserManagementPage() {
                   <TabsTrigger key={index} value={role}>
                     {roleLabels[role] || role}
                   </TabsTrigger>
-                )
+                ),
               )}
             </TabsList>
 
@@ -215,7 +212,7 @@ export default function UserManagementPage() {
                     onDelete={handleDeleteUser}
                   />
                 </TabsContent>
-              )
+              ),
             )}
           </Tabs>
         </CardContent>
