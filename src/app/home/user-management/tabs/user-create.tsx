@@ -16,7 +16,12 @@ import InputTag from "@/components/utils/FormElements/InputTag";
 import Checkbox from "@/components/utils/FormElements/Checkbox";
 import { FileUploader } from "@/components/animal/file-uploader";
 import Toggle from "@/components/utils/FormElements/Toggle";
-import { formatCnic, formatPhoneNumber, validEmail } from "@/Helper/Utility";
+import {
+  formatCnic,
+  formatPhoneNumber,
+  validEmail,
+  verifyPassword,
+} from "@/Helper/Utility";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import useHelper from "@/Helper/helper";
@@ -59,7 +64,8 @@ const UserCreate = ({ mode = "create", id = "0" }: Props) => {
     email: boolean;
     cnic: boolean;
     contact: boolean;
-  }>({ email: true, cnic: true, contact: true });
+    password: boolean | string | null;
+  }>({ email: true, cnic: true, contact: true, password: true });
   const { toast } = useToast();
   const [obj, setObj] = useState<UserObject>({
     UserId: 0,
@@ -78,13 +84,13 @@ const UserCreate = ({ mode = "create", id = "0" }: Props) => {
   const [zooList, setZooList] = useState<OPTION[]>(
     zoos.map((z: any) => {
       return { label: z.label, value: z.value };
-    })
+    }),
   );
   const [roles, setRoles] = useState<OPTION[]>([]);
   const capitalize = (value: string, space = " ") => {
     const words = String(value).split(space);
     const capitalizedWords = words.map(
-      (word) => word.charAt(0).toUpperCase() + word.slice(1)
+      (word) => word.charAt(0).toUpperCase() + word.slice(1),
     );
     return capitalizedWords.join(" ");
   };
@@ -114,18 +120,28 @@ const UserCreate = ({ mode = "create", id = "0" }: Props) => {
     IsActive: boolean;
     UserCnic: string;
     RoleId: number;
+    UserPassword?: string;
   }): boolean {
     const isValidEmail = Boolean(validEmail(data.UserEmail));
     const isValidCnic = data.UserCnic.length === 15;
     const isValidPhone = data.UserPhone.length === 11;
 
+    if (data.UserPassword) {
+      verifyPassword(data.UserPassword);
+    }
+
     setIsValidInput({
       email: isValidEmail,
       cnic: isValidCnic,
       contact: isValidPhone,
+      password: data.UserPassword
+        ? verifyPassword(data.UserPassword).isValid
+        : null,
     });
 
-    return isValidEmail && isValidCnic && isValidPhone;
+    return isValidEmail && isValidCnic && isValidPhone && data.UserPassword
+      ? verifyPassword(data.UserPassword).isValid
+      : true;
   }
 
   useEffect(() => {
@@ -149,16 +165,15 @@ const UserCreate = ({ mode = "create", id = "0" }: Props) => {
       helper.xhr
         .Get(
           "/Users/GetUserById",
-          helper.GetURLParamString({ userId: Number(id) }).toString()
+          helper.GetURLParamString({ userId: Number(id) }).toString(),
         )
         .then((response) => {
           const user = response.user;
+          console.log(response);
           setObj({
-            ...response.user,
+            ...user,
             ImagePath:
-              `/user/${response.user.UserId}${
-                response.user.Extension
-              }?v=${Date.now()}` || "",
+              user.ProfileImage != null ? user.ProfileImage.UserFilepath : null,
             UserPassword: "",
           });
         })
@@ -184,6 +199,7 @@ const UserCreate = ({ mode = "create", id = "0" }: Props) => {
       IsActive: obj.IsActive,
       UserCnic: obj.UserCnic,
       RoleId: obj.RoleId,
+      UserPassword: obj.UserPassword,
     };
     if (!validations(data)) return;
     helper.xhr
@@ -193,7 +209,7 @@ const UserCreate = ({ mode = "create", id = "0" }: Props) => {
           obj: data,
           ZooId: obj.AssignedZoo === 0 ? null : obj.AssignedZoo,
           image: imgFile,
-        })
+        }),
       )
       .then((response) => {
         toast({
@@ -243,8 +259,8 @@ const UserCreate = ({ mode = "create", id = "0" }: Props) => {
                       obj?.ImagePath && obj?.ImagePath != ""
                         ? helper.GetDocument(obj.ImagePath)
                         : imgFile
-                        ? URL.createObjectURL(imgFile)
-                        : "/placeholder.svg"
+                          ? URL.createObjectURL(imgFile)
+                          : "/placeholder.svg"
                     }
                     alt="Profile image"
                     fill
@@ -372,6 +388,20 @@ const UserCreate = ({ mode = "create", id = "0" }: Props) => {
                   setter={handleChange}
                   label="LicenseNumber"
                   placeHolder="VET-2024-001"
+                />
+              )}
+              {obj.UserId == 0 && (
+                <InputTag
+                  name="UserPassword"
+                  value={obj.UserPassword}
+                  setter={handleChange}
+                  label="UserPassword"
+                  placeHolder="********"
+                  error={
+                    !isValidInput.password
+                      ? verifyPassword(obj.UserPassword).errors.join("\n")
+                      : ""
+                  }
                 />
               )}
               <div

@@ -165,7 +165,7 @@ const ZooCrud = ({ ZooId }: Props) => {
       helper.xhr
         .Post(
           obj.ZooId != 0 ? `/Zoo/UpdateZoo` : `/Zoo/CreateZoo`,
-          helper.ConvertToFormData(object)
+          helper.ConvertToFormData(object),
         )
         .then((response) => {
           toast({
@@ -193,7 +193,9 @@ const ZooCrud = ({ ZooId }: Props) => {
       helper.xhr
         .Get(
           "/Zoo/GetZooById",
-          helper.GetURLParamString({ zooId: Number(ZooId) }).toString()
+          helper
+            .GetURLParamString({ zooId: Number(ZooId), animalCount: 0 })
+            .toString(),
         )
         .then((res) => {
           console.log(res);
@@ -208,7 +210,7 @@ const ZooCrud = ({ ZooId }: Props) => {
                 Docpath: file.ZooFilepath,
                 ZooId: res.zoo_details.ZooId,
               };
-            })
+            }),
           );
           setCoordinatePolygon(res.boundary);
         });
@@ -361,8 +363,8 @@ const ZooCrud = ({ ZooId }: Props) => {
                           obj?.ZooLogoFilepath && obj?.ZooLogoFilepath != ""
                             ? helper.GetDocument(obj.ZooLogoFilepath)
                             : iconImageSrc
-                            ? URL.createObjectURL(iconImageSrc)
-                            : "/placeholder.svg"
+                              ? URL.createObjectURL(iconImageSrc)
+                              : "/placeholder.svg"
                         }
                         alt="Zoo Logo"
                         fill
@@ -429,8 +431,8 @@ const ZooCrud = ({ ZooId }: Props) => {
                           obj?.CoverImageFilepath != ""
                             ? helper.GetDocument(obj.CoverImageFilepath)
                             : bannerImageSrc
-                            ? URL.createObjectURL(bannerImageSrc)
-                            : "/placeholder.svg"
+                              ? URL.createObjectURL(bannerImageSrc)
+                              : "/placeholder.svg"
                         }
                         alt="Zoo Banner"
                         fill

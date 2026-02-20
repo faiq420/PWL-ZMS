@@ -34,10 +34,10 @@ export default function LoginPage() {
   const helper = useHelper();
   const router = useRouter();
   const [email, setEmail] = useState(
-    process.env.NODE_ENV == "development" ? "admin@zoosystem.com" : ""
+    process.env.NODE_ENV == "development" ? "timessoftwarepk@gmail.com" : "",
   );
   const [password, setPassword] = useState(
-    process.env.NODE_ENV == "development" ? "password" : ""
+    process.env.NODE_ENV == "development" ? "Admin@1234" : "",
   );
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -57,7 +57,7 @@ export default function LoginPage() {
         helper.ConvertToFormData({
           email: email,
           password: password,
-        })
+        }),
       )
       .then((res) => {
         console.log(res);
@@ -72,6 +72,10 @@ export default function LoginPage() {
             UserCnic: res.user.UserCnic,
             UserPhone: res.user.UserPhone,
             UserName: res.user.UserName,
+            ProfileImage:
+              res.user.ProfileImage != null
+                ? res.user.ProfileImage.UserFilepath
+                : null,
           };
           setCookieKey("userDetails", JSON.stringify(userDetails));
           helper.updateMenuItemsInLocalStorage(
@@ -92,7 +96,7 @@ export default function LoginPage() {
                   view: item.View,
                   delete: item.Delete,
                 },
-              }))
+              })),
           );
           router.push("/home");
         }

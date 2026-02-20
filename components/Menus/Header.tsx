@@ -19,14 +19,21 @@ import useHelper from "@/Helper/helper";
 const Header = () => {
   const router = useRouter();
   const helper = useHelper();
-  const [userName, setUserName] = useState("");
-  const [subDetail, setSubDetail] = useState("");
+  const [userData, setUserData] = useState({
+    UserName: "Username",
+    UserCnic: "xxxxx-xxxxxxx-x",
+    ProfileImage: null,
+  });
 
   useEffect(() => {
     const userDetails = JSON.parse(getCookieKey("userDetails") || "");
+    console.log(userDetails);
     if (userDetails) {
-      setUserName(userDetails.UserName);
-      setSubDetail(userDetails.UserCnic);
+      setUserData({
+        UserName: userDetails.UserName,
+        UserCnic: userDetails.UserCnic,
+        ProfileImage: userDetails.ProfileImage,
+      });
     }
   }, []);
 
@@ -38,16 +45,20 @@ const Header = () => {
             <div className="text-sm flex-1 flex flex-col justify-center">
               <div className="flex justify-between">
                 <p className="tracking-tight font-medium text-xs mb-0 font-poppins leading-[1.2]">
-                  {userName}
+                  {userData.UserName}
                 </p>
               </div>
               <p className="text-[10px] font-poppins font-normal text-muted-foreground mb-0 leading-[1.2]">
-                {subDetail}
+                {userData.UserCnic}
               </p>
             </div>
             <div className="bg-slate-200 rounded-full h-8 w-8 cursor-pointer">
               <Image
-                src="/assets/menu/userProfile.svg"
+                src={
+                  userData.ProfileImage == null
+                    ? "/assets/menu/userProfile.svg"
+                    : helper.GetDocument(userData.ProfileImage)
+                }
                 height={32}
                 width={32}
                 alt="User"
@@ -58,7 +69,7 @@ const Header = () => {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="font-roboto text-[6px]">
           <DropdownMenuLabel className="text-xs font-medium text-center uppercase truncate">
-            {userName}
+            {userData.UserName}
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem

@@ -47,7 +47,7 @@ export const compressFile = async (
     maxWidthOrHeight?: number;
     maxIteration?: number;
     useWebWorker?: boolean;
-  }
+  },
 ): Promise<File> => {
   if (!file) throw new Error("No file provided for compression");
 
@@ -96,7 +96,7 @@ export const NavigateToRecord = (
   screen: ScreenKey,
   tab: string = "",
   mode: string,
-  id?: number
+  id?: number,
 ) => {
   const screens: Record<ScreenKey, string> = {
     user: "user-management",
@@ -120,4 +120,22 @@ export const NavigateToRecord = (
 export const validEmail = (string: string) => {
   const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return regex.test(string) ? string : "";
+};
+
+export const verifyPassword = (password: string) => {
+  const minLength = 8;
+  const hasUpperCase = /[A-Z]/.test(password);
+  const hasLowerCase = /[a-z]/.test(password);
+  const hasSymbol = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+  const hasMinLength = password.length >= minLength;
+
+  return {
+    isValid: hasUpperCase && hasLowerCase && hasSymbol && hasMinLength,
+    errors: [
+      !hasMinLength && `Password must be at least ${minLength} characters.`,
+      !hasUpperCase && "Password must contain at least one uppercase letter.",
+      !hasLowerCase && "Password must contain at least one lowercase letter.",
+      !hasSymbol && "Password must contain at least one symbol.",
+    ].filter(Boolean),
+  };
 };
