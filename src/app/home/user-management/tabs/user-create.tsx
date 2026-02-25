@@ -30,6 +30,7 @@ import Dropdown from "@/components/utils/FormElements/Dropdown";
 import { zoos } from "@/data/users";
 import ButtonComp from "@/components/utils/Button";
 import { useToast } from "@/components/ui/use-toast";
+import { setCookieKey, removeCookieKey } from "@/lib/cookieToken";
 
 interface Props {
   mode?: string;
@@ -219,6 +220,22 @@ const UserCreate = ({ mode = "create", id = "0" }: Props) => {
           } Successfully`,
           variant: "success",
         });
+        console.log(response,"responseeee");
+        removeCookieKey("userDetails");
+         const userDetails = {
+            UserId: response.user.UserId,
+            UserEmail: response.user.UserEmail,
+            RoleId: response.user.RoleId,
+            UserCnic: response.user.UserCnic,
+            UserPhone: response.user.UserPhone,
+            UserName: response.user.UserName,
+            ProfileImage:
+              response.user.UserFiles.length > 0
+                ? response.user.UserFiles[0].UserFilepath
+                : null,
+          };
+          console.log(userDetails,"userDetails");
+          setCookieKey("userDetails", JSON.stringify(userDetails));
       })
       .catch((error) => {
         toast({
@@ -234,7 +251,6 @@ const UserCreate = ({ mode = "create", id = "0" }: Props) => {
         router.back();
       });
   }
-
   return (
     <div className="flex-1 space-y-4">
       <div className="flex items-center justify-between">

@@ -73,8 +73,8 @@ export default function LoginPage() {
             UserPhone: res.user.UserPhone,
             UserName: res.user.UserName,
             ProfileImage:
-              res.user.ProfileImage != null
-                ? res.user.ProfileImage.UserFilepath
+              res.user.UserFiles.length > 0
+                ? res.user.UserFiles[0].UserFilepath
                 : null,
           };
           setCookieKey("userDetails", JSON.stringify(userDetails));

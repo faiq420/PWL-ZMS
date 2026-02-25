@@ -52,15 +52,16 @@ const Header = () => {
                 {userData.UserCnic}
               </p>
             </div>
-            <div className="bg-slate-200 rounded-full h-8 w-8 cursor-pointer">
+            <div className="bg-slate-200 rounded-full relative h-8 w-8 cursor-pointer">
               <Image
                 src={
                   userData.ProfileImage == null
                     ? "/assets/menu/userProfile.svg"
                     : helper.GetDocument(userData.ProfileImage)
                 }
-                height={32}
-                width={32}
+                // height={32}
+                // width={32}
+                fill
                 alt="User"
                 className="rounded-full"
               />
