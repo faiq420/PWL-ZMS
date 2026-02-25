@@ -42,8 +42,8 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: React.FormEvent) => {
+    e?.preventDefault();
     setIsLoading(true);
     setError("");
     if (email === "" || password === "") {
@@ -168,6 +168,9 @@ export default function LoginPage() {
                 }}
                 label="Password"
                 placeHolder="********"
+                onEnterPress={() => {
+                  handleSubmit();
+                }}
               />
               <div className="flex justify-between">
                 <div className="flex items-center space-x-2">
