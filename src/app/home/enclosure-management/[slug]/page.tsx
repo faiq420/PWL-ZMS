@@ -49,7 +49,6 @@ const Page = () => {
     ZooId: 0,
     LocationId: 0,
     Capacity: null,
-    OperationalStatusId: 1,
     EnclosureTypeId: 1,
     Temperature: "",
     Humidity: "",
@@ -77,16 +76,6 @@ const Page = () => {
           return {
             value: z.EnclosureTypeId,
             label: z.Type,
-          };
-        })
-      );
-    });
-    helper.xhr.Get("/List/GetOperationalStatus").then((res) => {
-      setStatuses(
-        res.map((z: any) => {
-          return {
-            value: z.OperationalStatusId,
-            label: z.Status,
           };
         })
       );
@@ -304,13 +293,6 @@ const Page = () => {
                 options={types}
                 handleDropdownChange={handleChange}
                 label="Type"
-              />
-              <Dropdown
-                activeId={obj.OperationalStatusId}
-                name="OperationalStatusId"
-                options={statuses}
-                handleDropdownChange={handleChange}
-                label="Status"
               />
               <InputTag
                 value={obj.Capacity}
