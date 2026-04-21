@@ -153,9 +153,11 @@ const ZooCrud = ({ ZooId }: Props) => {
         obj,
         boundaries: coordinatePolygon,
         zooCoverImage: bannerImageSrc,
-        zooImages: zooImages.map((x) => {
-          return x.file;
-        }),
+        zooImages: zooImages
+          .filter((x) => x.file)
+          .map((x) => {
+            return x.file;
+          }),
         ZooLogo: iconImageSrc,
       };
       if (obj.ZooId != 0) {

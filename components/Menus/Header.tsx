@@ -27,7 +27,6 @@ const Header = () => {
 
   useEffect(() => {
     const userDetails = JSON.parse(getCookieKey("userDetails") || "");
-    console.log(userDetails);
     if (userDetails) {
       setUserData({
         UserName: userDetails.UserName,

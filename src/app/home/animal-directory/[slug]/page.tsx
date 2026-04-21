@@ -38,7 +38,7 @@ export default function AnimalDetailPage() {
   const [zooList, setZooList] = useState([]);
   const isNewAnimal = params.slug === "new";
   const [isEditing, setIsEditing] = useState(
-    isNewAnimal || searchParams.get("edit") ? true : false
+    isNewAnimal || searchParams.get("edit") ? true : false,
   );
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [activeTab, setActiveTab] = useState("details");
@@ -96,7 +96,9 @@ export default function AnimalDetailPage() {
       helper.xhr
         .Get(
           "/Animal/GetAnimalById",
-          helper.GetURLParamString({ animalId: Number(params.slug) }).toString()
+          helper
+            .GetURLParamString({ animalId: Number(params.slug) })
+            .toString(),
         )
         .then((res) => {
           setAnimal({
@@ -119,21 +121,26 @@ export default function AnimalDetailPage() {
               AnimalFileId: img.AnimalFileId,
               file: null,
               Docpath: img.AnimalFilepath,
-            }))
+            })),
           );
           const mapping: {
             ZooId: number;
             EnclosureId: number;
             Count: number;
           }[] = res.animal.animalMapping.map((am: any) => {
+            const animalEnclosureMappingCount = res.animal.count.find(
+              (y: any) => y.EnclosureId == am.EnclosureId,
+            );
             return {
               ...am,
-              Count: res.animal.count.find(
-                (y: any) => y.EnclosureId == am.EnclosureId
-              ).Count,
+              Count:
+                res.animal.count.length > 0
+                  ? animalEnclosureMappingCount != undefined
+                    ? animalEnclosureMappingCount.Count
+                    : 0
+                  : 0,
             };
           });
-
           setZooEnclosureMapping(mapping);
         });
     }
@@ -147,7 +154,7 @@ export default function AnimalDetailPage() {
             value: Number(z.ZooId),
             label: z.ZooTitle,
           };
-        })
+        }),
       );
     });
   }, []);
@@ -196,8 +203,8 @@ export default function AnimalDetailPage() {
           animalImages
             .filter((x) => x.file != null)
             .map(async (image) =>
-              image.file ? await compressFile(image.file) : null
-            )
+              image.file ? await compressFile(image.file) : null,
+            ),
         ),
         animalCoverImage: coverImage ? await compressFile(coverImage) : null,
         dto: zooEnclosureMapping,
@@ -210,8 +217,8 @@ export default function AnimalDetailPage() {
           animalImages
             .filter((x) => x.file != null)
             .map(async (image) =>
-              image.file ? await compressFile(image.file) : null
-            )
+              image.file ? await compressFile(image.file) : null,
+            ),
         ),
         animalCoverImage: coverImage ? await compressFile(coverImage) : null,
         dto: zooEnclosureMapping,
@@ -222,7 +229,7 @@ export default function AnimalDetailPage() {
       helper.xhr
         .Post(
           `/Animal/${isNewAnimal ? "CreateAnimal" : "UpdateAnimal"}`,
-          helper.ConvertToFormData(isNewAnimal ? createObj : editObj)
+          helper.ConvertToFormData(isNewAnimal ? createObj : editObj),
         )
         .then(async (res) => {
           toast({
@@ -232,8 +239,8 @@ export default function AnimalDetailPage() {
             } the directory.`,
           });
           // if (isNewAnimal) {
-            // Redirect to the new animal page
-            router.back();
+          // Redirect to the new animal page
+          router.back();
           // } else {
           //   setIsEditing(false);
           // }
@@ -453,7 +460,7 @@ export default function AnimalDetailPage() {
                           .flatMap((mapping) => mapping.ZooId)
                           .map((zooId: number) => {
                             const zoo = zooList.find(
-                              (z: OPTION) => z.value === zooId
+                              (z: OPTION) => z.value === zooId,
                             ) as OPTION | undefined;
                             return zoo ? (
                               <p
