@@ -214,7 +214,7 @@ const ZooCrud = ({ ZooId }: Props) => {
               };
             }),
           );
-          setCoordinatePolygon(res.boundary);
+          // setCoordinatePolygon(res.boundary);
         });
     }
   }, [ZooId]);
