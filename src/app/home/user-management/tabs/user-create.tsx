@@ -81,11 +81,7 @@ const UserCreate = ({ mode = "create", id = "0" }: Props) => {
   const [inspectorZooMappings, setInspectorZooMappings] = useState<number[]>(
     [],
   );
-  const [zooList, setZooList] = useState<OPTION[]>(
-    zoos.map((z: any) => {
-      return { label: z.label, value: z.value };
-    }),
-  );
+  const [zooList, setZooList] = useState<OPTION[]>([]);
   const [roles, setRoles] = useState<OPTION[]>([]);
   const capitalize = (value: string, space = " ") => {
     const words = String(value).split(space);
@@ -262,6 +258,20 @@ const UserCreate = ({ mode = "create", id = "0" }: Props) => {
         router.back();
       });
   }
+
+  useEffect(() => {
+    helper.xhr.Get("/List/GetZooList").then((res) => {
+      setZooList(
+        res.map((z: any) => {
+          return {
+            value: Number(z.ZooId),
+            label: z.ZooTitle,
+          };
+        }),
+      );
+    });
+  }, []);
+
   return (
     <div className="flex-1 space-y-4">
       <div className="flex items-center justify-between">
