@@ -31,6 +31,7 @@ import { zoos } from "@/data/users";
 import ButtonComp from "@/components/utils/Button";
 import { useToast } from "@/components/ui/use-toast";
 import { setCookieKey, removeCookieKey } from "@/lib/cookieToken";
+import MultiSelectDropdown from "@/components/utils/FormElements/MultiSelectDropdown";
 
 interface Props {
   mode?: string;
@@ -51,9 +52,6 @@ type UserObject = {
   IsActive: boolean;
   UserCnic: string;
   ImagePath: string;
-  Specialization?: string;
-  LicenseNumber?: string;
-  AssignedZoo?: number;
 };
 
 const UserCreate = ({ mode = "create", id = "0" }: Props) => {
@@ -66,7 +64,8 @@ const UserCreate = ({ mode = "create", id = "0" }: Props) => {
     cnic: boolean;
     contact: boolean;
     password: boolean | string | null;
-  }>({ email: true, cnic: true, contact: true, password: true });
+    roleId: boolean;
+  }>({ email: true, cnic: true, contact: true, password: true, roleId: true });
   const { toast } = useToast();
   const [obj, setObj] = useState<UserObject>({
     UserId: 0,
@@ -78,10 +77,10 @@ const UserCreate = ({ mode = "create", id = "0" }: Props) => {
     UserCnic: "",
     ImagePath: "",
     RoleId: 0,
-    Specialization: "",
-    LicenseNumber: "",
-    AssignedZoo: 0,
   });
+  const [inspectorZooMappings, setInspectorZooMappings] = useState<number[]>(
+    [],
+  );
   const [zooList, setZooList] = useState<OPTION[]>(
     zoos.map((z: any) => {
       return { label: z.label, value: z.value };
@@ -126,7 +125,13 @@ const UserCreate = ({ mode = "create", id = "0" }: Props) => {
     const isValidEmail = Boolean(validEmail(data.UserEmail));
     const isValidCnic = data.UserCnic.length === 15;
     const isValidPhone = data.UserPhone.length === 11;
-
+    const isValidRole =
+      data.RoleId != 0 &&
+      ([2, 3].includes(data.RoleId)
+        ? inspectorZooMappings.length !== 0
+          ? true
+          : false
+        : true);
     if (data.UserPassword) {
       verifyPassword(data.UserPassword);
     }
@@ -138,9 +143,14 @@ const UserCreate = ({ mode = "create", id = "0" }: Props) => {
       password: data.UserPassword
         ? verifyPassword(data.UserPassword).isValid
         : null,
+      roleId: isValidRole,
     });
 
-    return isValidEmail && isValidCnic && isValidPhone && data.UserPassword
+    return isValidEmail &&
+      isValidCnic &&
+      isValidPhone &&
+      data.UserPassword &&
+      isValidRole
       ? verifyPassword(data.UserPassword).isValid
       : true;
   }
@@ -170,13 +180,13 @@ const UserCreate = ({ mode = "create", id = "0" }: Props) => {
         )
         .then((response) => {
           const user = response.user;
-          console.log(response);
           setObj({
             ...user,
             ImagePath:
               user.ProfileImage != null ? user.ProfileImage.UserFilepath : null,
             UserPassword: "",
           });
+          setInspectorZooMappings(response.zoos.map((x: any) => x.ZooId));
         })
         .catch((error) => {
           console.error("Error fetching user data:", error);
@@ -208,7 +218,8 @@ const UserCreate = ({ mode = "create", id = "0" }: Props) => {
         `/Users/${mode === "create" ? "CreateUser" : "UpdateUser"}`,
         helper.ConvertToFormData({
           obj: data,
-          ZooId: obj.AssignedZoo === 0 ? null : obj.AssignedZoo,
+          ZooId:
+            inspectorZooMappings.length === 0 ? null : inspectorZooMappings,
           image: imgFile,
         }),
       )
@@ -220,22 +231,22 @@ const UserCreate = ({ mode = "create", id = "0" }: Props) => {
           } Successfully`,
           variant: "success",
         });
-        console.log(response,"responseeee");
+        console.log(response, "responseeee");
         removeCookieKey("userDetails");
-         const userDetails = {
-            UserId: response.user.UserId,
-            UserEmail: response.user.UserEmail,
-            RoleId: response.user.RoleId,
-            UserCnic: response.user.UserCnic,
-            UserPhone: response.user.UserPhone,
-            UserName: response.user.UserName,
-            ProfileImage:
-              response.user.UserFiles.length > 0
-                ? response.user.UserFiles[0].UserFilepath
-                : null,
-          };
-          console.log(userDetails,"userDetails");
-          setCookieKey("userDetails", JSON.stringify(userDetails));
+        const userDetails = {
+          UserId: response.user.UserId,
+          UserEmail: response.user.UserEmail,
+          RoleId: response.user.RoleId,
+          UserCnic: response.user.UserCnic,
+          UserPhone: response.user.UserPhone,
+          UserName: response.user.UserName,
+          ProfileImage:
+            response.user.UserFiles.length > 0
+              ? response.user.UserFiles[0].UserFilepath
+              : null,
+        };
+        console.log(userDetails, "userDetails");
+        setCookieKey("userDetails", JSON.stringify(userDetails));
       })
       .catch((error) => {
         toast({
@@ -380,30 +391,14 @@ const UserCreate = ({ mode = "create", id = "0" }: Props) => {
                 label="Role"
               />
               {[2, 3].includes(obj.RoleId) && (
-                <Dropdown
-                  name="AssignedZoo"
+                <MultiSelectDropdown
+                  name="inspectorZooMappings"
                   options={zooList}
-                  activeId={obj.AssignedZoo || 0}
-                  handleDropdownChange={handleChange}
-                  label="Assigned Zoo"
-                />
-              )}
-              {obj.RoleId == 3 && (
-                <InputTag
-                  name="Specialization"
-                  value={obj.Specialization}
-                  setter={handleChange}
-                  label="Specialization"
-                  placeHolder="Large Animal Vet"
-                />
-              )}
-              {obj.RoleId == 3 && (
-                <InputTag
-                  name="LicenseNumber"
-                  value={obj.LicenseNumber}
-                  setter={handleChange}
-                  label="LicenseNumber"
-                  placeHolder="VET-2024-001"
+                  selectedIds={inspectorZooMappings}
+                  handleDropdownChange={(n, v) => {
+                    setInspectorZooMappings(v);
+                  }}
+                  label="Assigned Zoo(s)"
                 />
               )}
               {obj.UserId == 0 && (

@@ -15,14 +15,14 @@ const MetricPresentationCard: React.FC<MetricPresentationCardProps> = ({
   Description,
 }) => {
   return (
-    <Card>
+    <Card className="font-poppins">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium">{Title}</CardTitle>
         {icon}
       </CardHeader>
-      <CardContent>
-        <div className="text-2xl font-bold">{Count}</div>
-        <p className="text-xs text-muted-foreground">{Description}</p>
+      <CardContent className="flex gap-2 items-end">
+        <div className="text-2xl font-bold leading-[1]">{Count}</div>
+        <p className="text-xs text-muted-foreground leading-[1.2] mb-[0.5]">{Description}</p>
       </CardContent>
     </Card>
   );

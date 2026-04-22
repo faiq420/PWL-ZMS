@@ -21,19 +21,19 @@ export function UserStats({ users }: UserStatsProps) {
     {
       title: "Total Users",
       value: totalUsers,
-      icon: <Users className="text-muted-foreground h-4 w-4" />,
+      icon: <Users className="text-muted-foreground h-6 w-6" />,
       description: "All registered users",
     },
     {
       title: "Active Users",
       value: activeUsers,
-      icon: <UserCheck className="text-muted-foreground h-4 w-4" />,
+      icon: <UserCheck className="text-muted-foreground h-6 w-6" />,
       description: "Currently active users",
     },
     {
       title: "Inactive Users",
       value: inactiveUsers,
-      icon: <UserX className="text-muted-foreground h-4 w-4" />,
+      icon: <UserX className="text-muted-foreground h-6 w-6" />,
       description: "Inactive or suspended users",
     },
     // {
