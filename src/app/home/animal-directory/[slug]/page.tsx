@@ -5,7 +5,7 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Edit, Trash2, Save, X } from "lucide-react";
+import { ArrowLeft, Edit, Trash2, Save, X, Download } from "lucide-react";
 import Image from "next/image";
 import { AnimalDeleteDialog } from "@/components/animal/animal-delete-dialog";
 import { AnimalForm } from "@/components/animal/animal-form";
@@ -58,6 +58,7 @@ export default function AnimalDetailPage() {
     Diet: string;
     LifeSpan: string;
     CoverImageFilepath: string;
+    QrImage: string;
     IsAvailable: boolean;
   }>({
     AnimalId: 0,
@@ -71,6 +72,7 @@ export default function AnimalDetailPage() {
     Diet: "",
     LifeSpan: "",
     CoverImageFilepath: "",
+    QrImage: "",
     IsAvailable: true,
   });
   const [activeAnimalCategory, setActiveAnimalCategory] = useState("");
@@ -85,6 +87,7 @@ export default function AnimalDetailPage() {
   const [isCruding, setIsCruding] = useState(false);
   const [isCompressing, setIsCompressing] = useState(false);
   const [coverImage, setCoverImage] = useState<File | null>(null);
+  const [qrImage, setQrImage] = useState<File | null>(null);
   const [animalImages, setAnimalImages] = useState<AnimalFiles[]>([]);
   const [deletedImages, setDeletedImages] = useState<number[]>([]);
   const [animalVideos, setAnimalVideos] = useState<AnimalFiles[]>([]);
@@ -101,6 +104,7 @@ export default function AnimalDetailPage() {
             .toString(),
         )
         .then((res) => {
+          console.log(res);
           setAnimal({
             ...animal,
             AnimalId: res.animal.AnimalId,
@@ -113,6 +117,7 @@ export default function AnimalDetailPage() {
             Diet: res.animal.Diet,
             LifeSpan: res.animal.LifeSpan,
             CoverImageFilepath: res.animal.CoverImageFilepath,
+            QrImage: res.animal.QrImage,
           });
           setActiveAnimalCategory(res.animal.CategoryName);
           setActiveAnimalConservation(res.animal.Status);
@@ -207,6 +212,7 @@ export default function AnimalDetailPage() {
             ),
         ),
         animalCoverImage: coverImage ? await compressFile(coverImage) : null,
+        QrImage: qrImage ? await compressFile(qrImage) : null,
         dto: zooEnclosureMapping,
       };
       console.log(animalImages.filter((img) => img.file != null));
@@ -221,6 +227,7 @@ export default function AnimalDetailPage() {
             ),
         ),
         animalCoverImage: coverImage ? await compressFile(coverImage) : null,
+        QrImage: qrImage ? await compressFile(qrImage) : null,
         dto: zooEnclosureMapping,
         deletedFileIds: deletedImages,
       };
@@ -381,81 +388,111 @@ export default function AnimalDetailPage() {
               enclosuresByZoo={enclosuresByZoo}
               coverImage={coverImage}
               setCoverImage={setCoverImage}
+              qrImage={qrImage}
+              setQrImage={setQrImage}
             />
           ) : (
-            <Card>
-              <CardContent className="pt-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-4 font-poppins">
-                    <div className="">
-                      <Paragraph
-                        text="Basic Information"
-                        className="font-semibold"
-                      />
-                      <div className="space-y-1 text-sm mt-3">
-                        <div className="text-muted-foreground">
-                          <span className="font-medium text-black">
-                            Scientific Name:
-                          </span>{" "}
-                          {animal.AnimalScientificName}
-                        </div>
-                        <div className="text-muted-foreground">
-                          <span className="font-medium text-black">
-                            Category:
-                          </span>{" "}
-                          {activeAnimalCategory}
-                        </div>
-                        <div className="text-muted-foreground">
-                          <span className="font-medium text-black">
-                            Conservation Status:
-                          </span>{" "}
-                          {activeAnimalConservation}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="">
-                      <Paragraph
-                        text="Habitat & Diet"
-                        className="font-semibold"
-                      />
-                      <div className="space-y-1 text-sm mt-3">
-                        <div className="text-muted-foreground">
-                          <span className="font-medium text-black">
-                            Habitat:
-                          </span>{" "}
-                          {animal.Habitat}
-                        </div>
-                        <div className="text-muted-foreground">
-                          <span className="font-medium text-black">Diet:</span>{" "}
-                          {animal.Diet}
-                        </div>
-                        <div className="text-muted-foreground">
-                          <span className="font-medium text-black">
-                            Lifespan:
-                          </span>{" "}
-                          {animal.LifeSpan}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+            <Card className="overflow-hidden">
+              {/* Hero Section */}
+              <div className="relative flex items-center justify-center bg-muted/40 border-b p-8">
+                <Image
+                  src={
+                    helper.GetDocument(animal.CoverImageFilepath) ||
+                    "/placeholder.svg"
+                  }
+                  alt={animal.AnimalScientificName}
+                  width={400}
+                  height={400}
+                  className="rounded-xl border object-cover"
+                />
+                <span className="absolute top-3 right-3 text-[11px] font-medium px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-poppins">
+                  {activeAnimalConservation}
+                </span>
+              </div>
 
-                  <div>
-                    <div className="">
-                      <Paragraph
-                        text="Description"
-                        className="font-semibold "
-                      />
-                      <p className="text-muted-foreground text-sm mt-3">
+              <CardContent className="pt-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 font-poppins">
+                  {/* Left Column */}
+                  <div className="space-y-5">
+                    {/* Basic Information */}
+                    <div>
+                      <p className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground mb-3">
+                        Basic Information
+                      </p>
+                      <div className="space-y-3">
+                        <div>
+                          <p className="text-[11px] text-muted-foreground">
+                            Scientific Name
+                          </p>
+                          <p className="text-sm font-medium">
+                            {animal.AnimalScientificName}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-[11px] text-muted-foreground">
+                            Category
+                          </p>
+                          <p className="text-sm font-medium">
+                            {activeAnimalCategory}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="border-t" />
+
+                    {/* Habitat & Diet */}
+                    <div>
+                      <p className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground mb-3">
+                        Habitat & Diet
+                      </p>
+                      <div className="space-y-3">
+                        <div>
+                          <p className="text-[11px] text-muted-foreground">
+                            Habitat
+                          </p>
+                          <p className="text-sm font-medium">
+                            {animal.Habitat}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-[11px] text-muted-foreground">
+                            Diet
+                          </p>
+                          <p className="text-sm font-medium">{animal.Diet}</p>
+                        </div>
+                        <div>
+                          <p className="text-[11px] text-muted-foreground">
+                            Lifespan
+                          </p>
+                          <p className="text-sm font-medium">
+                            {animal.LifeSpan}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="border-t" />
+
+                    {/* Description */}
+                    <div>
+                      <p className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground mb-3">
+                        Description
+                      </p>
+                      <p className="text-sm text-muted-foreground leading-relaxed">
                         {animal.AnimalDescription}
                       </p>
                     </div>
-                    <div className="">
-                      <h3 className="text-lg font-semibold mt-4 mb-2"></h3>
-                      <Paragraph
-                        text="Available At"
-                        className="font-semibold "
-                      />
-                      <div className="flex flex-wrap gap-2 mt-3">
+                  </div>
+
+                  {/* Right Column */}
+                  <div className="space-y-5">
+                    {/* Available At */}
+                    <div>
+                      <p className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground mb-3">
+                        Available At
+                      </p>
+                      <div className="flex flex-wrap gap-2">
                         {zooEnclosureMapping
                           .flatMap((mapping) => mapping.ZooId)
                           .map((zooId: number) => {
@@ -463,19 +500,49 @@ export default function AnimalDetailPage() {
                               (z: OPTION) => z.value === zooId,
                             ) as OPTION | undefined;
                             return zoo ? (
-                              <p
+                              <span
                                 key={zooId}
-                                className="cursor-pointer bg-white px-2 py-1 text-xs shadow rounded-full border"
-                                onClick={() =>
-                                  router.push(`/home/zoo-profiles/${zooId}`)
-                                }
+                                className="text-[11px] font-medium px-3 py-1 rounded-full bg-background border shadow-sm"
                               >
                                 {zoo.label}
-                              </p>
+                              </span>
                             ) : null;
                           })}
                       </div>
                     </div>
+
+                    <div className="border-t" />
+
+                    {/* QR Code */}
+                    {animal.QrImage && animal.QrImage !== "" && (
+                      <div>
+                        <p className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground mb-3">
+                          Scan to Learn More
+                        </p>
+                        <div className="flex items-center justify-center bg-muted/40 border rounded-xl p-4 w-fit">
+                          <Image
+                            src={
+                              helper.GetDocument(animal.QrImage) ||
+                              "/placeholder.svg"
+                            }
+                            alt="QR Code"
+                            width={120}
+                            height={120}
+                          />
+                        </div>
+                        {animal.QrImage && animal.QrImage !== "" && (
+                          <a
+                            href={helper.GetDocument(animal.QrImage)}
+                            download
+                            target="_blank"
+                            className="mt-3 flex items-center justify-center text-center gap-1.5 w-fit text-[11px] font-medium text-muted-foreground hover:text-foreground transition-colors"
+                          >
+                            <Download className="w-3.5 h-3.5" />
+                            Download QR Code
+                          </a>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
               </CardContent>

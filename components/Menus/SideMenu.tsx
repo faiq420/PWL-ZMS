@@ -3,27 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { createPortal } from "react-dom";
-import {
-  Building,
-  Calendar,
-  Home,
-  Info,
-  MapPin,
-  Menu,
-  PawPrintIcon as Paw,
-  Stethoscope,
-  X,
-  LogOut,
-  User,
-  TowerControl,
-  UserCog,
-  Logs,
-  HomeIcon,
-  Clock,
-  ArrowRight,
-  ArrowLeft,
-  Binoculars,
-} from "lucide-react";
+import { Menu, X, LogOut, UserCog, ArrowRight, ArrowLeft } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
@@ -147,7 +127,7 @@ export function SideMenu() {
                           "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all hover:text-main-darkOrange",
                           isActiveURL(item.href)
                             ? "bg-[#CBE88C] font-medium text-black"
-                            : "text-muted-foreground hover:text-black/70"
+                            : "text-muted-foreground hover:text-black/70",
                         )}
                       >
                         {IconComponent && <IconComponent className="h-4 w-4" />}
@@ -223,7 +203,7 @@ export function SideMenu() {
                 setIsCollapsed(!isCollapsed);
                 window.localStorage.setItem(
                   "screenSize",
-                  isCollapsed ? (window.innerWidth >= 768 ? "83" : "85") : "5"
+                  isCollapsed ? (window.innerWidth >= 768 ? "83" : "85") : "5",
                 );
               }}
               style={{ boxShadow: "inset 0 2px 4px rgba(0,0,0,0.2)" }}
@@ -266,7 +246,7 @@ export function SideMenu() {
                         isActiveURL(item.href)
                           ? "bg-[#CBE88C] font-medium text-black"
                           : "text-muted-foreground hover:text-black/70",
-                        isCollapsed ? "justify-center" : ""
+                        isCollapsed ? "justify-center" : "",
                       )}
                     >
                       {IconComponent && (
@@ -290,7 +270,7 @@ export function SideMenu() {
                           {item.MenuName}
                           <div className="absolute left-[-6px] top-1/2 -translate-y-1/2 w-0 h-0 border-y-8 border-y-transparent border-r-8 border-r-[#CBE88C]" />
                         </div>,
-                        document.body
+                        document.body,
                       )}
                   </div>
                 );

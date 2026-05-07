@@ -34,10 +34,10 @@ export default function LoginPage() {
   const helper = useHelper();
   const router = useRouter();
   const [email, setEmail] = useState(
-    process.env.NODE_ENV == "development" ? "timessoftwarepk@gmail.com" : "",
+    process.env.NODE_ENV == "development" ? "admin@zoosystem.com" : "",
   );
   const [password, setPassword] = useState(
-    process.env.NODE_ENV == "development" ? "Admin@1234" : "",
+    process.env.NODE_ENV == "development" ? "password" : "",
   );
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");

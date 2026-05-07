@@ -53,6 +53,7 @@ const ZooCrud = ({ ZooId }: Props) => {
     ZooLogoFilepath: "",
     CoverImageFilepath: "",
     IsActive: true,
+    ZooAddress: "",
   });
   const [isCruding, setIsCruding] = useState(false);
   const [iconImageSrc, setIconImageSrc] = useState<File | null>(null);
@@ -171,7 +172,7 @@ const ZooCrud = ({ ZooId }: Props) => {
         )
         .then((response) => {
           toast({
-            title: `Zoo created successfully`,
+            title: `Zoo ${obj.ZooId != 0 ? "updated" : "created"} successfully`,
             variant: "success",
           });
           setIsCruding(false);
@@ -181,7 +182,7 @@ const ZooCrud = ({ ZooId }: Props) => {
         })
         .catch((error) => {
           toast({
-            title: `Zoo not created successfully`,
+            title: `Zoo not ${obj.ZooId != 0 ? "updated" : "created"} successfully`,
             description: error.message,
             variant: "danger",
           });
@@ -306,6 +307,14 @@ const ZooCrud = ({ ZooId }: Props) => {
                   placeHolder="Write description here..."
                 />
               </div>
+              <TextArea
+                value={obj.ZooAddress}
+                name="ZooAddress"
+                isRequired
+                setter={handleChange}
+                label="Address"
+                placeHolder="Write address here..."
+              />
             </div>
           </div>
           <div className="space-y-3 hidden">

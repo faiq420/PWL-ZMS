@@ -49,7 +49,6 @@ export function MediaGallery({ media, type }: MediaGalleryProps) {
             <div className="aspect-square relative overflow-hidden rounded-md border">
               <Image
                 src={helper.GetDocument(item.Docpath) || "/placeholder.svg"}
-                // alt={item.name}
                 alt=""
                 fill
                 className="object-cover transition-transform group-hover:scale-105"

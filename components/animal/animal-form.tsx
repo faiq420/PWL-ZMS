@@ -24,6 +24,8 @@ interface AnimalFormProps {
   enclosuresByZoo: any;
   coverImage: File | null;
   setCoverImage: Dispatch<SetStateAction<File | null>>;
+  qrImage: File | null;
+  setQrImage: Dispatch<SetStateAction<File | null>>;
 }
 
 export function AnimalForm({
@@ -35,6 +37,8 @@ export function AnimalForm({
   enclosuresByZoo,
   coverImage,
   setCoverImage,
+  qrImage,
+  setQrImage,
 }: AnimalFormProps) {
   const helper = useHelper();
   const [enclosures, setEnclosures] = useState<OPTION[]>([]);
@@ -52,14 +56,14 @@ export function AnimalForm({
           prev.map((mapping) =>
             mapping.ZooId === zooId
               ? { ...mapping, EnclosureId: rec.EnclosureId }
-              : mapping
-          )
+              : mapping,
+          ),
         );
       } else {
         setZooEnclosureMapping(
           zooEnclosureMapping.filter((x) => {
             return x.ZooId !== zooId;
-          })
+          }),
         );
       }
     } else {
@@ -78,7 +82,7 @@ export function AnimalForm({
         res.map((item: any) => ({
           value: item.AnimalCategoryId,
           label: item.CategoryName,
-        }))
+        })),
       );
     });
     helper.xhr.Get("/List/GetConservationStatus").then((res) => {
@@ -86,7 +90,7 @@ export function AnimalForm({
         res.map((item: any) => ({
           value: item.ConservationStatusId,
           label: item.Status,
-        }))
+        })),
       );
     });
   }, []);
@@ -97,6 +101,14 @@ export function AnimalForm({
       setCoverImage(selectedFile);
     }
   };
+  const handleQrImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const selectedFile = e.target.files[0];
+      setQrImage(selectedFile);
+    }
+  };
+
+  console.log(animal);
 
   return (
     <Card>
@@ -171,7 +183,7 @@ export function AnimalForm({
                       name="Id"
                       value={
                         zooEnclosureMapping.find(
-                          (mapping) => mapping.ZooId === zoo.value
+                          (mapping) => mapping.ZooId === zoo.value,
                         ) !== undefined
                           ? true
                           : false
@@ -191,7 +203,10 @@ export function AnimalForm({
                 {zooEnclosureMapping
                   .sort((a, b) => a.ZooId - b.ZooId)
                   .map((mapping) => (
-                    <div key={mapping.ZooId} className="rounded border p-1 space-y-2">
+                    <div
+                      key={mapping.ZooId}
+                      className="rounded border p-1 space-y-2"
+                    >
                       <Dropdown
                         activeId={mapping.EnclosureId}
                         clearable={true}
@@ -201,14 +216,14 @@ export function AnimalForm({
                             return prev.map((m) =>
                               m.ZooId === mapping.ZooId
                                 ? { ...m, EnclosureId: Number(v ?? 0) }
-                                : m
+                                : m,
                             );
                           });
                         }}
                         name={`EnclosureId_${mapping.ZooId}`}
                         label={`Enclosure in ${
                           zoos.find(
-                            (zoo: OPTION) => zoo.value === mapping.ZooId
+                            (zoo: OPTION) => zoo.value === mapping.ZooId,
                           )?.label
                         } `}
                       />
@@ -220,7 +235,7 @@ export function AnimalForm({
                         setter={(n, v) => {
                           setZooEnclosureMapping((prev) => {
                             return prev.map((m) =>
-                              m.ZooId === mapping.ZooId ? { ...m, [n]: v } : m
+                              m.ZooId === mapping.ZooId ? { ...m, [n]: v } : m,
                             );
                           });
                         }}
@@ -259,8 +274,8 @@ export function AnimalForm({
                       animal?.CoverImageFilepath != ""
                         ? helper.GetDocument(animal.CoverImageFilepath)
                         : coverImage
-                        ? URL.createObjectURL(coverImage)
-                        : "/placeholder.svg"
+                          ? URL.createObjectURL(coverImage)
+                          : "/placeholder.svg"
                     }
                     alt="Category image"
                     fill
@@ -284,7 +299,7 @@ export function AnimalForm({
               ) : (
                 <>
                   <input
-                    id="iconimage-upload"
+                    id="coverimage-upload"
                     type="file"
                     className="hidden"
                     accept="image/*"
@@ -293,7 +308,63 @@ export function AnimalForm({
                   <button
                     type="button"
                     onClick={() => {
-                      document.getElementById("iconimage-upload")?.click();
+                      document.getElementById("coverimage-upload")?.click();
+                    }}
+                    className="flex w-full flex-col items-center justify-center aspect-video rounded-md border border-dashed border-main-gray/50 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <Upload className="h-6 w-6 text-main-gray mb-1" />
+                    <span className="text-xs text-main-gray">Add Image</span>
+                  </button>
+                </>
+              )}
+            </div>
+            <div className="w-full">
+              <Label>QR Image</Label>
+              {qrImage != null ||
+              (animal?.QrImage != "" && animal?.QrImage != null) ? (
+                <div className="relative aspect-video rounded-md border border-main-gray/30 overflow-hidden w-full">
+                  <Image
+                    src={
+                      animal?.QrImage &&
+                      animal?.QrImage != "" &&
+                      animal?.QrImage != null
+                        ? helper.GetDocument(animal.QrImage)
+                        : qrImage
+                          ? URL.createObjectURL(qrImage)
+                          : "/placeholder.svg"
+                    }
+                    alt="QR image"
+                    fill
+                    className="object-contain"
+                    unoptimized
+                  />
+
+                  <Button
+                    variant="destructive"
+                    size="icon"
+                    className="absolute top-1 right-1 h-6 w-6 rounded-full"
+                    onClick={() => {
+                      handleChange("QrImage", null);
+                      setQrImage(null);
+                    }}
+                  >
+                    <X className="h-3 w-3" />
+                    <span className="sr-only">Remove image</span>
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  <input
+                    id="qrimage-upload"
+                    type="file"
+                    className="hidden"
+                    accept="image/*"
+                    onChange={handleQrImageChange}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      document.getElementById("qrimage-upload")?.click();
                     }}
                     className="flex w-full flex-col items-center justify-center aspect-video rounded-md border border-dashed border-main-gray/50 bg-gray-50 hover:bg-gray-100 transition-colors"
                   >

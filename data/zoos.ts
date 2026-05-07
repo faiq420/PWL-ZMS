@@ -27,7 +27,8 @@ import {
   Shield,
   Bell,
   Binoculars,
-} from "lucide-react";
+  BellPlus
+} from "lucide-react";  
 const zoos = [
   { value: "lahore-zoo", label: "Lahore Zoo" },
   { value: "lahore-safari-park", label: "Lahore Safari Park" },
@@ -59,4 +60,5 @@ export const iconOptions = {
   Logs: Logs,
   Paw: Paw,
   Binoculars: Binoculars,
+  BellPlus: BellPlus,
 };
