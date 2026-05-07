@@ -41,14 +41,7 @@ import InputTag from "@/components/utils/FormElements/InputTag";
 import TextArea from "@/components/utils/FormElements/TextArea";
 import ButtonComp from "@/components/utils/Button";
 
-type Recommendation = {
-  Id: number;
-  InspectionId: number;
-  Recommendation: string;
-};
 type Medication = {
-  Id: number;
-  InspectionId: number;
   MedicationName: string;
   Dosage: string;
   Frequency: string;
@@ -69,39 +62,33 @@ export default function InspectionDetailsPage() {
   const slug = params.slug;
   const [animals, setAnimals] = useState<OPTION[]>([]);
   const [veterinaryInspectors, setVeterinaryInspectors] = useState<OPTION[]>(
-    []
+    [],
   );
   const [status, setStatus] = useState(inspectionStatus);
   const [zooList, setZooList] = useState(zoos);
   const [obj, setObj] = useState({
-    Id: 0,
-    InspectionId: "",
+    InspectionId: 0,
+    InspectionNumber: "",
     AnimalId: 0,
     ZooId: 0,
-    VeterinaryInspectorId: 0,
-    DateTime: "",
-    Status: 0,
-    FollowupDate: "",
-    Reason: "",
+    VeterinaryInspector: 0,
+    Datetime: "",
+    InspectionStatusId: 0,
+    FollowUpDate: "",
+    ReasonForInspection: "",
     Findings: "",
   });
   const [vitalSigns, setVitalSigns] = useState({
-    Id: 0,
-    InspectionId: 0,
     HeartRate: null,
     Temperature: null,
     RespiratoryRate: null,
     Weight: null,
   });
 
-  const [recommendations, setRecommendations] = useState<Recommendation[]>([
-    { Id: 0, InspectionId: obj.Id, Recommendation: "" },
-  ]);
+  const [recommendations, setRecommendations] = useState<string[]>([]);
 
   const [medications, setMedications] = useState<Medication[]>([
     {
-      Id: 0,
-      InspectionId: obj.Id,
       MedicationName: "",
       Dosage: "",
       Frequency: "",
@@ -109,12 +96,8 @@ export default function InspectionDetailsPage() {
     },
   ]);
   const [imageFiles, setImageFiles] = useState<ImagesFiles[]>([]);
-  const recommendationObj = {
-    InspectionId: obj.Id,
-    Recommendation: "",
-  };
+
   const MedicationObj = {
-    InspectionId: obj.Id,
     MedicationName: "",
     Dosage: "",
     Frequency: "",
@@ -125,7 +108,7 @@ export default function InspectionDetailsPage() {
   const capitalize = (value: string, space = " ") => {
     const words = String(value).split(space);
     const capitalizedWords = words.map(
-      (word) => word.charAt(0).toUpperCase() + word.slice(1)
+      (word) => word.charAt(0).toUpperCase() + word.slice(1),
     );
     return capitalizedWords.join(" ");
   };
@@ -133,7 +116,7 @@ export default function InspectionDetailsPage() {
   function GetHeading() {
     return `${capitalize(slug == "new" ? "Create" : "Edit")} - ${capitalize(
       String("Inspection"),
-      "-"
+      "-",
     )} ${slug != "new" ? `for ${obj.InspectionId}` : ""}`;
   }
 
@@ -143,21 +126,17 @@ export default function InspectionDetailsPage() {
   function handleVSChange(n: string, v: string | boolean | number) {
     setVitalSigns({ ...vitalSigns, [n]: v });
   }
-  function handleRecommendationChange<K extends keyof Recommendation>(
-    n: K,
-    v: Recommendation[K],
-    index: number
-  ) {
+  function handleRecommendationChange(n: string, v: string, index: number) {
     setRecommendations((prev) => {
       const updated = [...prev];
-      updated[index][n] = v;
+      updated[index] = v;
       return updated;
     });
   }
   function handleMedicationChange<K extends keyof Medication>(
     n: K,
     v: Medication[K],
-    index: number
+    index: number,
   ) {
     setMedications((prev) => {
       const updated = [...prev];
@@ -167,10 +146,7 @@ export default function InspectionDetailsPage() {
   }
 
   function AddRecommendation() {
-    setRecommendations((prev) => [
-      ...prev,
-      { ...recommendationObj, Id: prev.length + 1 },
-    ]);
+    setRecommendations((prev) => [...prev, ""]);
   }
   const RemoveRecommendation = (index: number) => {
     setRecommendations(recommendations.filter((_, i) => i !== index));
@@ -193,7 +169,7 @@ export default function InspectionDetailsPage() {
         return {
           FileId: 0,
           file: f,
-          ObjectId: obj.Id,
+          ObjectId: obj.InspectionId,
         };
       });
       setImageFiles([...imageFiles, ...temp]);
@@ -266,39 +242,39 @@ export default function InspectionDetailsPage() {
                   activeId={obj.AnimalId}
                 />
                 <Dropdown
-                  name="VeterinaryInspectorId"
+                  name="VeterinaryInspector"
                   label="Veterinary Inspector"
                   options={veterinaryInspectors}
                   handleDropdownChange={handleObjChange}
-                  activeId={obj.VeterinaryInspectorId}
+                  activeId={obj.VeterinaryInspector}
                 />
                 <DateTimePicker
-                  value={obj.DateTime}
-                  name="DateTime"
+                  value={obj.Datetime}
+                  name="Datetime"
                   setter={handleObjChange}
                   label="Date and Time"
                 />
                 <Dropdown
-                  name="Status"
+                  name="InspectionStatusId"
                   label="Status"
                   options={status}
                   handleDropdownChange={handleObjChange}
-                  activeId={obj.Status}
+                  activeId={obj.InspectionStatusId}
                 />
                 <InputTag
                   type="date"
-                  value={obj.FollowupDate}
-                  name="FollowupDate"
+                  value={obj.FollowUpDate}
+                  name="FollowUpDate"
                   setter={handleObjChange}
                   label="Follow-up Date"
                 />
               </div>
               <div className="space-y-3">
                 <TextArea
-                  value={obj.Reason}
-                  name="Reason"
+                  value={obj.ReasonForInspection}
+                  name="ReasonForInspection"
                   setter={handleObjChange}
-                  label="Reason for Inspection"
+                  label="Reason for inspection"
                   placeHolder="Describe the reason for this inspection"
                 />
                 <TextArea
@@ -370,13 +346,9 @@ export default function InspectionDetailsPage() {
                   <InputTag
                     name={`Recommendation`}
                     placeHolder="Enter recommendation"
-                    value={recommendation.Recommendation}
+                    value={recommendation}
                     setter={(n, v) => {
-                      handleRecommendationChange(
-                        n as keyof Recommendation,
-                        v,
-                        index
-                      );
+                      handleRecommendationChange(n, v, index);
                     }}
                   />
                   <Button
@@ -505,14 +477,15 @@ export default function InspectionDetailsPage() {
                       />
                     )}
                     {image.FileId == 0 &&
-                      obj.Id != 0 &&
+                      obj.InspectionId != 0 &&
                       imageFiles.length > 0 && (
                         <Button
                           variant="outline"
                           size="icon"
                           className="absolute top-1 left-1 h-6 w-6 rounded-full"
                           onClick={() =>
-                            image.file && AddNewFile(obj.Id, image.file, index)
+                            image.file &&
+                            AddNewFile(obj.InspectionId, image.file, index)
                           }
                         >
                           <Save className="h-3 w-3" />

@@ -11,6 +11,7 @@ interface Props {
   value: any;
   isRequired?: boolean;
   subfield?: string;
+  disabled?: boolean;
 }
 
 const TextArea = ({
@@ -22,6 +23,7 @@ const TextArea = ({
   range,
   isRequired,
   subfield,
+  disabled,
 }: Props) => {
   return (
     <div className={`${styles.inputGroup} space-y-[6px]`}>
@@ -39,6 +41,7 @@ const TextArea = ({
         id={name}
         name={name}
         value={value}
+        disabled={disabled}
         placeholder={placeHolder}
         onChange={(e) => {
           if (e.target.value.length < (range ?? 100000)) {
