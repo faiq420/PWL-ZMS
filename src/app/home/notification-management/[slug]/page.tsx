@@ -53,6 +53,8 @@ const NotificationManagementPage = () => {
   const [isCruding, setIsCruding] = useState(false);
   const [targetMode, setTargetMode] = useState<TargetMode>("role");
   const [roles, setRoles] = useState<OPTION[]>([]);
+  const [zoos, setZoos] = useState<OPTION[]>([]);
+  const [selectedZoo, setSelectedZoo] = useState<number | null>(null);
   const [channels, setChannels] = useState<OPTION[]>([]);
   const [types, setTypes] = useState<OPTION[]>([]);
   const [users, setUsers] = useState<User[]>([]);
@@ -78,6 +80,19 @@ const NotificationManagementPage = () => {
 
   // ─── Data Fetching ───────────────────────────────────────────────────────────
 
+  function GetZooList() {
+    helper.xhr.Get("/List/GetZooList").then((res) => {
+      setZoos(
+        res.map((z: any) => {
+          return {
+            value: Number(z.ZooId),
+            label: z.ZooTitle,
+          };
+        }),
+      );
+    });
+  }
+
   function GetAllRoles() {
     helper.xhr
       .Get("/Roles/GetAllRoles")
@@ -91,7 +106,7 @@ const NotificationManagementPage = () => {
 
   function GetChannels() {
     helper.xhr
-      .Get("/Notifications/GetChannels")
+      .Get("/List/GetNotificationChannels")
       .then((res) =>
         setChannels(
           res.channels.map((c: any) => ({ label: c.ChannelName, value: c.Id })),
@@ -102,18 +117,18 @@ const NotificationManagementPage = () => {
 
   function GetTypes() {
     helper.xhr
-      .Get("/Notifications/GetTypes")
+      .Get("/List/GetNotificationTypes")
       .then((res) =>
         setTypes(res.types.map((t: any) => ({ label: t.Label, value: t.Id }))),
       )
       .catch(console.error);
   }
 
-  function GetUsersByRole(roleId?: number) {
+  function GetUsersByRole(roleId?: number, zooId?: number) {
     helper.xhr
       .Get(
-        `/List/GetUsersByRole`,
-        helper.GetURLParamString({ roleId }).toString(),
+        `/List/GetUsersByRoleAndZoo`,
+        helper.GetURLParamString({ roleId, zooId }).toString(),
       )
       .then((res) => {
         console.log(res.users);
@@ -123,17 +138,18 @@ const NotificationManagementPage = () => {
   }
 
   useEffect(() => {
-    GetAllRoles();
     GetChannels();
     GetTypes();
+    GetAllRoles();
+    GetZooList();
   }, []);
 
   // Fetch users when target mode is specific
   useEffect(() => {
     if (targetMode === "specific" && obj.RoleId != 0) {
-      GetUsersByRole(obj.RoleId ?? undefined);
+      GetUsersByRole(obj.RoleId ?? undefined, selectedZoo ?? 0);
     }
-  }, [targetMode, obj.RoleId]);
+  }, [targetMode, obj.RoleId, selectedZoo]);
 
   // Load existing notification for view
   useEffect(() => {
@@ -243,7 +259,7 @@ const NotificationManagementPage = () => {
       .then((res) => {
         if (res.statusCode === 200) {
           toast({ title: res.message, variant: "success" });
-          setTimeout(() => router.back(), 2000);
+          setTimeout(() => router.back(), 3000);
         }
       })
       .catch((err) => {
@@ -421,6 +437,18 @@ const NotificationManagementPage = () => {
                         }}
                         label="Filter by Role"
                         isDisabled={false}
+                      />
+                    </div>
+                    <div className="w-56">
+                      <Dropdown
+                        activeId={selectedZoo}
+                        name="ZooId"
+                        clearable={true}
+                        options={[{ label: "All Zoos", value: 0 }, ...zoos]}
+                        handleDropdownChange={(n, v) => {
+                          setSelectedZoo((v as number) ?? 0);
+                        }}
+                        label="Filter by Zoo"
                       />
                     </div>
                     <div className="flex-1 mt-5">
