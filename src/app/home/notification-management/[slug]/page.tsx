@@ -11,7 +11,15 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Save, X, Users, Shield, Globe } from "lucide-react";
+import {
+  ArrowLeft,
+  Save,
+  X,
+  Users,
+  Shield,
+  Globe,
+  Navigation,
+} from "lucide-react";
 import Subheading from "@/components/utils/Headings/Subheading";
 import { OPTION } from "@/types/utils";
 import InputTag from "@/components/utils/FormElements/InputTag";
@@ -23,6 +31,146 @@ import ButtonComp from "@/components/utils/Button";
 
 type TargetMode = "role" | "specific" | "all";
 
+type ScreenKey =
+  | "none"
+  | "animal-screen"
+  | "event-screens"
+  // | "zoo-screen"
+  | "things-to-do-screen"
+  // | "inspection-history-screen"
+  // | "inspection-form-screen"
+  // | "map-screen"
+  // | "notification-screen"
+  // | "search-screen"
+  // | "all-animals-screen"
+  // | "emergency-contact-screen";
+
+// Defines what params each screen needs and what data must be fetched
+type ScreenConfig = {
+  label: string;
+  requiresZoo: boolean;
+  requiresAnimal: boolean;
+  requiresEvent: boolean;
+  requiresRoleId: boolean; // pull roleId from obj.RoleId automatically
+  includeAnimalName: boolean; // InspectionFormScreen needs animalName
+  paramsPreview: string; // shown as helper text in the form
+};
+
+const SCREEN_CONFIG: Record<ScreenKey, ScreenConfig> = {
+  none: {
+    label: "None — just open the app",
+    requiresZoo: false,
+    requiresAnimal: false,
+    requiresEvent: false,
+    requiresRoleId: false,
+    includeAnimalName: false,
+    paramsPreview: "No navigation params needed",
+  },
+  "animal-screen": {
+    label: "Animal Detail",
+    requiresZoo: true,
+    requiresAnimal: true,
+    requiresEvent: false,
+    requiresRoleId: true,
+    includeAnimalName: false,
+    paramsPreview: "{ animalId, zooId, roleId }",
+  },
+  "event-screens": {
+    label: "Event Detail",
+    requiresZoo: false,
+    requiresAnimal: false,
+    requiresEvent: true,
+    requiresRoleId: false,
+    includeAnimalName: false,
+    paramsPreview: "{ EventId }",
+  },
+  // "zoo-screen": {
+  //   label: "Zoo Screen",
+  //   requiresZoo: true,
+  //   requiresAnimal: false,
+  //   requiresEvent: false,
+  //   requiresRoleId: false,
+  //   includeAnimalName: false,
+  //   paramsPreview: "{ zooId }",
+  // },
+  "things-to-do-screen": {
+    label: "Things To Do",
+    requiresZoo: true,
+    requiresAnimal: false,
+    requiresEvent: false,
+    requiresRoleId: false,
+    includeAnimalName: false,
+    paramsPreview: "{ zooId }",
+  },
+  // "inspection-history-screen": {
+  //   label: "Inspection History",
+  //   requiresZoo: true,
+  //   requiresAnimal: true,
+  //   requiresEvent: false,
+  //   requiresRoleId: false,
+  //   includeAnimalName: false,
+  //   paramsPreview: "{ animalId }",
+  // },
+  // "inspection-form-screen": {
+  //   label: "Inspection Form",
+  //   requiresZoo: true,
+  //   requiresAnimal: true,
+  //   requiresEvent: false,
+  //   requiresRoleId: false,
+  //   includeAnimalName: true,
+  //   paramsPreview: "{ animalId, animalName, zooId }",
+  // },
+  // "map-screen": {
+  //   label: "Map",
+  //   requiresZoo: false,
+  //   requiresAnimal: false,
+  //   requiresEvent: false,
+  //   requiresRoleId: false,
+  //   includeAnimalName: false,
+  //   paramsPreview: "No params needed",
+  // },
+  // "notification-screen": {
+  //   label: "Notifications",
+  //   requiresZoo: false,
+  //   requiresAnimal: false,
+  //   requiresEvent: false,
+  //   requiresRoleId: false,
+  //   includeAnimalName: false,
+  //   paramsPreview: "No params needed",
+  // },
+  // "search-screen": {
+  //   label: "Search",
+  //   requiresZoo: false,
+  //   requiresAnimal: false,
+  //   requiresEvent: false,
+  //   requiresRoleId: false,
+  //   includeAnimalName: false,
+  //   paramsPreview: "No params needed",
+  // },
+  // "all-animals-screen": {
+  //   label: "All Animals",
+  //   requiresZoo: true,
+  //   requiresAnimal: false,
+  //   requiresEvent: false,
+  //   requiresRoleId: true,
+  //   includeAnimalName: false,
+  //   paramsPreview: "No params needed",
+  // },
+  // "emergency-contact-screen": {
+  //   label: "Emergency Contact",
+  //   requiresZoo: false,
+  //   requiresAnimal: false,
+  //   requiresEvent: false,
+  //   requiresRoleId: false,
+  //   includeAnimalName: false,
+  //   paramsPreview: "No params needed",
+  // },
+};
+
+const SCREEN_OPTIONS: OPTION[] = Object.entries(SCREEN_CONFIG).map(
+  ([key, cfg]) => ({ value: key, label: cfg.label }),
+);
+
 type Notification = {
   Id: number;
   Title: string;
@@ -30,14 +178,15 @@ type Notification = {
   UserIds: number[];
   ChannelId: number;
   TypeId: number;
-  DataPayload: string | null;
   Body: string;
+  // Navigation
+  Screen: ScreenKey;
+  EntityParams: string; // JSON string sent in FCM data.entityParams
 };
 
-type User = {
-  UserId: number;
-  UserName: string;
-};
+type User = { UserId: number; UserName: string };
+type Animal = { AnimalId: number; AnimalName: string };
+type Event = { EventId: number; EventTitle: string };
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
@@ -52,13 +201,26 @@ const NotificationManagementPage = () => {
 
   const [isCruding, setIsCruding] = useState(false);
   const [targetMode, setTargetMode] = useState<TargetMode>("role");
+
+  // Dropdowns
   const [roles, setRoles] = useState<OPTION[]>([]);
   const [zoos, setZoos] = useState<OPTION[]>([]);
-  const [selectedZoo, setSelectedZoo] = useState<number | null>(null);
   const [channels, setChannels] = useState<OPTION[]>([]);
   const [types, setTypes] = useState<OPTION[]>([]);
   const [users, setUsers] = useState<User[]>([]);
+  const [animals, setAnimals] = useState<Animal[]>([]);
+  const [events, setEvents] = useState<Event[]>([]);
+
+  // Navigation entity selection state
+  const [navZooId, setNavZooId] = useState<number>(0);
+  const [navAnimalId, setNavAnimalId] = useState<number>(0);
+  const [navAnimalName, setNavAnimalName] = useState<string>("");
+  const [navEventId, setNavEventId] = useState<number>(0);
+
+  // Specific user targeting state
+  const [selectedZoo, setSelectedZoo] = useState<number>(0);
   const [userSearch, setUserSearch] = useState("");
+
   const [obj, setObj] = useState<Notification>({
     Id: 0,
     Title: "",
@@ -67,38 +229,69 @@ const NotificationManagementPage = () => {
     ChannelId: 0,
     TypeId: 0,
     Body: "",
-    DataPayload: null,
+    Screen: "none",
+    EntityParams: "",
   });
 
-  // ─── Guards ─────────────────────────────────────────────────────────────────
-
+  // ─── Guards ───────────────────────────────────────────────────────────────────
   useEffect(() => {
     if (slug && slug !== "new" && isNaN(Number(slug))) {
       router.push("/home/notification-management");
     }
   }, [slug]);
 
-  // ─── Data Fetching ───────────────────────────────────────────────────────────
+  // ─── Derived ──────────────────────────────────────────────────────────────────
+  const screenCfg = SCREEN_CONFIG[obj.Screen];
 
-  function GetZooList() {
-    helper.xhr.Get("/List/GetZooList").then((res) => {
-      setZoos(
-        res.map((z: any) => {
-          return {
-            value: Number(z.ZooId),
-            label: z.ZooTitle,
-          };
-        }),
-      );
-    });
-  }
+  // Build entityParams JSON whenever navigation selections change
+  useEffect(() => {
+    if (obj.Screen === "none") {
+      setObj((p) => ({ ...p, EntityParams: "" }));
+      return;
+    }
 
+    const cfg = SCREEN_CONFIG[obj.Screen];
+    const built: Record<string, any> = {};
+
+    if (cfg.requiresAnimal && navAnimalId) built.animalId = navAnimalId;
+    if (cfg.includeAnimalName && navAnimalName)
+      built.animalName = navAnimalName;
+    if (cfg.requiresZoo && navZooId) built.zooId = navZooId;
+    if (cfg.requiresEvent && navEventId) built.EventId = navEventId;
+    if (cfg.requiresRoleId && obj.RoleId) built.roleId = obj.RoleId;
+
+    // For screens with no required params, pass screen key only
+    setObj((p) => ({
+      ...p,
+      EntityParams: Object.keys(built).length ? JSON.stringify(built) : "",
+    }));
+  }, [
+    obj.Screen,
+    navZooId,
+    navAnimalId,
+    navAnimalName,
+    navEventId,
+    obj.RoleId,
+  ]);
+
+  // ─── Data Fetching ────────────────────────────────────────────────────────────
   function GetAllRoles() {
     helper.xhr
       .Get("/Roles/GetAllRoles")
       .then((res) =>
         setRoles(
           res.roles.map((r: any) => ({ label: r.RoleName, value: r.RoleId })),
+        ),
+      )
+      .catch(console.error);
+  }
+
+  function GetZooList() {
+    helper.xhr
+      .Get("/List/GetZooList")
+      .then((res) =>
+        setZoos(
+          res.map((z: any) => ({ value: Number(z.ZooId), label: z.ZooTitle })),
         ),
       )
       .catch(console.error);
@@ -127,31 +320,72 @@ const NotificationManagementPage = () => {
   function GetUsersByRole(roleId?: number, zooId?: number) {
     helper.xhr
       .Get(
-        `/List/GetUsersByRoleAndZoo`,
+        "/List/GetUsersByRoleAndZoo",
         helper.GetURLParamString({ roleId, zooId }).toString(),
       )
+      .then((res) =>
+        setUsers(res.users.filter((u: User) => !!u.UserName) ?? []),
+      )
+      .catch(console.error);
+  }
+
+  function GetAnimalsByZoo(zooId: number) {
+    console.log("Fetching animals for zooId:", zooId);
+    if (!zooId) return;
+    helper.xhr
+      .Get(
+        "/List/GetAnimalsByZooId",
+        helper.GetURLParamString({ zooId }).toString(),
+      )
+      .then((res) => setAnimals(res ?? []))
+      .catch(console.error);
+  }
+
+  function GetEvents() {
+    console.log("Fetching events for event screen");
+    helper.xhr
+      .Get("/Event/GetEventList")
       .then((res) => {
-        console.log(res.users);
-        setUsers(res.users.filter((u: User) => !!u.UserName) ?? []);
+        {
+          console.log(res);
+          setEvents(
+            res.events.filter((event: any) => event.IsOccasional) ?? [],
+          );
+        }
       })
       .catch(console.error);
   }
 
   useEffect(() => {
-    GetChannels();
-    GetTypes();
     GetAllRoles();
     GetZooList();
+    GetChannels();
+    GetTypes();
   }, []);
 
-  // Fetch users when target mode is specific
+  // Fetch users when targeting specific users
   useEffect(() => {
-    if (targetMode === "specific" && obj.RoleId != 0) {
+    if (targetMode === "specific" && obj.RoleId) {
       GetUsersByRole(obj.RoleId ?? undefined, selectedZoo ?? 0);
     }
   }, [targetMode, obj.RoleId, selectedZoo]);
 
-  // Load existing notification for view
+  // Fetch animals when zoo is selected for navigation
+  useEffect(() => {
+    console.log("Zoo selected for navigation:", navZooId);
+    if (screenCfg.requiresAnimal && navZooId) {
+      setNavAnimalId(0);
+      setNavAnimalName("");
+      GetAnimalsByZoo(navZooId);
+    }
+  }, [navZooId, obj.Screen]);
+
+  // Fetch events when event screen is selected
+  useEffect(() => {
+    if (screenCfg.requiresEvent) GetEvents();
+  }, [obj.Screen]);
+
+  // Load view data
   useEffect(() => {
     if (isView) {
       helper.xhr
@@ -169,23 +403,38 @@ const NotificationManagementPage = () => {
             ChannelId: n.ChannelId,
             TypeId: n.TypeId,
             Body: n.Body,
-            DataPayload: n.DataPayload,
+            Screen: n.Screen ?? "none",
+            EntityParams: n.EntityParams ?? "",
           });
         });
     }
   }, [slug]);
 
-  // ─── Handlers ────────────────────────────────────────────────────────────────
-
+  // ─── Handlers ─────────────────────────────────────────────────────────────────
   function handleChange(n: string, v: string | boolean | number) {
     setObj((prev) => ({ ...prev, [n]: v }));
   }
 
+  function handleScreenChange(_: string, v: string | boolean | number) {
+    // Reset all nav selections when screen changes
+    setNavZooId(0);
+    setNavAnimalId(0);
+    setNavAnimalName("");
+    setNavEventId(0);
+    setObj((prev) => ({ ...prev, Screen: v as ScreenKey, EntityParams: "" }));
+  }
+
   function handleTargetMode(mode: TargetMode) {
     setTargetMode(mode);
-    // Reset targeting fields when mode changes
     setObj((prev) => ({ ...prev, RoleId: null, UserIds: [] }));
     setUserSearch("");
+  }
+
+  function handleAnimalSelect(_: string, animalId: number | string) {
+    const id = Number(animalId);
+    const animal = animals.find((a) => a.AnimalId === id);
+    setNavAnimalId(id);
+    setNavAnimalName(animal?.AnimalName ?? "");
   }
 
   function toggleUser(userId: number) {
@@ -205,23 +454,18 @@ const NotificationManagementPage = () => {
   }
 
   const filteredUsers = useMemo(() => {
-    if (!userSearch || userSearch.trim() === "") return users;
-
-    const query = userSearch.toLowerCase();
-    console.log("Filtering users with query:", users, query);
-    return users.filter(
-      (u) => u.UserName !== null && u.UserName.toLowerCase().includes(query),
+    if (!userSearch.trim()) return users;
+    return users.filter((u) =>
+      u.UserName?.toLowerCase().includes(userSearch.toLowerCase()),
     );
   }, [users, userSearch]);
 
-  // ─── Validation ──────────────────────────────────────────────────────────────
-
+  // ─── Validation ───────────────────────────────────────────────────────────────
   const verify = (): boolean => {
     const fail = (msg: string) => {
       toast({ title: "Validation Error", description: msg });
       return false;
     };
-
     if (!obj.Title.trim()) return fail("Title is required");
     if (!obj.Body.trim()) return fail("Description is required");
     if (!obj.ChannelId) return fail("Notification channel is required");
@@ -230,14 +474,19 @@ const NotificationManagementPage = () => {
       return fail("Please select a role");
     if (targetMode === "specific" && obj.UserIds.length === 0)
       return fail("Please select at least one user");
+    // Navigation param validation
+    if (screenCfg.requiresZoo && !navZooId)
+      return fail("Please select a zoo for the navigation target");
+    if (screenCfg.requiresAnimal && !navAnimalId)
+      return fail("Please select an animal for the navigation target");
+    if (screenCfg.requiresEvent && !navEventId)
+      return fail("Please select an event for the navigation target");
     return true;
   };
 
-  // ─── Submit ──────────────────────────────────────────────────────────────────
-
+  // ─── Submit ───────────────────────────────────────────────────────────────────
   const HandleSubmit = () => {
     if (!verify()) return;
-
     setIsCruding(true);
 
     const payload = {
@@ -245,10 +494,10 @@ const NotificationManagementPage = () => {
       Body: obj.Body,
       ChannelId: obj.ChannelId,
       TypeId: obj.TypeId,
-      DataPayload: obj.DataPayload,
-      // Targeting — only send what's relevant to the mode
       RoleId: targetMode === "role" ? obj.RoleId : null,
       UserIds: targetMode === "specific" ? obj.UserIds : [],
+      Screen: obj.Screen !== "none" ? obj.Screen : null,
+      EntityParams: obj.EntityParams || null,
     };
 
     helper.xhr
@@ -259,24 +508,17 @@ const NotificationManagementPage = () => {
       .then((res) => {
         if (res.statusCode === 200) {
           toast({ title: res.message, variant: "success" });
-          setTimeout(() => router.back(), 3000);
+          // setTimeout(() => router.back(), 3000);
         }
       })
-      .catch((err) => {
-        toast({ title: err.message, variant: "danger" });
-      })
+      .catch((err) => toast({ title: err.message, variant: "danger" }))
       .finally(() => setIsCruding(false));
   };
 
-  // ─── Heading ──────────────────────────────────────────────────────────────────
-
+  // ─── Helpers ──────────────────────────────────────────────────────────────────
   function GetHeading() {
-    const action = isNew ? "Create" : "View";
-    const suffix = !isNew && obj.Title ? ` — ${obj.Title}` : "";
-    return `${action} Notification${suffix}`;
+    return `${isNew ? "Create" : "View"} Notification${!isNew && obj.Title ? ` — ${obj.Title}` : ""}`;
   }
-
-  // ─── Target Mode Options ──────────────────────────────────────────────────────
 
   const targetModes: {
     mode: TargetMode;
@@ -305,23 +547,20 @@ const NotificationManagementPage = () => {
   ];
 
   // ─── Render ───────────────────────────────────────────────────────────────────
-
   return (
     <div className="flex-1 space-y-4">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <Button variant="outline" size="icon" onClick={() => router.back()}>
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-          <Subheading text={GetHeading()} />
-        </div>
+      <div className="flex items-center space-x-2">
+        <Button variant="outline" size="icon" onClick={() => router.back()}>
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
+        <Subheading text={GetHeading()} />
       </div>
 
       <Card>
         <CardHeader />
         <CardContent className="space-y-8">
-          {/* ── Section 1: Details ── */}
+          {/* ── Section 1: Details ─────────────────────────────────────────── */}
           <div className="space-y-3">
             <Paragraph text="Details" />
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3">
@@ -358,39 +597,133 @@ const NotificationManagementPage = () => {
                   disabled={!isNew}
                 />
               </div>
-              <div className="col-span-1 md:col-span-2">
-                <TextArea
-                  value={obj.DataPayload ?? ""}
-                  name="DataPayload"
-                  setter={handleChange}
-                  label="Data Payload (optional)"
-                  placeHolder='{"key": "value","key2": "value2"}'
-                  disabled={!isNew}
-                />
-              </div>
             </div>
           </div>
 
-          {/* ── Section 2: Targeting (only on create) ── */}
+          {/* ── Section 2: Navigation ──────────────────────────────────────── */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <Paragraph text="On Tap Navigation" />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+              <div>
+                <Dropdown
+                  activeId={obj.Screen}
+                  name="Screen"
+                  options={SCREEN_OPTIONS}
+                  handleDropdownChange={handleScreenChange}
+                  label="Navigate To Screen"
+                  isDisabled={!isNew}
+                />
+                {obj.Screen !== "none" && (
+                  <p className="mt-1 text-xs text-muted-foreground font-mono">
+                    params: {screenCfg.paramsPreview}
+                  </p>
+                )}
+              </div>
+
+              {/* Zoo selector (navigation) */}
+              {isNew && screenCfg.requiresZoo && (
+                <Dropdown
+                  activeId={navZooId}
+                  name="navZooId"
+                  options={[{ label: "Select Zoo...", value: 0 }, ...zoos]}
+                  handleDropdownChange={(_, v) => setNavZooId(Number(v))}
+                  label="Zoo"
+                />
+              )}
+
+              {/* Animal selector — appears after zoo is selected */}
+              {isNew && screenCfg.requiresAnimal && (
+                <Dropdown
+                  activeId={navAnimalId}
+                  name="navAnimalId"
+                  options={[
+                    {
+                      label: navZooId
+                        ? "Select Animal..."
+                        : "Select a zoo first",
+                      value: 0,
+                    },
+                    ...animals.map((a) => ({
+                      label: a.AnimalName,
+                      value: a.AnimalId,
+                    })),
+                  ]}
+                  handleDropdownChange={handleAnimalSelect}
+                  label="Animal"
+                  isDisabled={!navZooId}
+                />
+              )}
+
+              {/* Event selector */}
+              {isNew && screenCfg.requiresEvent && (
+                <Dropdown
+                  activeId={navEventId}
+                  name="navEventId"
+                  options={[
+                    { label: "Select Event...", value: 0 },
+                    ...events.map((e) => ({
+                      label: e.EventTitle,
+                      value: e.EventId,
+                    })),
+                  ]}
+                  handleDropdownChange={(_, v) => setNavEventId(Number(v))}
+                  label="Event"
+                />
+              )}
+            </div>
+
+            {/* Live params preview */}
+            {isNew && obj.Screen !== "none" && obj.EntityParams && (
+              <div className="flex items-start gap-2 p-3 rounded-md bg-muted/40 border border-border">
+                <Navigation className="h-4 w-4 mt-0.5 text-muted-foreground shrink-0" />
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground mb-0.5">
+                    Params that will be sent
+                  </p>
+                  <code className="text-xs font-mono text-foreground break-all">
+                    {obj.EntityParams}
+                  </code>
+                </div>
+              </div>
+            )}
+
+            {/* View mode: show stored params */}
+            {isView && obj.EntityParams && (
+              <div className="flex items-start gap-2 p-3 rounded-md bg-muted/40 border border-border">
+                <Navigation className="h-4 w-4 mt-0.5 text-muted-foreground shrink-0" />
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground mb-0.5">
+                    Navigation Params
+                  </p>
+                  <code className="text-xs font-mono text-foreground break-all">
+                    {obj.EntityParams}
+                  </code>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* ── Section 3: Target Audience (create only) ────────────────────── */}
           {isNew && (
             <div className="space-y-4">
               <Paragraph text="Target Audience" />
 
-              {/* Mode selector */}
+              {/* Mode cards */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 {targetModes.map(({ mode, label, description, icon }) => (
                   <button
                     key={mode}
                     type="button"
                     onClick={() => handleTargetMode(mode)}
-                    className={`
-                      flex items-start gap-3 p-4 rounded-lg border text-left transition-all font-poppins
+                    className={`flex items-start gap-3 p-4 rounded-lg border text-left transition-all font-poppins
                       ${
                         targetMode === mode
                           ? "border-primary bg-primary/5 text-primary"
                           : "border-border hover:border-primary/40 hover:bg-muted/40"
-                      }
-                    `}
+                      }`}
                   >
                     <div
                       className={`mt-0.5 ${targetMode === mode ? "text-primary" : "text-muted-foreground"}`}
@@ -407,7 +740,7 @@ const NotificationManagementPage = () => {
                 ))}
               </div>
 
-              {/* Role dropdown */}
+              {/* Role mode */}
               {targetMode === "role" && (
                 <div className="max-w-xs">
                   <Dropdown
@@ -416,45 +749,45 @@ const NotificationManagementPage = () => {
                     options={roles}
                     handleDropdownChange={handleChange}
                     label="Select Role"
-                    isDisabled={false}
                   />
                 </div>
               )}
 
-              {/* Specific user selector */}
+              {/* Specific users mode */}
               {targetMode === "specific" && (
                 <div className="space-y-3">
-                  {/* Optional role filter */}
-                  <div className="flex items-center gap-3">
-                    <div className="w-56">
+                  <div className="flex items-end gap-3 flex-wrap">
+                    <div className="w-48">
                       <Dropdown
                         activeId={obj.RoleId ?? 0}
                         name="RoleId"
                         options={[{ label: "All Roles", value: 0 }, ...roles]}
                         handleDropdownChange={(n, v) => {
                           handleChange(n, v);
-                          setObj((prev) => ({ ...prev, UserIds: [] }));
+                          setObj((p) => ({ ...p, UserIds: [] }));
                         }}
                         label="Filter by Role"
-                        isDisabled={false}
                       />
                     </div>
-                    <div className="w-56">
+                    <div className="w-48">
                       <Dropdown
                         activeId={selectedZoo}
                         name="ZooId"
-                        clearable={true}
+                        clearable
                         options={[{ label: "All Zoos", value: 0 }, ...zoos]}
-                        handleDropdownChange={(n, v) => {
-                          setSelectedZoo((v as number) ?? 0);
-                        }}
+                        handleDropdownChange={(_, v) =>
+                          setSelectedZoo(Number(v) ?? 0)
+                        }
                         label="Filter by Zoo"
                       />
                     </div>
-                    <div className="flex-1 mt-5">
+                    <div className="flex-1 min-w-[200px]">
+                      <label className="text-xs font-medium text-muted-foreground block mb-1">
+                        Search Users
+                      </label>
                       <input
                         type="text"
-                        placeholder="Search users..."
+                        placeholder="Search by name..."
                         value={userSearch}
                         onChange={(e) => setUserSearch(e.target.value)}
                         className="w-full px-3 py-2 text-sm rounded-md border border-input bg-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
@@ -462,7 +795,7 @@ const NotificationManagementPage = () => {
                     </div>
                   </div>
 
-                  {/* Selected users chips */}
+                  {/* Selected chips */}
                   {obj.UserIds.length > 0 && (
                     <div className="flex flex-wrap gap-2">
                       {obj.UserIds.map((id) => {
@@ -500,15 +833,8 @@ const NotificationManagementPage = () => {
                             key={user.UserId}
                             type="button"
                             onClick={() => toggleUser(user.UserId)}
-                            className={`
-                              w-full flex items-center justify-between px-4 py-2.5 text-xs
-                              border-b border-border last:border-0 transition-colors text-left
-                              ${
-                                selected
-                                  ? "bg-primary/5 text-primary"
-                                  : "hover:bg-muted/50"
-                              }
-                            `}
+                            className={`w-full flex items-center justify-between px-4 py-2.5 text-xs border-b border-border last:border-0 transition-colors text-left
+                                ${selected ? "bg-primary/5 text-primary" : "hover:bg-muted/50"}`}
                           >
                             <span>{user.UserName}</span>
                             {selected && (
@@ -529,7 +855,7 @@ const NotificationManagementPage = () => {
                 </div>
               )}
 
-              {/* All users confirmation note */}
+              {/* All users note */}
               {targetMode === "all" && (
                 <div className="flex items-center gap-2 p-3 rounded-md border border-primary/40 bg-muted/40 text-sm">
                   <Globe className="h-4 w-4 shrink-0" />
