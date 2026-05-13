@@ -38,6 +38,7 @@ import {
 import Checkbox from "@/components/utils/FormElements/Checkbox";
 import useHelper from "@/Helper/helper";
 import { useToast } from "@/components/ui/use-toast";
+import { changeDateFormat, to12Hour } from "@/Helper/DateFormats";
 import { usePageData } from "@/hooks/usePageData";
 
 type Event = {
@@ -67,7 +68,7 @@ export default function EventPage() {
     setSelectedEvents((prev) =>
       prev.includes(eventId)
         ? prev.filter((id) => id !== eventId)
-        : [...prev, eventId]
+        : [...prev, eventId],
     );
   };
 
@@ -81,7 +82,7 @@ export default function EventPage() {
 
   const filteredEvents = events.filter((event) => {
     const matchesSearch = event.EventTitle.toLowerCase().includes(
-      searchQuery.toLowerCase()
+      searchQuery.toLowerCase(),
     );
 
     return matchesSearch;
@@ -118,12 +119,12 @@ export default function EventPage() {
           "/Event/DeleteEvent",
           helper.ConvertToFormData({
             eventId: eventToDelete.EventId,
-          })
+          }),
         )
         .then((res) => {
           if (res == "Event deleted successfully.") {
             const updatedEvents = events.filter(
-              (event: any) => event.EventId !== eventToDelete.EventId
+              (event: any) => event.EventId !== eventToDelete.EventId,
             );
             setEvents(updatedEvents);
             setDeleteEventsDialog(false);
@@ -142,7 +143,7 @@ export default function EventPage() {
 
   useEffect(() => {
     helper.xhr.Get("/Event/GetEventList").then((res) => {
-      setEvents(res.events.filter((event: any) => !event.IsOccasional));
+      setEvents(res.events.filter((event: any) => event.IsOccasional));
     });
   }, []);
 
@@ -156,7 +157,8 @@ export default function EventPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete the trip "{eventToDelete?.EventName}
+              This will permanently delete the event "
+              {eventToDelete?.EventTitle}
               ". This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -177,16 +179,17 @@ export default function EventPage() {
           title={pageData?.MenuName}
           description={pageData?.Description}
         />
+
         <Card className="space-y-4">
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardIntro title="Trips" description="Overview of all trips." />
+            <CardIntro title="Events" description="Overview of all events." />
             <div className="w-fit">
               <ButtonComp
-                text="Add New Trip"
+                text="Add New Event"
                 type={"dark"}
                 beforeIcon={<Plus className="h-4 w-4" />}
                 clickEvent={() => {
-                  router.push("/home/trip-management/new");
+                  router.push("/home/occasional-event-management/new");
                 }}
               />
             </div>
@@ -195,12 +198,12 @@ export default function EventPage() {
             <SearchTag
               value={searchQuery}
               setter={(value) => setSearchQuery(value)}
-              placeHolder="Select Trips..."
+              placeHolder="Select Events..."
             />
             {selectedEvents.length > 0 && (
               <div className="flex items-center gap-2 mb-4 p-2 bg-main-frostyBlue/10 rounded-md">
                 <span className="text-sm text-main-darkFadedBlue">
-                  {selectedEvents.length} trip
+                  {selectedEvents.length} event
                   {selectedEvents.length > 1 ? "s" : ""} selected
                 </span>
                 <div className="flex-1"></div>
@@ -232,11 +235,11 @@ export default function EventPage() {
                       className="flex items-center gap-1 cursor-pointer"
                       onClick={() =>
                         setSortOrder(
-                          sortOrder === "name-asc" ? "name-desc" : "name-asc"
+                          sortOrder === "name-asc" ? "name-desc" : "name-asc",
                         )
                       }
                     >
-                      Trip Name
+                      Event Name
                       <ArrowUpDown className="h-4 w-4" />
                     </TableHead>
                     <TableHead>Days</TableHead>
@@ -247,7 +250,7 @@ export default function EventPage() {
                 </TableHeader>
                 <TableBody>
                   {currentPosts.length > 0 ? (
-                    currentPosts.map((event) => (
+                    currentPosts.map((event: Event) => (
                       <TableRow key={event.EventId}>
                         <TableCell>
                           <Checkbox
@@ -259,9 +262,17 @@ export default function EventPage() {
                         <TableCell className="font-medium">
                           {event.EventTitle}
                         </TableCell>
-                        <TableCell>{event.EventDays}</TableCell>
                         <TableCell>
-                          {event.EventStartingTime} - {event.EventClosingTime}
+                          {changeDateFormat(event.EventDays.split(",")[0])} -
+                          {changeDateFormat(
+                            event.EventDays.split(",")[
+                              event.EventDays.split(",").length - 1
+                            ],
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {to12Hour(event.EventStartingTime)} -{" "}
+                          {to12Hour(event.EventClosingTime)}
                         </TableCell>
                         <TableCell>{event.ZooTitle}</TableCell>
                         <TableCell className="text-right flex justify-end">
@@ -270,7 +281,7 @@ export default function EventPage() {
                             size="sm"
                             onClick={() => {
                               router.push(
-                                `/home/trip-management/${event.EventId}`
+                                `/home/occasional-event-management/${event.EventId}`,
                               );
                             }}
                           >
@@ -297,7 +308,7 @@ export default function EventPage() {
                         colSpan={9}
                         className="h-24 text-center text-main-gray"
                       >
-                        No trips found.
+                        No events found.
                       </TableCell>
                     </TableRow>
                   )}

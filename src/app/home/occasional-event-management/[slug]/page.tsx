@@ -74,7 +74,7 @@ const Page = () => {
   useEffect(() => {
     if (slug) {
       if (slug != "new" && isNaN(Number(slug))) {
-        router.push("/home/event-management");
+        router.push("/home/occasional-event-management");
       }
     }
   }, [slug]);

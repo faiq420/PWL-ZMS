@@ -115,7 +115,7 @@ const TripManagementPage = () => {
   useEffect(() => {
     if (slug) {
       if (slug != "new" && isNaN(Number(slug))) {
-        router.push("/home/trip-management");
+        router.push("/home/scheduled-event-management");
       }
     }
   }, [slug]);
@@ -130,7 +130,7 @@ const TripManagementPage = () => {
 
   function GetHeading() {
     return `${capitalize(slug == "new" ? "create" : "edit")} - ${capitalize(
-      "Trip",
+      "Scehduled Event",
     )} ${slug != "new" ? `for ${obj.EventTitle}` : ""}`;
   }
 
@@ -161,7 +161,7 @@ const TripManagementPage = () => {
 
     switch (true) {
       case obj.EventTitle === "":
-        return fail("Trip event name is required.");
+        return fail("Scheduled event name is required.");
 
       case obj.EventStartingTime === "" || obj.EventClosingTime === "":
         return fail("Starting and ending time are required.");
@@ -292,7 +292,7 @@ const TripManagementPage = () => {
             const tripsAddedorUpdated = await AddOrUpdateTrip(details);
             console.log(tripsAddedorUpdated);
             toast({
-              title: `Trip event ${
+              title: `Event ${
                 slug == "new" ? "created" : "updated"
               } successfully`,
               variant: "success",
@@ -305,7 +305,7 @@ const TripManagementPage = () => {
         })
         .catch((error) => {
           toast({
-            title: `Trip event not ${
+            title: `Event not ${
               slug == "new" ? "created" : "updated"
             } successfully`,
             description: error.message,
@@ -553,7 +553,7 @@ const TripManagementPage = () => {
                           ? URL.createObjectURL(logoFile)
                           : "/placeholder.svg"
                     }
-                    alt="Trip event logo"
+                    alt="Event logo"
                     fill
                     className="object-contain"
                     unoptimized
@@ -695,7 +695,7 @@ const TripManagementPage = () => {
                 setSelectedDays(v);
               }}
               selectedIds={selectedDays}
-              label="Days for trip"
+              label="Days for event"
             />
             <Dropdown
               activeId={obj.ZooId}
@@ -731,7 +731,7 @@ const TripManagementPage = () => {
                 name="EventDescription"
                 setter={handleChange}
                 label="Description"
-                placeHolder="Write description for the trip event here..."
+                placeHolder="Write description for the scheduled event here..."
               />
             </div>
           </div>

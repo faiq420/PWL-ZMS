@@ -38,7 +38,6 @@ import {
 import Checkbox from "@/components/utils/FormElements/Checkbox";
 import useHelper from "@/Helper/helper";
 import { useToast } from "@/components/ui/use-toast";
-import { changeDateFormat, to12Hour } from "@/Helper/DateFormats";
 import { usePageData } from "@/hooks/usePageData";
 
 type Event = {
@@ -143,7 +142,7 @@ export default function EventPage() {
 
   useEffect(() => {
     helper.xhr.Get("/Event/GetEventList").then((res) => {
-      setEvents(res.events.filter((event: any) => event.IsOccasional));
+      setEvents(res.events.filter((event: any) => !event.IsOccasional));
     });
   }, []);
 
@@ -157,8 +156,7 @@ export default function EventPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete the event "
-              {eventToDelete?.EventTitle}
+              This will permanently delete the event "{eventToDelete?.EventName}
               ". This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -179,17 +177,16 @@ export default function EventPage() {
           title={pageData?.MenuName}
           description={pageData?.Description}
         />
-
         <Card className="space-y-4">
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardIntro title="Events" description="Overview of all events." />
+            <CardIntro title="Scheduled Events" description="Overview of all scheduled events." />
             <div className="w-fit">
               <ButtonComp
                 text="Add New Event"
                 type={"dark"}
                 beforeIcon={<Plus className="h-4 w-4" />}
                 clickEvent={() => {
-                  router.push("/home/event-management/new");
+                  router.push("/home/scheduled-event-management/new");
                 }}
               />
             </div>
@@ -250,7 +247,7 @@ export default function EventPage() {
                 </TableHeader>
                 <TableBody>
                   {currentPosts.length > 0 ? (
-                    currentPosts.map((event: Event) => (
+                    currentPosts.map((event) => (
                       <TableRow key={event.EventId}>
                         <TableCell>
                           <Checkbox
@@ -262,17 +259,9 @@ export default function EventPage() {
                         <TableCell className="font-medium">
                           {event.EventTitle}
                         </TableCell>
+                        <TableCell>{event.EventDays}</TableCell>
                         <TableCell>
-                          {changeDateFormat(event.EventDays.split(",")[0])} -
-                          {changeDateFormat(
-                            event.EventDays.split(",")[
-                              event.EventDays.split(",").length - 1
-                            ]
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          {to12Hour(event.EventStartingTime)} -{" "}
-                          {to12Hour(event.EventClosingTime)}
+                          {event.EventStartingTime} - {event.EventClosingTime}
                         </TableCell>
                         <TableCell>{event.ZooTitle}</TableCell>
                         <TableCell className="text-right flex justify-end">
@@ -281,7 +270,7 @@ export default function EventPage() {
                             size="sm"
                             onClick={() => {
                               router.push(
-                                `/home/event-management/${event.EventId}`
+                                `/home/scheduled-event-management/${event.EventId}`
                               );
                             }}
                           >
@@ -308,7 +297,7 @@ export default function EventPage() {
                         colSpan={9}
                         className="h-24 text-center text-main-gray"
                       >
-                        No events found.
+                        No scheduled events found.
                       </TableCell>
                     </TableRow>
                   )}
