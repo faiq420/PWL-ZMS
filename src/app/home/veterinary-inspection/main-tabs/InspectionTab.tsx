@@ -155,7 +155,7 @@ const InspectionTab = () => {
               title="Inspection Management"
               description="Schedule, track, and manage animal health inspections"
             />
-            <div className="w-fit">
+            {/* <div className="w-fit">
               <ButtonComp
                 type={"dark"}
                 clickEvent={() => {
@@ -164,7 +164,7 @@ const InspectionTab = () => {
                 text="Schedule Appointment"
                 beforeIcon={<Plus className=" h-4 w-4" />}
               />
-            </div>
+            </div> */}
           </div>
         </CardHeader>
         <CardContent className="space-y-4 mt-4">
