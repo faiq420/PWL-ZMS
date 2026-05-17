@@ -5,17 +5,19 @@ import Link from "next/link";
 import React from "react";
 
 interface Props {
-  InspectionId: string;
+  InspectionId: number;
+  InspectionNumber:string;
   Status: string;
   Date: string;
   Inspector: string;
   Findings: string;
-  Slug: string;
+  Slug: number;
   isCurrent: boolean;
 }
 
 const HistoryCard = ({
   InspectionId,
+  InspectionNumber,
   Status,
   Date,
   Inspector,
@@ -29,7 +31,7 @@ const HistoryCard = ({
         <FileText className="h-6 w-6 text-muted-foreground" />
       </div>
       <div className="flex-1 space-y-1">
-        <p className="font-medium font-poppins">{InspectionId}</p>
+        <p className="font-medium font-poppins">{InspectionNumber}</p>
         <p className="text-muted-foreground text-sm">
           {Date} • {Inspector}
         </p>

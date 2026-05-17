@@ -48,78 +48,45 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+
+interface Inspection {
+  InspectionId: number;
+  InspectionNumber: string;
+  InspectionDate: string;
+  FollowUpDate: string;
+  InspectionStatusId: number;
+  Status: string;
+  VeterinaryInspector: string;
+  AnimalName: string;
+  Slug: number;
+}
 
 const InspectionTab = () => {
   const helper = useHelper();
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("all");
-  const [inspections, setInspections] = useState([
-    {
-      Id: "INS-2023-001",
-      Slug: "ins-2023-001-zara-african-elephant",
-      Animal: "Zara",
-      Species: "African Elephant",
-      Inspector: "Dr. Sarah Johnson",
-      Date: "2023-04-15",
-      Status: "completed",
-    },
-    {
-      Id: "INS-2023-002",
-      Slug: "ins-2023-002-raja-bengal-tiger",
-      Animal: "Raja",
-      Species: "Bengal Tiger",
-      Inspector: "Dr. Michael Chen",
-      Date: "2023-04-18",
-      Status: "completed",
-    },
-    {
-      Id: "INS-2023-003",
-      Slug: "ins-2023-003-leo-african-lion",
-      Animal: "Leo",
-      Species: "African Lion",
-      Inspector: "Dr. Sarah Johnson",
-      Date: "2023-04-20",
-      Status: "completed",
-    },
-    {
-      Id: "INS-2023-004",
-      Slug: "ins-2023-004-bubbles-bottlenose-dolphin",
-      Animal: "Bubbles",
-      Species: "Bottlenose Dolphin",
-      Inspector: "Dr. Emily Rodriguez",
-      Date: "2023-04-25",
-      Status: "scheduled",
-    },
-    {
-      Id: "INS-2023-005",
-      Slug: "ins-2023-005-koko-western-gorilla",
-      Animal: "Koko",
-      Species: "Western Gorilla",
-      Inspector: "Dr. Michael Chen",
-      Date: "2023-04-10",
-      Status: "overdue",
-    },
-    {
-      Id: "INS-2023-006",
-      Slug: "ins-2023-006-melman-reticulated-giraffe",
-      Animal: "Melman",
-      Species: "Reticulated Giraffe",
-      Inspector: "Dr. Sarah Johnson",
-      Date: "2023-04-30",
-      Status: "scheduled",
-    },
-    {
-      Id: "INS-2023-007",
-      Slug: "ins-2023-007-spike-komodo-dragon",
-      Animal: "Spike",
-      Species: "Komodo Dragon",
-      Inspector: "Dr. Emily Rodriguez",
-      Date: "2023-04-05",
-      Status: "completed",
-    },
-  ]);
+  const [inspections, setInspections] = useState<Inspection[]>([]);
+  let currentPost:any[] = []
+
+  useEffect(() => {
+    helper.xhr.Get("/Inspection/GetInspectionList").then((res) => {
+      console.log(res);
+      var s = "2";
+      console.log("typeee",typeof s === "number")
+      setInspections(
+        res.map((data: any) => ({
+          ...data,
+          InspectionDate: data.InspectionDate.split("T")[0],
+          Slug: data.InspectionId
+        })),
+      );
+
+      currentPost = inspections;
+    });
+  }, []);
+
   const [sortOrder, setSortOrder] = useState("name-asc");
   const [selectedInspections, setSelectedInspections] = useState<string[]>([]);
 
@@ -127,7 +94,7 @@ const InspectionTab = () => {
     setSelectedInspections((prev) =>
       prev.includes(inspectionId)
         ? prev.filter((id) => id !== inspectionId)
-        : [...prev, inspectionId]
+        : [...prev, inspectionId],
     );
   };
 
@@ -136,14 +103,14 @@ const InspectionTab = () => {
       setSelectedInspections([]);
     } else {
       setSelectedInspections(
-        filteredInspections.map((inspection: any) => inspection.Id)
+        filteredInspections.map((inspection: any) => inspection.Id),
       );
     }
   };
 
   const filteredInspections = inspections.filter((inspection) => {
-    const matchesSearch = inspection.Animal.toLowerCase().includes(
-      searchQuery.toLowerCase()
+    const matchesSearch = inspection.AnimalName.toLowerCase().includes(
+      searchQuery.toLowerCase(),
     );
     const matchedFilter =
       selectedFilter == "all" ||
@@ -156,9 +123,9 @@ const InspectionTab = () => {
   const sortedInspections = [...filteredInspections].sort((a, b) => {
     switch (sortOrder) {
       case "name-asc":
-        return a.Id.localeCompare(b.Id);
+        return a.InspectionNumber.localeCompare(b.InspectionNumber);
       case "name-desc":
-        return b.Id.localeCompare(a.Id);
+        return b.InspectionNumber.localeCompare(a.InspectionNumber);
       default:
         return 0;
     }
@@ -169,9 +136,9 @@ const InspectionTab = () => {
   const postsPerPage = 20;
   const indexOfLastPost = currentPage * postsPerPage;
   const indexOfFirstPost = indexOfLastPost - postsPerPage;
-  const currentPosts = sortedInspections.slice(
+  currentPost = sortedInspections.slice(
     indexOfFirstPost,
-    indexOfLastPost
+    indexOfLastPost,
   );
 
   const totalPages = Math.ceil(inspections.length / postsPerPage);
@@ -188,7 +155,7 @@ const InspectionTab = () => {
               title="Inspection Management"
               description="Schedule, track, and manage animal health inspections"
             />
-            <div className="w-fit">
+            {/* <div className="w-fit">
               <ButtonComp
                 type={"dark"}
                 clickEvent={() => {
@@ -197,7 +164,7 @@ const InspectionTab = () => {
                 text="Schedule Appointment"
                 beforeIcon={<Plus className=" h-4 w-4" />}
               />
-            </div>
+            </div> */}
           </div>
         </CardHeader>
         <CardContent className="space-y-4 mt-4">
@@ -247,7 +214,7 @@ const InspectionTab = () => {
             <Table>
               <TableHeader>
                 <TableRow className="bg-main-frostyBlue/5">
-                  <TableHead className="w-12">
+                  {/* <TableHead className="w-12">
                     <Checkbox
                       value={
                         selectedInspections.length ===
@@ -257,13 +224,13 @@ const InspectionTab = () => {
                       setter={toggleSelectAll}
                       name=""
                     />
-                  </TableHead>
+                  </TableHead> */}
                   <TableHead>
                     <div
                       className="flex items-center gap-1 cursor-pointer"
                       onClick={() =>
                         setSortOrder(
-                          sortOrder === "name-asc" ? "name-desc" : "name-asc"
+                          sortOrder === "name-asc" ? "name-desc" : "name-asc",
                         )
                       }
                     >
@@ -281,34 +248,35 @@ const InspectionTab = () => {
                 </TableRow>
               </TableHeader>
               <TableBody className="!text-sm">
-                {currentPosts.length > 0 ? (
-                  currentPosts.map((inspection: any, index: number) => (
+                {currentPost.length > 0 ? (
+                  currentPost.map((inspection: Inspection, index: number) => (
                     <TableRow key={index}>
-                      <TableCell>
+                      {/* <TableCell>
                         <Checkbox
-                          value={selectedInspections.includes(inspection.Id)}
+                          value={selectedInspections.includes(inspection.InspectionId.toString())}
                           setter={(n, v) =>
-                            toggleSelectInspection(inspection.Id)
+                            toggleSelectInspection(inspection.InspectionId.toString())
                           }
                           name="id"
                         />
-                      </TableCell>
-                      <TableCell>{inspection.Id}</TableCell>
-                      <TableCell>{inspection.Species}</TableCell>
-                      <TableCell>{inspection.Inspector}</TableCell>
+                      </TableCell> */}
+                      <TableCell>{inspection.InspectionNumber}</TableCell>
+                      <TableCell>{inspection.AnimalName}</TableCell>
+                      <TableCell>{inspection.VeterinaryInspector}</TableCell>
                       <TableCell>
-                        {changeDateFormatWithTime(inspection.Date)}
+                        {inspection.InspectionDate}
+                        {/* {changeDateFormatWithTime(inspection.InspectionDate)} */}
                       </TableCell>
                       <TableCell>
                         <Badge
                           className={
-                            inspection.Status === "completed"
+                            inspection.Status.toLowerCase() === "completed"
                               ? "bg-green-100 text-green-800 hover:bg-green-100"
-                              : inspection.Status === "scheduled"
-                              ? "bg-blue-100 text-blue-800 hover:bg-blue-100"
-                              : inspection.Status === "overdue"
-                              ? "bg-red-100 text-red-800 hover:bg-red-100"
-                              : "bg-gray-100 text-gray-800 hover:bg-gray-100"
+                              : inspection.Status.toLowerCase() === "scheduled"
+                                ? "bg-blue-100 text-blue-800 hover:bg-blue-100"
+                                : inspection.Status.toLowerCase() === "overdue"
+                                  ? "bg-red-100 text-red-800 hover:bg-red-100"
+                                  : "bg-gray-100 text-gray-800 hover:bg-gray-100"
                           }
                         >
                           {inspection.Status.charAt(0).toUpperCase() +
@@ -321,7 +289,7 @@ const InspectionTab = () => {
                           size="sm"
                           onClick={() => {
                             router.push(
-                              `/home/veterinary-inspection/${inspection.Slug}`
+                              `/home/veterinary-inspection/${inspection.Slug}`,
                             );
                           }}
                         >
@@ -333,7 +301,7 @@ const InspectionTab = () => {
                           size="sm"
                           onClick={() => {
                             router.push(
-                              `/home/veterinary-inspection/${inspection.Slug}/View`
+                              `/home/veterinary-inspection/${Number(inspection.Slug)}/View`,
                             );
                           }}
                         >
