@@ -36,7 +36,7 @@ type ScreenKey =
   | "animal-screen"
   | "event-screens"
   // | "zoo-screen"
-  | "things-to-do-screen"
+  // | "things-to-do-screen"
   // | "inspection-history-screen"
   // | "inspection-form-screen"
   // | "map-screen"
@@ -93,15 +93,15 @@ const SCREEN_CONFIG: Record<ScreenKey, ScreenConfig> = {
   //   includeAnimalName: false,
   //   paramsPreview: "{ zooId }",
   // },
-  "things-to-do-screen": {
-    label: "Things To Do",
-    requiresZoo: true,
-    requiresAnimal: false,
-    requiresEvent: false,
-    requiresRoleId: false,
-    includeAnimalName: false,
-    paramsPreview: "{ zooId }",
-  },
+  // "things-to-do-screen": {
+  //   label: "Things To Do",
+  //   requiresZoo: true,
+  //   requiresAnimal: false,
+  //   requiresEvent: false,
+  //   requiresRoleId: false,
+  //   includeAnimalName: false,
+  //   paramsPreview: "{ zooId }",
+  // },
   // "inspection-history-screen": {
   //   label: "Inspection History",
   //   requiresZoo: true,
