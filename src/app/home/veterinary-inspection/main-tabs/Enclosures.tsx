@@ -292,7 +292,7 @@ const Enclosures = () => {
                         setCurrentPage(label);
                       }}
                       className={`${
-                        currentPage == label && "bg-main-gray"
+                        currentPage == label && "bg-main-background font-semibold"
                       }  text-main-navyBlue cursor-pointer`}
                     >
                       {label}

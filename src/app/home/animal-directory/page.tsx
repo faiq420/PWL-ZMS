@@ -336,7 +336,7 @@ export default function AnimalDirectoryPage() {
                         setCurrentPage(label);
                       }}
                       className={`${
-                        currentPage == label && "bg-main-gray"
+                        currentPage == label && "bg-main-background font-semibold"
                       }  text-main-secondaryText cursor-pointer`}
                     >
                       {label}
