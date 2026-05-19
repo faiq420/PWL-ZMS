@@ -64,10 +64,11 @@ export default function AnimalDirectoryPage() {
   const pageData = usePageData();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
-  const [activeTab, setActiveTab] = useState("all");
+  const [selectedZoo, setSelectedZoo] = useState("all");
   const [animalToDelete, setAnimalToDelete] = useState<number | null>(null);
   const [sortOrder, setSortOrder] = useState("name-asc");
   const [zoos, setZoos] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [animals, setAnimals] = useState<
     {
       AnimalId: number;
@@ -82,31 +83,31 @@ export default function AnimalDirectoryPage() {
 
   useEffect(() => {
     helper.xhr.Get("/Animal/GetAnimalsList").then((res) => {
-      console.log(res);
       setAnimals(
         res.map((animal: any) => ({
           ...animal,
           enclosureList: animal.animalMapping.flatMap(
-            (x: any) => x.EnclosureName
+            (x: any) => x.EnclosureName,
           ),
           zooList: animal.animalMapping.flatMap((x: any) => x.ZooTitle),
-        }))
+        })),
       );
     });
   }, []);
 
   const filteredAnimals = animals.filter((animal) => {
     const matchesSearch = animal.AnimalName.toLowerCase().includes(
-      searchTerm.toLowerCase()
+      searchTerm.toLowerCase(),
     );
 
     const matchesCategory =
-      activeTab === "all" ||
-      animal.CategoryName.toLowerCase() === activeTab.toLowerCase();
+      selectedCategory === "all" ||
+      animal.CategoryName.toLowerCase() === selectedCategory.toLowerCase();
 
     const matchesLocation =
-      selectedCategory == "all" ||
-      animal.zooList.some((location) => selectedCategory == location);
+      selectedZoo == "all" ||
+      // animal.zooList.some((location) => selectedZoo == location);
+      animal.zooList.includes(selectedZoo);
     return matchesSearch && matchesCategory && matchesLocation;
   });
 
@@ -128,7 +129,7 @@ export default function AnimalDirectoryPage() {
   const indexOfFirstPost = indexOfLastPost - postsPerPage;
   const currentPosts = sortedAnimals.slice(indexOfFirstPost, indexOfLastPost);
 
-  const totalPages = Math.ceil(animals.length / postsPerPage);
+  const totalPages = Math.ceil(sortedAnimals.length / postsPerPage);
   const paginationLabels = Array.from({ length: totalPages }, (_, i) => i + 1);
 
   /////////////////////////////////////
@@ -144,17 +145,24 @@ export default function AnimalDirectoryPage() {
   };
 
   useEffect(() => {
-    helper.xhr.Get("/Animal/GetAnimalsList").then((res) => {
-      console.log(res);
+    helper.xhr.Get("/List/GetAnimalCategoryList").then((res) => {
+      setCategories(
+        res.map((z: any) => {
+          return {
+            value: z.CategoryName,
+            label: z.CategoryName,
+          };
+        }),
+      );
     });
     helper.xhr.Get("/List/GetZooList").then((res) => {
       setZoos(
         res.map((z: any) => {
           return {
-            value: z.ZooId,
+            value: z.ZooTitle,
             label: z.ZooTitle,
           };
-        })
+        }),
       );
     });
   }, []);
@@ -176,6 +184,19 @@ export default function AnimalDirectoryPage() {
         />
         <div className="flex gap-2">
           <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+            <SelectTrigger className="w-[165px]">
+              <SelectValue placeholder="All Categories" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All</SelectItem>
+              {categories.map((category: any, index: number) => (
+                <SelectItem key={index} value={category.value}>
+                  {category.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select value={selectedZoo} onValueChange={setSelectedZoo}>
             <SelectTrigger className="w-[165px]">
               <SelectValue placeholder="All Zoos" />
             </SelectTrigger>
@@ -220,7 +241,7 @@ export default function AnimalDirectoryPage() {
                       className="flex items-center gap-1 cursor-pointer"
                       onClick={() =>
                         setSortOrder(
-                          sortOrder === "name-asc" ? "name-desc" : "name-asc"
+                          sortOrder === "name-asc" ? "name-desc" : "name-asc",
                         )
                       }
                     >
@@ -250,7 +271,7 @@ export default function AnimalDirectoryPage() {
                           size="sm"
                           onClick={() => {
                             router.push(
-                              `/home/animal-directory/${animal.AnimalId}`
+                              `/home/animal-directory/${animal.AnimalId}`,
                             );
                           }}
                         >
@@ -261,7 +282,7 @@ export default function AnimalDirectoryPage() {
                           size="sm"
                           onClick={() => {
                             router.push(
-                              `/home/animal-directory/${animal.AnimalId}?edit=true`
+                              `/home/animal-directory/${animal.AnimalId}?edit=true`,
                             );
                           }}
                         >
